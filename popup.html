@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h2>👻 BooTube</h2>
+    <div class="input-group">
+      <input type="text" id="newWord" placeholder="Add a word..." autocomplete="off">
+      <button id="addBtn">Add</button>
+    </div>
+    <ul id="wordList"></ul>
+    
+    <div class="settings-group">
+      <label class="toggle-switch">
+        <input type="checkbox" id="masterToggle">
+        <span class="slider"></span>
+      </label>
+      <span class="settings-label" style="font-weight: bold; color: #ff4757;">Enable Censor Filter</span>
+    </div>
+
+    <div class="settings-group" style="margin-top: 8px; padding-top: 0; border-top: none;">
+      <label class="toggle-switch">
+        <input type="checkbox" id="hideCcToggle">
+        <span class="slider"></span>
+      </label>
+      <span class="settings-label">Hide Captions on Screen</span>
+    </div>
+    
+    <div class="settings-group" style="margin-top: 8px; padding-top: 0; border-top: none;">
+      <label class="toggle-switch">
+        <input type="checkbox" id="blurToggle">
+        <span class="slider"></span>
+      </label>
+      <span class="settings-label">Blur Video on Censor</span>
+    </div>
+    
+    <div style="margin-top: 20px; text-align: center; border-top: 1px solid #3d3d3d; padding-top: 15px;">
+      <a id="supportLink" href="https://ko-fi.com/bootube" target="_blank" style="color: #4688F1; text-decoration: none; font-size: 13px; font-weight: 500;">
+        ❤️ Support the Developer
+      </a>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
