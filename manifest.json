@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "BooTube",
-  "version": "1.0",
-  "description": "Ghost the bad words on YouTube! Automatically mutes and blurs profanity in real-time.",
+  "name": "BooTube: The Ultimate Profanity Filter",
+  "version": "1.1",
+  "description": "Ghost the inappropriate words on YouTube. Automatically mutes audio and blurs the screen during profanity.",
   "permissions": [
     "storage"
   ],

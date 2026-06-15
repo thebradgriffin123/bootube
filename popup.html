@@ -2,11 +2,19 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <div class="container">
-    <h2>👻 BooTube</h2>
+    <h2 class="nav-title"><img src="logo.png" style="width:20px; vertical-align:middle; margin-right:5px; filter: drop-shadow(0 0 2px rgba(0,243,255,0.8));">Boo<span class="text-neon-red">Tube</span></h2>
+    <div class="support-container">
+      <a id="supportLink" href="https://ko-fi.com/bootube" target="_blank">
+        ❤️ Support the Developer
+      </a>
+    </div>
     <div class="input-group">
       <input type="text" id="newWord" placeholder="Add a word..." autocomplete="off">
       <button id="addBtn">Add</button>
@@ -14,34 +22,39 @@
     <ul id="wordList"></ul>
     
     <div class="settings-group">
+      <span class="settings-label" style="font-weight: bold; color: #ff3333;">Enable Censor Filter</span>
       <label class="toggle-switch">
         <input type="checkbox" id="masterToggle">
         <span class="slider"></span>
       </label>
-      <span class="settings-label" style="font-weight: bold; color: #ff4757;">Enable Censor Filter</span>
+    </div>
+    
+    <div class="help-text">
+      ⚠️ <strong>Important:</strong> BooTube requires YouTube's Closed Captions (CC) to be turned <strong>ON</strong> in the video player to detect words. If you turn CC off on YouTube, the filter will stop working!
     </div>
 
     <div class="settings-group" style="margin-top: 8px; padding-top: 0; border-top: none;">
+      <span class="settings-label">Hide Captions on Screen</span>
       <label class="toggle-switch">
         <input type="checkbox" id="hideCcToggle">
         <span class="slider"></span>
       </label>
-      <span class="settings-label">Hide Captions on Screen</span>
+    </div>
+    <div class="help-text">
+      Use this to hide the captions visually while keeping the filter running in the background.
     </div>
     
     <div class="settings-group" style="margin-top: 8px; padding-top: 0; border-top: none;">
+      <span class="settings-label">Blur Video on Censor</span>
       <label class="toggle-switch">
         <input type="checkbox" id="blurToggle">
         <span class="slider"></span>
       </label>
-      <span class="settings-label">Blur Video on Censor</span>
+    </div>
+    <div class="help-text">
+      When turned on, the entire video will heavily blur while an inappropriate word is spoken to prevent lip-reading and hide inappropriate visual context.
     </div>
     
-    <div style="margin-top: 20px; text-align: center; border-top: 1px solid #3d3d3d; padding-top: 15px;">
-      <a id="supportLink" href="https://ko-fi.com/bootube" target="_blank" style="color: #4688F1; text-decoration: none; font-size: 13px; font-weight: 500;">
-        ❤️ Support the Developer
-      </a>
-    </div>
   </div>
   <script src="popup.js"></script>
 </body>

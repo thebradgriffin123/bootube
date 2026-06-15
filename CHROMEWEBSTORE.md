@@ -8,10 +8,10 @@
 BooTube
 
 **Short Description** [REQUIRED]
-Ghost the bad words on YouTube! Automatically mutes and blurs profanity in real-time based on your custom word list.
+Ghost the inappropriate words on YouTube! Automatically mutes and blurs profanity in real-time based on your custom word list.
 
 **Detailed Description** [REQUIRED]
-BooTube is a powerful, privacy-first extension that ensures a family-friendly viewing experience by proactively ghosting bad words on YouTube.
+BooTube is a powerful, privacy-first extension that ensures a family-friendly viewing experience by proactively ghosting inappropriate words on YouTube. 
 
 Key features:
 - Automatically turns on Closed Captions (CC) behind the scenes to read upcoming dialog.

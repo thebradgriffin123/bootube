@@ -42,7 +42,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     wordListEl.innerHTML = '';
     blocklist.forEach((word, index) => {
       const li = document.createElement('li');
-      li.textContent = obfuscate(word);
+      
+      const textSpan = document.createElement('span');
+      textSpan.textContent = obfuscate(word);
+      textSpan.className = 'word-text';
+      
+      const btnGroup = document.createElement('div');
+      btnGroup.className = 'btn-group';
+      
+      const revealBtn = document.createElement('button');
+      revealBtn.className = 'reveal-btn';
+      revealBtn.innerHTML = '👁️';
+      let isRevealed = false;
+      revealBtn.onclick = () => {
+        isRevealed = !isRevealed;
+        textSpan.textContent = isRevealed ? word : obfuscate(word);
+        revealBtn.innerHTML = isRevealed ? '🙈' : '👁️';
+      };
       
       const delBtn = document.createElement('button');
       delBtn.className = 'delete-btn';
@@ -53,7 +69,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderList();
       };
       
-      li.appendChild(delBtn);
+      btnGroup.appendChild(revealBtn);
+      btnGroup.appendChild(delBtn);
+      
+      li.appendChild(textSpan);
+      li.appendChild(btnGroup);
       wordListEl.appendChild(li);
     });
   }
