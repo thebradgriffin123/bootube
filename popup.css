@@ -216,7 +216,7 @@ input:checked + .slider:before {
 .small-switch {
   width: 28px;
   height: 16px;
-  margin-right: 6px;
+  margin-right: 0;
 }
 
 .small-switch .slider:before {
