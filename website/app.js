@@ -202,30 +202,6 @@ document.addEventListener('DOMContentLoaded', () => {
     animateParticles();
   }
 
-  // --- 5. Floating Parallax Blocks ---
-  const blocksContainer = document.getElementById('floatingBlocks');
-  if (blocksContainer) {
-    for(let i=0; i<8; i++) {
-      let block = document.createElement('div');
-      block.className = 'floating-block';
-      block.style.left = Math.random() * 100 + 'vw';
-      block.style.top = Math.random() * 100 + 'vh';
-      block.style.width = (Math.random() * 100 + 50) + 'px';
-      block.style.height = block.style.width;
-      block.dataset.speed = Math.random() * 0.5 + 0.1;
-      blocksContainer.appendChild(block);
-    }
-    
-    window.addEventListener('scroll', () => {
-      let scrollY = window.scrollY;
-      const blocks = document.querySelectorAll('.floating-block');
-      blocks.forEach(block => {
-        let speed = block.dataset.speed;
-        block.style.transform = `translateY(${-scrollY * speed}px)`;
-      });
-    });
-  }
-
 
 
   // --- 7. Feature Card Glow Follow ---
