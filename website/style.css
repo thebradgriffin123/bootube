@@ -228,14 +228,3 @@ h1, h2, h3, h4 { font-weight: 700; line-height: 1.2; }
   .footer-grid { grid-template-columns: 1fr; text-align: center; }
 }
 
-/* Live Demo Custom Styles */
-.demo-input:focus {
-  border-color: var(--neon-cyan) !important;
-  box-shadow: inset 0 0 5px rgba(0, 243, 255, 0.2), 0 0 10px rgba(0, 243, 255, 0.3);
-}
-
-.demo-output span.censored {
-  color: var(--neon-red);
-  text-shadow: var(--red-glow);
-  font-weight: bold;
-}
