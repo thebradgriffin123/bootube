@@ -4,6 +4,8 @@ const DEFAULT_BLOCKLIST = [
   "motherfucker", "bastard", "[ __ ]", "[__]"
 ]; 
 let blocklist = [];
+let disabledWords = [];
+let activeBlocklist = [];
 let muteZones = [];
 
 let videoElement = null;
@@ -23,8 +25,10 @@ let queuedPayloads = [];
 console.log("🤬 [Censor] Content script loaded. Initializing bulletproof tracker...");
 
 // Initialize storage safely
-chrome.storage.local.get(['blocklist', 'hideCC', 'enableBlur', 'extensionEnabled'], (result) => {
+chrome.storage.local.get(['blocklist', 'disabledWords', 'hideCC', 'enableBlur', 'extensionEnabled'], (result) => {
   blocklist = result.blocklist || DEFAULT_BLOCKLIST;
+  disabledWords = result.disabledWords || [];
+  activeBlocklist = blocklist.filter(w => !disabledWords.includes(w));
   if (result.hideCC !== undefined) hideCC = result.hideCC;
   if (result.enableBlur !== undefined) enableBlur = result.enableBlur;
   if (result.extensionEnabled !== undefined) extensionEnabled = result.extensionEnabled;
@@ -40,6 +44,11 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
   if (namespace === 'local') {
     if (changes.blocklist) {
       blocklist = changes.blocklist.newValue || DEFAULT_BLOCKLIST;
+      activeBlocklist = blocklist.filter(w => !disabledWords.includes(w));
+    }
+    if (changes.disabledWords) {
+      disabledWords = changes.disabledWords.newValue || [];
+      activeBlocklist = blocklist.filter(w => !disabledWords.includes(w));
     }
     if (changes.hideCC) {
       hideCC = changes.hideCC.newValue;
@@ -145,7 +154,7 @@ function processCaptionData(data, isTranslated) {
       
       const cleanText = combinedText.replace(/[^\w\s'\[\]]/g, " ").replace(/\s+/g, " ").toLowerCase();
       
-      let wordsToCheck = [...blocklist];
+      let wordsToCheck = [...activeBlocklist];
       const autoCensoredMatches = cleanText.match(/\[\s*_+\s*\]/g);
       if (autoCensoredMatches) {
         wordsToCheck.push(...autoCensoredMatches);
@@ -235,7 +244,7 @@ function startFallbackObserver() {
         return clone.textContent;
       }).join(' ').replace(/[^\w\s'\[\]]/g, " ").replace(/\s+/g, ' ').toLowerCase();
       
-      const containsBadWord = blocklist.some(word => currentText.includes(word)) || /\[\s*_+\s*\]/.test(currentText);
+      const containsBadWord = activeBlocklist.some(word => currentText.includes(word)) || /\[\s*_+\s*\]/.test(currentText);
       if (containsBadWord && !fallbackIsMuting) {
         console.log(`🤬 [Censor] Fallback caught word: ${currentText}`);
         fallbackIsMuting = true;

@@ -222,4 +222,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // --- 6. Live Censor Demo ---
+  const demoInput = document.getElementById('demoInput');
+  const demoOutput = document.getElementById('demoOutput');
+  const demoSwearWords = ['shit', 'fuck', 'damn', 'bitch', 'asshole', 'crap']; // Hardcoded for demo
+
+  if (demoInput && demoOutput) {
+    demoInput.addEventListener('input', (e) => {
+      let text = e.target.value;
+      
+      if (!text.trim()) {
+        demoOutput.innerHTML = 'Waiting for input...';
+        demoOutput.style.color = 'var(--text-secondary)';
+        return;
+      }
+      
+      demoOutput.style.color = 'var(--text-primary)';
+      
+      let censoredText = text;
+      demoSwearWords.forEach(word => {
+        const regex = new RegExp(`\\b${word}\\b`, 'gi');
+        censoredText = censoredText.replace(regex, (match) => {
+          if (match.length <= 2) return `<span class="censored">${match[0]}*</span>`;
+          return `<span class="censored">${match[0]}${'*'.repeat(match.length - 2)}${match[match.length - 1]}</span>`;
+        });
+      });
+      
+      demoOutput.innerHTML = censoredText;
+    });
+  }
+
 });

@@ -19,6 +19,25 @@
       <input type="text" id="newWord" placeholder="Add a word..." autocomplete="off">
       <button id="addBtn">Add</button>
     </div>
+    <div class="list-actions-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding: 0 4px;">
+      <span class="settings-label" style="font-size: 11px; font-weight: bold; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; transform: translateY(1px); display: inline-block;">Blocklist</span>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <button id="bulkRevealBtn" class="bulk-action-btn" title="Reveal all words">
+          <svg id="eyeIconOpen" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          <svg id="eyeIconClosed" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+        </button>
+        <span id="deleteCounter" style="display: none; font-size: 11px; color: #ff4757; font-weight: bold; margin-right: 4px;">0 selected</span>
+        <button id="bulkDeleteBtn" class="bulk-action-btn" title="Delete words">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        </button>
+        <button id="confirmDeleteBtn" class="bulk-action-btn" title="Confirm Deletion" style="display: none; color: #ff4757;">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </button>
+        <button id="cancelDeleteBtn" class="bulk-action-btn" title="Cancel" style="display: none; color: var(--text-secondary);">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
     <ul id="wordList"></ul>
     
     <div class="settings-group">
