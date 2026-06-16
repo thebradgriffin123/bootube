@@ -33,6 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
       siteContent.style.opacity = '1';
       siteContent.style.pointerEvents = 'auto';
     }
+    if (video) {
+      video.style.opacity = '0';
+      setTimeout(() => { video.style.display = 'none'; }, 500);
+    }
     document.body.style.overflow = 'auto';
     initAudio(); // Init audio context on first user interaction
   }
