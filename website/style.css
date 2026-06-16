@@ -23,6 +23,12 @@ body {
   cursor: none;
 }
 
+/* Custom Global Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--surface-color); }
+::-webkit-scrollbar-thumb { background: rgba(0, 243, 255, 0.2); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--neon-cyan); }
+
 /* 1. Canvas Particles & Floating Blocks */
 #particleCanvas {
   position: fixed;
@@ -148,11 +154,35 @@ h1, h2, h3, h4 { font-weight: 700; line-height: 1.2; }
 /* Hero */
 .hero { position: relative; height: 100vh; min-height: 600px; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; padding-top: 60px; background: transparent; }
 .hero-content { z-index: 1; padding: 2rem; }
+.hero-title {
+  font-size: 3.5rem;
+  background: linear-gradient(270deg, var(--neon-cyan), #ffffff, #04B9CD);
+  background-size: 200% auto;
+  color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: gradientText 4s linear infinite;
+}
+@keyframes gradientText {
+  to { background-position: 200% center; }
+}
 
 /* Features */
 .features { padding: 8rem 0; background-color: rgba(5,5,5,0.8); }
 .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem; }
-.feature-card { background-color: var(--surface-color); padding: 3rem 2rem; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s ease; }
+.feature-card { position: relative; overflow: hidden; background-color: var(--surface-color); padding: 3rem 2rem; border-radius: 20px; text-align: center; border: 1px solid rgba(255,255,255,0.05); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s ease; }
+.feature-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle 600px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(0, 243, 255, 0.08), transparent 40%);
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.feature-card:hover::before { opacity: 1; }
+.feature-card > * { position: relative; z-index: 1; }
 .feature-card:hover { transform: translateY(-10px); border-color: rgba(0, 243, 255, 0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 .feature-icon { font-size: 3rem; margin-bottom: 1.5rem; }
 .feature-card h3 { font-size: 1.5rem; margin-bottom: 1rem; }
@@ -168,7 +198,7 @@ h1, h2, h3, h4 { font-weight: 700; line-height: 1.2; }
 .about-us { padding: 8rem 0; background-color: rgba(5,5,5,0.8); }
 .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
 .about-text p { margin-bottom: 1.5rem; color: var(--text-secondary); font-size: 1.1rem; }
-.about-image .glass-panel { background: rgba(17, 17, 17, 0.6); border: 1px solid rgba(0, 243, 255, 0.2); border-radius: 20px; padding: 4rem 3rem; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4), inset 0 0 20px rgba(0, 243, 255, 0.05); position: relative; overflow: hidden; }
+.about-image .glass-panel { background: rgba(17, 17, 17, 0.6); border: 1px solid rgba(0, 243, 255, 0.2); border-radius: 20px; padding: 4rem 3rem; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.6), inset 0 0 20px rgba(0, 243, 255, 0.05), inset 0 1px 0 rgba(255,255,255,0.1); position: relative; overflow: hidden; }
 .about-image .glass-panel::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(0,243,255,0.1) 0%, rgba(0,0,0,0) 70%); pointer-events: none; }
 .about-image .glass-panel h3 { color: var(--neon-cyan); margin-bottom: 1rem; font-size: 1.8rem; }
 
