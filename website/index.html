@@ -21,10 +21,11 @@
   <!-- Parallax Floating Blocks -->
   <div id="floatingBlocks"></div>
 
-  <!-- Fullscreen Auto-play Video -->
-  <video autoplay muted playsinline id="promoVideo" style="position: fixed; top: 0; left: 0; width: 100vw; height: auto; z-index: -2; opacity: 1; pointer-events: none; -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%); mask-image: linear-gradient(to bottom, black 60%, transparent 100%);">
+  <!-- Fullscreen Auto-play Video with Atmospheric Overlay -->
+  <video autoplay muted playsinline id="promoVideo" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -3; opacity: 0.6; pointer-events: none;">
     <source src="assets/bootube.mp4" type="video/mp4">
   </video>
+  <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle at center, rgba(10, 10, 10, 0.3) 0%, rgba(10, 10, 10, 0.9) 70%, rgba(10, 10, 10, 1) 100%); z-index: -2; pointer-events: none;"></div>
 
   <!-- Skip Intro Button -->
   <button id="skipIntroBtn" style="position: fixed; bottom: 2rem; right: 2rem; z-index: 999; padding: 0.8rem 1.5rem; border-radius: 50px; background: rgba(5,5,5,0.6); backdrop-filter: blur(5px); color: #fff; border: 1px solid rgba(255,255,255,0.2); font-family: 'Outfit', sans-serif; font-weight: 500; transition: opacity 0.5s ease; cursor: none;">Skip Intro ⏭️</button>
