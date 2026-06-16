@@ -89,10 +89,12 @@ input[type="text"]:focus {
 
 ul {
   list-style: none;
-  padding: 0;
+  padding: 0 0 25px 0;
   margin: 0;
   max-height: 180px;
   overflow-y: auto;
+  -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 25px), transparent 100%);
+  mask-image: linear-gradient(to bottom, black calc(100% - 25px), transparent 100%);
 }
 
 li {
