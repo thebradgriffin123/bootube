@@ -135,7 +135,9 @@ h1, h2, h3, h4 { font-weight: 700; line-height: 1.2; }
 
 .how-to-img {
   width: 100%;
-  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  object-position: top right;
   border-radius: 8px;
   margin-bottom: 1.5rem;
   border: 1px solid rgba(255,255,255,0.1);
