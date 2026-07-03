@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy | BooTube</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="assets/boo-tube-icon.svg">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .privacy-container {
+      max-width: 800px;
+      margin: 8rem auto 4rem auto;
+      padding: 2.5rem;
+      background: rgba(17, 17, 17, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+    }
+    .privacy-title {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      color: var(--neon-cyan);
+      text-shadow: var(--cyan-glow);
+    }
+    .privacy-meta {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 1rem;
+    }
+    .privacy-section {
+      margin-bottom: 2rem;
+    }
+    .privacy-section h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.8rem;
+      color: #ffffff;
+    }
+    .privacy-section p {
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      line-height: 1.7;
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--neon-cyan);
+      text-decoration: none;
+      font-weight: 500;
+      margin-bottom: 2rem;
+      transition: opacity 0.3s;
+    }
+    .back-btn:hover {
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="index.html" class="nav-brand">
+          <img src="assets/boo-tube-icon.svg" alt="BooTube Logo" class="nav-logo">
+          <span class="nav-title">Boo<span class="text-neon-red">Tube</span></span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Privacy Content -->
+    <div class="privacy-container">
+      <a href="index.html" class="back-btn">← Back to Home</a>
+      <h1 class="privacy-title">Privacy Policy</h1>
+      <div class="privacy-meta">Last updated: July 3, 2026</div>
+
+      <div class="privacy-section">
+        <h2>What Data We Collect</h2>
+        <p>BooTube collects absolutely no personal data, browsing history, or metrics. The only data collected is the list of censored words you manually add to your blocklist and your basic UI toggle preferences (e.g., whether the Blur effect is enabled).</p>
+      </div>
+
+      <div class="privacy-section">
+        <h2>How Data Is Stored</h2>
+        <p>Your custom blocklist and application preferences are stored locally on your device using local sandboxed storage. We do not maintain any cloud databases or external backups of your preferences.</p>
+      </div>
+
+      <div class="privacy-section">
+        <h2>How Data Is Used</h2>
+        <p>Your blocklist is used exclusively to scan the local closed-caption text of YouTube videos on your device to determine when to mute or blur the video player.</p>
+      </div>
+
+      <div class="privacy-section">
+        <h2>Third-Party Services</h2>
+        <p>This application does not use any third-party services, analytics trackers, or external APIs. All scanning and censoring algorithms run completely client-side in your local environment.</p>
+      </div>
+
+      <div class="privacy-section">
+        <h2>Data Sharing</h2>
+        <p>BooTube does NOT transmit any data off your device. Your blocklist and preferences are never shared with the developer, Google, or any third party.</p>
+      </div>
+
+      <div class="privacy-section">
+        <h2>Data Retention and Deletion</h2>
+        <p>Data is retained locally on your machine for as long as the application is installed. You can delete all your stored data at any time by uninstalling the application or clearing your custom blocklist inside the settings menu.</p>
+      </div>
+
+      <div class="privacy-section">
+        <h2>Contact</h2>
+        <p>For any privacy inquiries or questions regarding this policy, please contact us at support@mythic-makers.com.</p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <span class="nav-title">Boo<span class="text-neon-red">Tube</span></span>
+            <p class="text-secondary mt-1">Ghost the inappropriate words on YouTube.</p>
+          </div>
+          <div class="footer-links">
+            <h4>Links</h4>
+            <a href="index.html">Home</a>
+            <a href="index.html#about">About</a>
+          </div>
+          <div class="footer-links">
+            <h4>Legal</h4>
+            <a href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa" target="_blank">Chrome Web Store</a>
+            <a href="privacy.html">Privacy Policy</a>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <p>&copy; 2026 BooTube. Built for a cleaner internet.</p>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+</body>
+</html>
