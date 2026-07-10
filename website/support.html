@@ -432,9 +432,27 @@
     function handleFormSubmit(e) {
       e.preventDefault();
       
+      const name = document.getElementById('supportName').value;
+      const email = document.getElementById('supportEmail').value;
+      const platform = document.getElementById('supportPlatform').value;
+      const desc = document.getElementById('supportDesc').value;
+      
       // Generate a random ticket ID
       const randomId = "BT-" + Math.floor(10000 + Math.random() * 90000);
       document.getElementById('modalTicketId').innerText = "#" + randomId;
+      
+      // Construct mailto link with structured details
+      const subject = encodeURIComponent(`BooTube Support Request [${randomId}] - ${platform.toUpperCase()}`);
+      const body = encodeURIComponent(
+        `Ticket ID: #${randomId}\n` +
+        `Name: ${name}\n` +
+        `Email: ${email}\n` +
+        `Platform: ${platform.toUpperCase()}\n\n` +
+        `Description:\n${desc}`
+      );
+      
+      // Open default mail client
+      window.location.href = `mailto:support@mythic-makers.com?subject=${subject}&body=${body}`;
       
       // Open modal
       const backdrop = document.getElementById('successModalBackdrop');
