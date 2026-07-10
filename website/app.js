@@ -10,11 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const mobileLinks = document.querySelectorAll('.mobile-link');
   const skipBtn = document.getElementById('skipIntroBtn');
   
-  document.body.style.overflow = 'hidden';
-  
   if (video) {
+    document.body.style.overflow = 'hidden';
     video.addEventListener('ended', revealContent);
     video.addEventListener('click', revealContent);
+  } else {
+    document.body.style.overflow = 'auto';
   }
   
   if (skipBtn) {
