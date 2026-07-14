@@ -107,62 +107,56 @@ export default function LandingPage() {
           }}
         />
         
-        {/* Split-the-difference Gradient Overlays for readability and Dad visibility */}
-        {/* Desktop: Fade from 90% black on the left to 60% in the middle, then transparent on the right */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#050505]/90 via-[#050505]/60 to-transparent hidden lg:block z-1" />
+        {/* Cinematic Uniform Overlay & Vertical Vignette (for centered text contrast) */}
+        <div className="absolute inset-0 bg-black/65 z-1" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-transparent to-[#050505] z-1" />
         
-        {/* Mobile: Midpoint vertical fade */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/90 via-[#050505]/50 to-[#050505]/90 lg:hidden z-1" />
-        <div className="absolute inset-0 bg-black/35 lg:hidden z-1" /> {/* Midpoint subtle darkening */}
-
-        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-16 items-center relative z-10 py-16">
+        {/* Centered Content Container */}
+        <div className="max-w-5xl mx-auto w-full flex flex-col items-center justify-center text-center relative z-10 py-20 md:py-28">
           
-          {/* Left Hero Column: Copy and CTA */}
-          <div className="lg:col-span-7 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-950/40 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-6 backdrop-blur-sm">
-              ✨ Now supporting YouTube, Disney+, Hulu & Plex
-            </div>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white leading-[1.1] mb-6 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
-              Because &apos;Family Friendly&apos; shouldn&apos;t come with sudden surprises.
-            </h1>
-            <p className="text-lg md:text-xl text-gray-300 leading-relaxed mb-8 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] max-w-2xl mx-auto lg:mx-0">
-              Tired of scrambling for the remote? BooTube automatically mutes profanity and blasphemy in real-time. Clean up your favorite YouTube videos and podcasts, plus major streaming platforms, without cutting a single scene.
-            </p>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-950/45 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-8 backdrop-blur-sm">
+            ✨ Now supporting YouTube, Disney+, Hulu & Plex
+          </div>
+          
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.1] mb-6 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] max-w-4xl">
+            Because &apos;Family Friendly&apos; shouldn&apos;t come with sudden surprises.
+          </h1>
+          
+          <p className="text-lg md:text-xl text-gray-300 leading-relaxed mb-10 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] max-w-3xl">
+            Tired of scrambling for the remote? BooTube automatically mutes profanity and blasphemy in real-time. Clean up your favorite YouTube videos and podcasts, plus major streaming platforms, without cutting a single scene.
+          </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
-              <a 
-                href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa" 
-                target="_blank"
-                className="w-full sm:w-auto text-center px-8 py-4 bg-white text-black font-extrabold rounded-full shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] transition-all hover:bg-gray-100"
-              >
-                Get BooTube — It&apos;s Free
-              </a>
-              <a 
-                href="#pricing" 
-                className="w-full sm:w-auto text-center px-8 py-4 border border-white/10 hover:border-white/20 bg-black/40 hover:bg-black/60 backdrop-blur-sm text-white font-semibold rounded-full transition-all"
-              >
-                View Premium Plans
-              </a>
-            </div>
-
-            <p className="text-sm text-gray-400 mt-5 italic drop-shadow-[0_1px_5px_rgba(0,0,0,0.8)]">
-              Blasphemy filtering is 100% free. Upgrade to filter profanity, blur screens, and add custom words for just $3.99/month.
-            </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full sm:w-auto mb-6">
+            <a 
+              href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa" 
+              target="_blank"
+              className="w-full sm:w-auto text-center px-10 py-4.5 bg-white text-black font-extrabold rounded-full shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:shadow-[0_0_45px_rgba(255,255,255,0.35)] transition-all hover:bg-gray-100 text-base"
+            >
+              Get BooTube — It&apos;s Free
+            </a>
+            <a 
+              href="#pricing" 
+              className="w-full sm:w-auto text-center px-10 py-4.5 border border-white/15 hover:border-white/25 bg-black/45 hover:bg-black/60 backdrop-blur-sm text-white font-semibold rounded-full transition-all text-base"
+            >
+              View Premium Plans
+            </a>
           </div>
 
-          {/* Right Hero Column: HUD Indicator overlay */}
-          <div className="lg:col-span-5 flex justify-center lg:justify-end">
-            <div className="p-5 rounded-2xl border border-white/10 bg-black/60 backdrop-blur-md shadow-2xl flex items-center justify-between gap-6 max-w-[340px] w-full transform hover:scale-105 transition-transform duration-300">
-              <div className="flex items-center gap-3">
-                <div className="w-3 h-3 rounded-full bg-cyan-400 animate-ping" />
-                <div>
-                  <h4 className="text-xs font-bold text-white tracking-wide uppercase">Active Filter</h4>
-                  <p className="text-[10px] text-gray-400">YouTube, Disney+, Hulu, Plex</p>
-                </div>
+          <p className="text-sm text-gray-400 mb-12 italic drop-shadow-[0_1px_5px_rgba(0,0,0,0.9)]">
+            Blasphemy filtering is 100% free. Upgrade to filter profanity, blur screens, and add custom words for just $3.99/month.
+          </p>
+
+          {/* Centered HUD Indicator */}
+          <div className="p-5 rounded-2xl border border-white/10 bg-black/60 backdrop-blur-md shadow-2xl flex items-center justify-between gap-6 max-w-[340px] w-full transform hover:scale-105 transition-transform duration-300">
+            <div className="flex items-center gap-3">
+              <div className="w-3 h-3 rounded-full bg-cyan-400 animate-ping" />
+              <div>
+                <h4 className="text-xs font-bold text-white tracking-wide uppercase">Active Filter</h4>
+                <p className="text-[10px] text-gray-400">YouTube, Disney+, Hulu, Plex</p>
               </div>
-              <div className="px-3.5 py-2 rounded-lg bg-cyan-950/40 border border-cyan-500/20 text-[10px] font-black uppercase text-cyan-400 tracking-wider">
-                🔇 Sound Muted
-              </div>
+            </div>
+            <div className="px-3.5 py-2 rounded-lg bg-cyan-950/40 border border-cyan-500/20 text-[10px] font-black uppercase text-cyan-400 tracking-wider">
+              🔇 Sound Muted
             </div>
           </div>
 
