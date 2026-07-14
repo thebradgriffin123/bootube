@@ -99,9 +99,9 @@ export default function LandingPage() {
       {/* Netflix-Style Hero Section (Full-bleed Background) */}
       <section className="relative min-h-screen flex items-center px-6 pt-20">
         
-        {/* Hero Background Image (Un-flipped) */}
+        {/* Hero Background Image with Parallax (bg-fixed on desktop) */}
         <div 
-          className="absolute inset-0 bg-cover bg-center z-0"
+          className="absolute inset-0 bg-cover bg-center lg:bg-fixed z-0"
           style={{ 
             backgroundImage: "url('/hero-bg.jpg')"
           }}
