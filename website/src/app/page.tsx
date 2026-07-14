@@ -27,11 +27,6 @@ export default function LandingPage() {
 
   return (
     <div className="relative min-h-screen bg-[#050505] text-gray-100 overflow-x-hidden selection:bg-cyan-500 selection:text-black">
-      
-      {/* Dynamic Background Glows */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-cyan-900/10 blur-[120px] pointer-events-none" />
-      <div className="absolute top-[40%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-red-900/10 blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[20%] w-[50vw] h-[50vw] rounded-full bg-cyan-900/10 blur-[120px] pointer-events-none" />
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#050505]/60 backdrop-blur-md">
@@ -101,19 +96,31 @@ export default function LandingPage() {
         )}
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative pt-32 pb-24 md:pt-40 md:pb-32 px-6 overflow-hidden">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+      {/* Netflix-Style Hero Section (Full-bleed Background) */}
+      <section 
+        className="relative min-h-screen flex items-center px-6 bg-cover bg-center pt-20"
+        style={{ backgroundImage: "url('/hero-bg.jpg')" }}
+      >
+        
+        {/* Cinematic Gradient Overlays for Readability */}
+        {/* Desktop: Fade from solid black on the left (text) to semi-transparent on the right */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/85 to-transparent hidden lg:block" />
+        
+        {/* Mobile: Vertical fade (darker at top/bottom, semi-transparent in middle) */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-[#050505]/75 to-[#050505] lg:hidden" />
+        <div className="absolute inset-0 bg-black/45 lg:hidden" /> {/* Subtle darkening to aid contrast */}
+
+        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-16 items-center relative z-10 py-16">
           
-          {/* Left Hero Column */}
-          <div className="lg:col-span-7 z-10 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-cyan-500/20 bg-cyan-950/20 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-6">
+          {/* Left Hero Column: Copy and CTA */}
+          <div className="lg:col-span-7 text-center lg:text-left">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-950/40 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-6 backdrop-blur-sm">
               ✨ Introducing Unified Cloud Syncing
             </div>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white leading-[1.1] mb-6">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white leading-[1.1] mb-6 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
               Because &apos;Family Friendly&apos; shouldn&apos;t come with sudden surprises.
             </h1>
-            <p className="text-lg md:text-xl text-gray-400 leading-relaxed mb-8">
+            <p className="text-lg md:text-xl text-gray-300 leading-relaxed mb-8 drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] max-w-2xl mx-auto lg:mx-0">
               Tired of scrambling for the remote? BooTube automatically mutes profanity and blasphemy in real-time. Clean up your favorite YouTube videos and podcasts, plus major streaming platforms, without cutting a single scene.
             </p>
 
@@ -127,48 +134,33 @@ export default function LandingPage() {
               </a>
               <a 
                 href="#pricing" 
-                className="w-full sm:w-auto text-center px-8 py-4 border border-white/10 hover:border-white/20 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-full transition-all"
+                className="w-full sm:w-auto text-center px-8 py-4 border border-white/10 hover:border-white/20 bg-black/40 hover:bg-black/60 backdrop-blur-sm text-white font-semibold rounded-full transition-all"
               >
                 View Premium Plans
               </a>
             </div>
 
-            <p className="text-sm text-gray-500 mt-5 italic">
+            <p className="text-sm text-gray-400 mt-5 italic drop-shadow-[0_1px_5px_rgba(0,0,0,0.8)]">
               Blasphemy filtering is 100% free. Upgrade to filter profanity, blur screens, and add custom words for just $3.99/month.
             </p>
           </div>
 
-          {/* Right Hero Column (Visual Frame) */}
-          <div className="lg:col-span-5 relative flex justify-center z-10">
-            <div className="relative group w-full max-w-[500px] lg:max-w-none">
-              
-              {/* Glassmorphic border behind the hero image */}
-              <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-cyan-500 to-red-500 opacity-30 blur-md group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
-              
-              {/* Main Image Panel */}
-              <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-black">
-                <img 
-                  src="/hero-bg.jpg" 
-                  alt="Family watching movies safely with BooTube" 
-                  className="w-full object-cover aspect-[16/10] sm:aspect-[16/9] lg:aspect-square filter brightness-95 group-hover:scale-[1.02] transition-transform duration-700"
-                />
-                
-                {/* Floating UI HUD elements */}
-                <div className="absolute bottom-4 left-4 right-4 p-4 rounded-xl border border-white/10 bg-black/70 backdrop-blur-md shadow-2xl flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
-                    <div>
-                      <h4 className="text-xs font-bold text-white tracking-wide uppercase">Active Filter</h4>
-                      <p className="text-[10px] text-gray-400">YouTube, Disney+, Hulu, Plex</p>
-                    </div>
-                  </div>
-                  <div className="px-3 py-1.5 rounded-lg bg-cyan-950/40 border border-cyan-500/20 text-[10px] font-black uppercase text-cyan-400">
-                    🔇 Sound Muted
-                  </div>
+          {/* Right Hero Column: HUD Indicator overlay */}
+          <div className="lg:col-span-5 flex justify-center lg:justify-end">
+            <div className="p-5 rounded-2xl border border-white/10 bg-black/60 backdrop-blur-md shadow-2xl flex items-center justify-between gap-6 max-w-[340px] w-full transform hover:scale-105 transition-transform duration-300">
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 rounded-full bg-cyan-400 animate-ping" />
+                <div>
+                  <h4 className="text-xs font-bold text-white tracking-wide uppercase">Active Filter</h4>
+                  <p className="text-[10px] text-gray-400">YouTube, Disney+, Hulu, Plex</p>
                 </div>
+              </div>
+              <div className="px-3.5 py-2 rounded-lg bg-cyan-950/40 border border-cyan-500/20 text-[10px] font-black uppercase text-cyan-400 tracking-wider">
+                🔇 Sound Muted
               </div>
             </div>
           </div>
+
         </div>
       </section>
 
