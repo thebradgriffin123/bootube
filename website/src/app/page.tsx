@@ -97,18 +97,24 @@ export default function LandingPage() {
       </nav>
 
       {/* Netflix-Style Hero Section (Full-bleed Background) */}
-      <section 
-        className="relative min-h-screen flex items-center px-6 bg-cover bg-center pt-20"
-        style={{ backgroundImage: "url('/hero-bg.jpg')" }}
-      >
+      <section className="relative min-h-screen flex items-center px-6 pt-20">
         
-        {/* Cinematic Gradient Overlays for Readability */}
+        {/* Horizontally Flipped Background Image (Moves Dad to the visible right side) */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center z-0"
+          style={{ 
+            backgroundImage: "url('/hero-bg.jpg')",
+            transform: "scaleX(-1)"
+          }}
+        />
+        
+        {/* Cinematic Gradient Overlays for Readability (Un-flipped) */}
         {/* Desktop: Fade from solid black on the left (text) to semi-transparent on the right */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/85 to-transparent hidden lg:block" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/85 to-transparent hidden lg:block z-1" />
         
         {/* Mobile: Vertical fade (darker at top/bottom, semi-transparent in middle) */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-[#050505]/75 to-[#050505] lg:hidden" />
-        <div className="absolute inset-0 bg-black/45 lg:hidden" /> {/* Subtle darkening to aid contrast */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-[#050505]/75 to-[#050505] lg:hidden z-1" />
+        <div className="absolute inset-0 bg-black/45 lg:hidden z-1" /> {/* Subtle darkening to aid contrast */}
 
         <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-16 items-center relative z-10 py-16">
           
