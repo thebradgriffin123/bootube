@@ -115,7 +115,7 @@ export default function LandingPage() {
           {/* Left Hero Column: Copy and CTA */}
           <div className="lg:col-span-7 text-center lg:text-left">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-950/40 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-6 backdrop-blur-sm">
-              ✨ Introducing Unified Cloud Syncing
+              ✨ Now supporting YouTube, Disney+, Hulu & Plex
             </div>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white leading-[1.1] mb-6 drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
               Because &apos;Family Friendly&apos; shouldn&apos;t come with sudden surprises.
