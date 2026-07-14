@@ -107,13 +107,13 @@ export default function LandingPage() {
           }}
         />
         
-        {/* Lightened Gradient Overlays for Dad visibility */}
-        {/* Desktop: Fade from 80% black on the left to 40% in the middle, then transparent on the right */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#050505]/80 via-[#050505]/40 to-transparent hidden lg:block z-1" />
+        {/* Split-the-difference Gradient Overlays for readability and Dad visibility */}
+        {/* Desktop: Fade from 90% black on the left to 60% in the middle, then transparent on the right */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#050505]/90 via-[#050505]/60 to-transparent hidden lg:block z-1" />
         
-        {/* Mobile: Lightened vertical fade */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/80 via-[#050505]/35 to-[#050505]/80 lg:hidden z-1" />
-        <div className="absolute inset-0 bg-black/25 lg:hidden z-1" /> {/* Lightened subtle darkening */}
+        {/* Mobile: Midpoint vertical fade */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/90 via-[#050505]/50 to-[#050505]/90 lg:hidden z-1" />
+        <div className="absolute inset-0 bg-black/35 lg:hidden z-1" /> {/* Midpoint subtle darkening */}
 
         <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-16 items-center relative z-10 py-16">
           
