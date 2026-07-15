@@ -114,9 +114,7 @@ export default function LandingPage() {
         {/* Centered Content Container */}
         <div className="max-w-5xl mx-auto w-full flex flex-col items-center justify-center text-center relative z-10 py-20 md:py-28">
           
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-cyan-500/30 bg-cyan-950/45 text-cyan-400 text-xs font-bold uppercase tracking-wider mb-8 backdrop-blur-sm">
-            ✨ Now supporting YouTube, Disney+, Hulu & Plex
-          </div>
+
           
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.1] mb-6 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] max-w-4xl">
             Keep your streams clean.
