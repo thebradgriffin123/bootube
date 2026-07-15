@@ -85,7 +85,7 @@ export default function ForgotPasswordPage() {
               )}
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Email Address</label>
+                <label className="block text-xs font-bold text-gray-400 mb-2">Email address</label>
                 <input 
                   type="email" 
                   required

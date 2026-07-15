@@ -94,7 +94,7 @@ export default function SignupPage() {
               )}
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Email Address</label>
+                <label className="block text-xs font-bold text-gray-400 mb-2">Email address</label>
                 <input 
                   type="email" 
                   required
@@ -106,7 +106,7 @@ export default function SignupPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Password</label>
+                <label className="block text-xs font-bold text-gray-400 mb-2">Password</label>
                 <input 
                   type="password" 
                   required
@@ -118,7 +118,7 @@ export default function SignupPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Confirm Password</label>
+                <label className="block text-xs font-bold text-gray-400 mb-2">Confirm password</label>
                 <input 
                   type="password" 
                   required

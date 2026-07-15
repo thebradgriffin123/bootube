@@ -109,7 +109,7 @@ export default function ResetPasswordPage() {
               {!error || (error && !error.includes('expired')) ? (
                 <>
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">New Password</label>
+                    <label className="block text-xs font-bold text-gray-400 mb-2">New password</label>
                     <input 
                       type="password" 
                       required
@@ -121,7 +121,7 @@ export default function ResetPasswordPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Confirm New Password</label>
+                    <label className="block text-xs font-bold text-gray-400 mb-2">Confirm new password</label>
                     <input 
                       type="password" 
                       required

@@ -68,7 +68,7 @@ export default function LoginPage() {
             )}
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Email Address</label>
+              <label className="block text-xs font-bold text-gray-400 mb-2">Email address</label>
               <input 
                 type="email" 
                 required
@@ -80,13 +80,14 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Password</label>
+              <label className="block text-xs font-bold text-gray-400 mb-2">Password</label>
               <input 
                 type="password" 
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
+                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all"
               />
             </div>
 
