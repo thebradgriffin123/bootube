@@ -63,7 +63,7 @@ export default function SignupPage() {
             />
           </Link>
           <h2 className="text-xl font-bold text-white mt-4">Create your account</h2>
-          <p className="text-xs text-gray-400 mt-1">Get started with clean, custom streaming.</p>
+          <p className="text-xs text-gray-400 mt-1">Get started with custom, clean streaming.</p>
         </div>
 
         {/* Form Card */}
