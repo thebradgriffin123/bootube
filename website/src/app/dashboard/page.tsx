@@ -82,6 +82,82 @@ export default function DashboardPage() {
     checkUser();
   }, [router]);
 
+  const [billingLoading, setBillingLoading] = useState(false);
+
+  const handleUpgrade = async () => {
+    setBillingLoading(true);
+    setNotification(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        setNotification({ type: 'error', message: 'You must be logged in to upgrade.' });
+        return;
+      }
+
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || 'Failed to create checkout session.');
+      }
+
+      const { url } = await res.json();
+      if (url) {
+        window.location.href = url;
+      } else {
+        throw new Error('No checkout redirect URL returned.');
+      }
+    } catch (err: any) {
+      console.error('Upgrade redirection error:', err);
+      setNotification({ type: 'error', message: err.message || 'Failed to redirect to checkout.' });
+    } finally {
+      setBillingLoading(false);
+    }
+  };
+
+  const handleManageBilling = async () => {
+    setBillingLoading(true);
+    setNotification(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        setNotification({ type: 'error', message: 'You must be logged in to manage subscription.' });
+        return;
+      }
+
+      const res = await fetch('/api/portal', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || 'Failed to create portal session.');
+      }
+
+      const { url } = await res.json();
+      if (url) {
+        window.location.href = url;
+      } else {
+        throw new Error('No portal redirect URL returned.');
+      }
+    } catch (err: any) {
+      console.error('Portal redirection error:', err);
+      setNotification({ type: 'error', message: err.message || 'Failed to redirect to billing portal.' });
+    } finally {
+      setBillingLoading(false);
+    }
+  };
+
   const handleSaveSettings = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile) return;
@@ -208,13 +284,24 @@ export default function DashboardPage() {
                 <span className={`w-2.5 h-2.5 rounded-full ${isPremium ? 'bg-cyan-400 animate-pulse' : 'bg-gray-500'}`} />
               </div>
             </div>
-            {!isPremium && (
-              <a 
-                href="/#pricing" 
-                className="px-4 py-2 bg-white text-black font-extrabold text-xs rounded-lg hover:bg-gray-200 transition-all shadow-md"
+            {!isPremium ? (
+              <button 
+                type="button"
+                onClick={handleUpgrade}
+                disabled={billingLoading}
+                className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-extrabold text-xs rounded-lg transition-all shadow-md disabled:opacity-50 cursor-pointer"
               >
-                Upgrade
-              </a>
+                {billingLoading ? 'Loading...' : 'Upgrade'}
+              </button>
+            ) : (
+              <button 
+                type="button"
+                onClick={handleManageBilling}
+                disabled={billingLoading}
+                className="px-4 py-2 bg-white/[0.05] border border-white/10 hover:bg-white/[0.1] text-white font-extrabold text-xs rounded-lg transition-all shadow-md disabled:opacity-50 cursor-pointer"
+              >
+                {billingLoading ? 'Loading...' : 'Manage Billing'}
+              </button>
             )}
           </div>
         </div>
