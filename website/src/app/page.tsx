@@ -146,19 +146,7 @@ export default function LandingPage() {
             Blasphemy filtering is 100% free. Upgrade to filter profanity, blur screens, and add custom words for just $3.99/month.
           </p>
 
-          {/* Centered HUD Indicator */}
-          <div className="p-5 rounded-2xl border border-white/10 bg-black/60 backdrop-blur-md shadow-2xl flex items-center justify-between gap-6 max-w-[340px] w-full transform hover:scale-105 transition-transform duration-300">
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-cyan-400 animate-ping" />
-              <div>
-                <h4 className="text-xs font-bold text-white tracking-wide uppercase">Active Filter</h4>
-                <p className="text-[10px] text-gray-400">YouTube, Disney+, Hulu, Plex</p>
-              </div>
-            </div>
-            <div className="px-3.5 py-2 rounded-lg bg-cyan-950/40 border border-cyan-500/20 text-[10px] font-black uppercase text-cyan-400 tracking-wider">
-              🔇 Sound Muted
-            </div>
-          </div>
+
 
         </div>
       </section>
