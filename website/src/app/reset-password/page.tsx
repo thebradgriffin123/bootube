@@ -9,9 +9,21 @@ export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [confirmError, setConfirmError] = useState<string | null>(null);
+  const [showValidation, setShowValidation] = useState(false);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  // Password complexity strength evaluation
+  const passwordReqs = {
+    length: password.length >= 8,
+    casing: /[a-z]/.test(password) && /[A-Z]/.test(password),
+    number: /[0-9]/.test(password),
+    special: /[^a-zA-Z0-9]/.test(password),
+  };
+  const isPasswordStrong = Object.values(passwordReqs).every(Boolean);
 
   // Verify that an active session exists (Supabase should have auto-set it from the URL hash)
   useEffect(() => {
@@ -27,14 +39,19 @@ export default function ResetPasswordPage() {
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setPasswordError(null);
+    setConfirmError(null);
+    setShowValidation(true);
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.');
+    // 1. Password complexity check
+    if (!isPasswordStrong) {
+      setPasswordError('Password does not meet the complexity requirements.');
       return;
     }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long.');
+    // 2. Match check
+    if (password !== confirmPassword) {
+      setConfirmError('Passwords do not match.');
       return;
     }
 
@@ -114,10 +131,51 @@ export default function ResetPasswordPage() {
                       type="password" 
                       required
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                        if (passwordError) setPasswordError(null);
+                      }}
                       placeholder="••••••••"
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all"
+                      className={`w-full bg-white/[0.03] border rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-1 transition-all ${
+                        passwordError || (showValidation && !isPasswordStrong)
+                          ? 'border-red-500/50 focus:border-red-500/50 focus:ring-red-500/50'
+                          : 'border-white/10 focus:border-cyan-500/50 focus:ring-cyan-500/50'
+                      }`}
                     />
+                    {passwordError && (
+                      <p className="text-red-400 text-[11px] mt-1.5 flex items-center gap-1">
+                        ⚠️ {passwordError}
+                      </p>
+                    )}
+
+                    {/* Password strength checklist */}
+                    <div className="mt-2.5 p-3 rounded-lg bg-white/[0.01] border border-white/5 space-y-1.5 text-[11px]">
+                      <div className="text-gray-400 font-semibold mb-1">Password requirements:</div>
+                      <div className="flex items-center gap-2">
+                        <span className={passwordReqs.length ? "text-cyan-400 font-bold" : "text-gray-600"}>
+                          {passwordReqs.length ? "✓" : "○"}
+                        </span>
+                        <span className={passwordReqs.length ? "text-gray-300" : "text-gray-500"}>At least 8 characters</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={passwordReqs.casing ? "text-cyan-400 font-bold" : "text-gray-600"}>
+                          {passwordReqs.casing ? "✓" : "○"}
+                        </span>
+                        <span className={passwordReqs.casing ? "text-gray-300" : "text-gray-500"}>Uppercase & lowercase letters</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={passwordReqs.number ? "text-cyan-400 font-bold" : "text-gray-600"}>
+                          {passwordReqs.number ? "✓" : "○"}
+                        </span>
+                        <span className={passwordReqs.number ? "text-gray-300" : "text-gray-500"}>At least one number (0-9)</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={passwordReqs.special ? "text-cyan-400 font-bold" : "text-gray-600"}>
+                          {passwordReqs.special ? "✓" : "○"}
+                        </span>
+                        <span className={passwordReqs.special ? "text-gray-300" : "text-gray-500"}>At least one special character (!@#$)</span>
+                      </div>
+                    </div>
                   </div>
 
                   <div>
@@ -126,10 +184,22 @@ export default function ResetPasswordPage() {
                       type="password" 
                       required
                       value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      onChange={(e) => {
+                        setConfirmPassword(e.target.value);
+                        if (confirmError) setConfirmError(null);
+                      }}
                       placeholder="••••••••"
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all"
+                      className={`w-full bg-white/[0.03] border rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-1 transition-all ${
+                        confirmError || (showValidation && password !== confirmPassword)
+                          ? 'border-red-500/50 focus:border-red-500/50 focus:ring-red-500/50'
+                          : 'border-white/10 focus:border-cyan-500/50 focus:ring-cyan-500/50'
+                      }`}
                     />
+                    {(confirmError || (showValidation && password !== confirmPassword)) && (
+                      <p className="text-red-400 text-[11px] mt-1.5 flex items-center gap-1">
+                        ⚠️ {confirmError || 'Passwords do not match.'}
+                      </p>
+                    )}
                   </div>
 
                   <button 
