@@ -57,10 +57,17 @@ export default function DashboardPage() {
             buffer_timer: 1
           });
         } else if (data) {
-          setProfile(data);
-          setCustomBlockedWords((data.custom_blocked_words ?? []).join(', '));
-          setBlurScreens(data.blur_screens ?? false);
-          setBufferTimer(data.buffer_timer ?? 1);
+          const mappedProfile: UserProfile = {
+            id: data.id,
+            subscription_status: data.subscription_status,
+            custom_blocked_words: data.custom_filter_words || [],
+            blur_screens: data.blur_screen_enabled || false,
+            buffer_timer: data.buffer_timer_seconds ?? 1
+          };
+          setProfile(mappedProfile);
+          setCustomBlockedWords((mappedProfile.custom_blocked_words ?? []).join(', '));
+          setBlurScreens(mappedProfile.blur_screens ?? false);
+          setBufferTimer(mappedProfile.buffer_timer ?? 1);
         }
       } catch (err) {
         console.error('Auth check error:', err);
@@ -103,9 +110,9 @@ export default function DashboardPage() {
       const { error } = await supabase
         .from('profiles')
         .update({
-          custom_blocked_words: wordsArray,
-          blur_screens: blurScreens,
-          buffer_timer: bufferTimer,
+          custom_filter_words: wordsArray,
+          blur_screen_enabled: blurScreens,
+          buffer_timer_seconds: bufferTimer,
         })
         .eq('id', profile.id);
 
