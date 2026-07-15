@@ -119,11 +119,11 @@ export default function LandingPage() {
           </div>
           
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.1] mb-6 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] max-w-4xl">
-            Mute the profanity. Keep the show.
+            Keep your streams clean.
           </h1>
           
           <p className="text-lg md:text-xl text-gray-300 leading-relaxed mb-10 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] max-w-3xl">
-            Tired of scrambling for the remote? BooTube automatically mutes profanity and blasphemy in real-time. Clean up your favorite YouTube videos and podcasts, plus major streaming platforms, without cutting a single scene.
+            BooTube automatically ghosts profanity and blasphemy in real-time. Muting the language, never the video.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full sm:w-auto mb-6">
