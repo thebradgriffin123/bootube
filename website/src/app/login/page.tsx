@@ -9,12 +9,25 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  
+  // Track focus/blur interactions
+  const [emailTouched, setEmailTouched] = useState(false);
+  const [showValidation, setShowValidation] = useState(false);
+  
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  // Email validation regex check
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setShowValidation(true);
+    setEmailTouched(true);
+
+    if (!isEmailValid) return;
+
     setLoading(true);
 
     try {
@@ -59,7 +72,7 @@ export default function LoginPage() {
 
         {/* Form Card */}
         <div className="bg-white/[0.02] border border-white/5 backdrop-blur-md rounded-2xl p-8 shadow-2xl">
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleLogin} noValidate className="space-y-5">
             
             {error && (
               <div className="p-3 rounded-lg bg-red-950/20 border border-red-500/20 text-xs text-red-400">
@@ -71,19 +84,27 @@ export default function LoginPage() {
               <label className="block text-xs font-bold text-gray-400 mb-2">Email address</label>
               <input 
                 type="email" 
-                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onBlur={() => setEmailTouched(true)}
                 placeholder="name@domain.com"
-                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all"
+                className={`w-full bg-white/[0.03] border rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-1 transition-all ${
+                  (emailTouched || showValidation) && !isEmailValid
+                    ? 'border-red-500/50 focus:border-red-500/50 focus:ring-red-500/50'
+                    : 'border-white/10 focus:border-cyan-500/50 focus:ring-cyan-500/50'
+                }`}
               />
+              {(emailTouched || showValidation) && !isEmailValid && (
+                <p className="text-red-400 text-xs mt-1.5">
+                  Please enter a valid email address.
+                </p>
+              )}
             </div>
 
             <div>
               <label className="block text-xs font-bold text-gray-400 mb-2">Password</label>
               <input 
                 type="password" 
-                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"

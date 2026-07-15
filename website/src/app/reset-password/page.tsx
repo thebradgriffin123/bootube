@@ -9,8 +9,11 @@ export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
-  const [confirmError, setConfirmError] = useState<string | null>(null);
+  
+  // Track focus/blur interactions
+  const [passwordTouched, setPasswordTouched] = useState(false);
+  const [confirmTouched, setConfirmTouched] = useState(false);
+  
   const [showValidation, setShowValidation] = useState(false);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -39,21 +42,15 @@ export default function ResetPasswordPage() {
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setPasswordError(null);
-    setConfirmError(null);
     setShowValidation(true);
+    setPasswordTouched(true);
+    setConfirmTouched(true);
 
     // 1. Password complexity check
-    if (!isPasswordStrong) {
-      setPasswordError('Password does not meet the complexity requirements.');
-      return;
-    }
+    if (!isPasswordStrong) return;
 
     // 2. Match check
-    if (password !== confirmPassword) {
-      setConfirmError('Passwords do not match.');
-      return;
-    }
+    if (password !== confirmPassword) return;
 
     setLoading(true);
 
@@ -114,7 +111,7 @@ export default function ResetPasswordPage() {
               </p>
             </div>
           ) : (
-            <form onSubmit={handlePasswordReset} className="space-y-5">
+            <form onSubmit={handlePasswordReset} noValidate className="space-y-5">
               
               {error && (
                 <div className="p-3 rounded-lg bg-red-950/20 border border-red-500/20 text-xs text-red-400">
@@ -129,22 +126,19 @@ export default function ResetPasswordPage() {
                     <label className="block text-xs font-bold text-gray-400 mb-2">New password</label>
                     <input 
                       type="password" 
-                      required
                       value={password}
-                      onChange={(e) => {
-                        setPassword(e.target.value);
-                        if (passwordError) setPasswordError(null);
-                      }}
+                      onChange={(e) => setPassword(e.target.value)}
+                      onBlur={() => setPasswordTouched(true)}
                       placeholder="••••••••"
                       className={`w-full bg-white/[0.03] border rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-1 transition-all ${
-                        passwordError || (showValidation && !isPasswordStrong)
+                        (passwordTouched || showValidation) && !isPasswordStrong
                           ? 'border-red-500/50 focus:border-red-500/50 focus:ring-red-500/50'
                           : 'border-white/10 focus:border-cyan-500/50 focus:ring-cyan-500/50'
                       }`}
                     />
-                    {passwordError && (
-                      <p className="text-red-400 text-[11px] mt-1.5 flex items-center gap-1">
-                        ⚠️ {passwordError}
+                    {(passwordTouched || showValidation) && !isPasswordStrong && (
+                      <p className="text-red-400 text-xs mt-1.5">
+                        Password does not meet complexity requirements.
                       </p>
                     )}
 
@@ -182,22 +176,19 @@ export default function ResetPasswordPage() {
                     <label className="block text-xs font-bold text-gray-400 mb-2">Confirm new password</label>
                     <input 
                       type="password" 
-                      required
                       value={confirmPassword}
-                      onChange={(e) => {
-                        setConfirmPassword(e.target.value);
-                        if (confirmError) setConfirmError(null);
-                      }}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      onBlur={() => setConfirmTouched(true)}
                       placeholder="••••••••"
                       className={`w-full bg-white/[0.03] border rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-1 transition-all ${
-                        confirmError || (showValidation && password !== confirmPassword)
+                        (confirmTouched || showValidation) && password !== confirmPassword
                           ? 'border-red-500/50 focus:border-red-500/50 focus:ring-red-500/50'
                           : 'border-white/10 focus:border-cyan-500/50 focus:ring-cyan-500/50'
                       }`}
                     />
-                    {(confirmError || (showValidation && password !== confirmPassword)) && (
-                      <p className="text-red-400 text-[11px] mt-1.5 flex items-center gap-1">
-                        ⚠️ {confirmError || 'Passwords do not match.'}
+                    {(confirmTouched || showValidation) && password !== confirmPassword && (
+                      <p className="text-red-400 text-xs mt-1.5">
+                        Passwords do not match.
                       </p>
                     )}
                   </div>
