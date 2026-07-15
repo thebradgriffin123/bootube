@@ -119,7 +119,7 @@ export default function LandingPage() {
           </div>
           
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.1] mb-6 drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)] max-w-4xl">
-            Because &apos;Family Friendly&apos; shouldn&apos;t come with sudden surprises.
+            All the content you love. None of the language you don&apos;t.
           </h1>
           
           <p className="text-lg md:text-xl text-gray-300 leading-relaxed mb-10 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] max-w-3xl">
