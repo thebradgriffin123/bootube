@@ -60,7 +60,9 @@ export default function ResetPasswordPage() {
       });
 
       if (updateError) {
-        setError(updateError.message);
+        console.error("Supabase password update error:", updateError);
+        const msg = updateError.message;
+        setError(msg && msg !== '{}' ? msg : 'Password update failed. Please try again.');
       } else {
         setSuccess(true);
         // Clear active session to force them to sign in with their new password
@@ -70,7 +72,8 @@ export default function ResetPasswordPage() {
         }, 3000);
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
+      console.error("Password reset exception caught:", err);
+      setError(err instanceof Error && err.message !== '{}' ? err.message : 'An unexpected error occurred.');
     } finally {
       setLoading(false);
     }

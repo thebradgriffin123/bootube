@@ -37,12 +37,15 @@ export default function LoginPage() {
       });
 
       if (loginError) {
-        setError(loginError.message);
+        console.error("Supabase login error:", loginError);
+        const msg = loginError.message;
+        setError(msg && msg !== '{}' ? msg : 'Sign in failed. Please check your credentials or try again.');
       } else {
         router.push('/dashboard');
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
+      console.error("Login exception caught:", err);
+      setError(err instanceof Error && err.message !== '{}' ? err.message : 'An unexpected error occurred.');
     } finally {
       setLoading(false);
     }

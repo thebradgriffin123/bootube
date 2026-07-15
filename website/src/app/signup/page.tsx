@@ -60,12 +60,15 @@ export default function SignupPage() {
       });
 
       if (signUpError) {
-        setError(signUpError.message);
+        console.error("Supabase signup error:", signUpError);
+        const msg = signUpError.message;
+        setError(msg && msg !== '{}' ? msg : 'Sign up failed. Please check your connection or try again.');
       } else {
         setSuccess(true);
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'An unexpected error occurred.');
+      console.error("Signup exception caught:", err);
+      setError(err instanceof Error && err.message !== '{}' ? err.message : 'An unexpected error occurred.');
     } finally {
       setLoading(false);
     }
