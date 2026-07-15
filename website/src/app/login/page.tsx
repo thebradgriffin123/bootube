@@ -46,15 +46,12 @@ export default function LoginPage() {
         
         {/* Logo and branding */}
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-3 group">
+          <Link href="/" className="inline-flex items-center group">
             <img 
               src="/boo-tube-icon.svg" 
               alt="BooTube Logo" 
-              className="w-10 h-10 transition-transform duration-300 group-hover:scale-110 filter drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]"
+              className="h-9 w-auto transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]"
             />
-            <span className="text-2xl font-black tracking-tight text-white">
-              Boo<span className="text-red-500">Tube</span>
-            </span>
           </Link>
           <h2 className="text-xl font-bold text-white mt-4">Welcome back</h2>
           <p className="text-xs text-gray-400 mt-1">Sign in to manage your filters and account settings.</p>

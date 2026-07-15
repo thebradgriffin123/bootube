@@ -160,15 +160,12 @@ export default function DashboardPage() {
       {/* Header */}
       <header className="border-b border-white/5 bg-[#050505]/80 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 group">
+          <Link href="/" className="flex items-center group">
             <img 
               src="/boo-tube-icon.svg" 
               alt="BooTube Logo" 
-              className="w-8 h-8"
+              className="h-7 w-auto"
             />
-            <span className="text-xl font-black tracking-tight text-white">
-              Boo<span className="text-red-500">Tube</span>
-            </span>
           </Link>
           
           <div className="flex items-center gap-4">

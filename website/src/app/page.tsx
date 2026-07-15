@@ -31,15 +31,12 @@ export default function LandingPage() {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#050505]/60 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <a href="#" className="flex items-center gap-3 group">
+          <a href="#" className="flex items-center group">
             <img 
               src="/boo-tube-icon.svg" 
               alt="BooTube Logo" 
-              className="w-9 h-9 transition-transform duration-300 group-hover:scale-110 filter drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]"
+              className="h-8 w-auto transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]"
             />
-            <span className="text-2xl font-black tracking-tight text-white">
-              Boo<span className="text-red-500 transition-colors duration-300 group-hover:text-red-400">Tube</span>
-            </span>
           </a>
 
           {/* Desktop Nav Links */}
@@ -376,11 +373,8 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-white/5 py-12 px-6 bg-black">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <img src="/boo-tube-icon.svg" alt="BooTube Logo" className="w-7 h-7" />
-            <span className="text-lg font-bold text-white tracking-tight">
-              Boo<span className="text-red-500">Tube</span>
-            </span>
+          <div className="flex items-center">
+            <img src="/boo-tube-icon.svg" alt="BooTube Logo" className="h-6 w-auto" />
           </div>
 
           <div className="flex flex-wrap justify-center gap-8 text-xs text-gray-500">
