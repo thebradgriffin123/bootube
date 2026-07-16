@@ -93,6 +93,7 @@ export async function POST(req: Request) {
             .from('profiles')
             .update({
               stripe_customer_id: customerId,
+              subscription_status: 'active',
               updated_at: new Date().toISOString(),
             })
             .eq('id', userId);
