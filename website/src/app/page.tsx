@@ -48,13 +48,12 @@ export default function LandingPage() {
           </div>
 
           <div className="hidden md:flex items-center gap-4">
-            <a href="/login" className="text-sm font-semibold hover:text-white transition-colors px-4 py-2 text-gray-300">Sign In</a>
+            <a href="/login" className="text-sm font-semibold hover:text-white transition-colors px-4 py-2 text-gray-300">Log in</a>
             <a 
-              href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa" 
-              target="_blank"
+              href="/signup" 
               className="text-sm font-bold bg-white text-black hover:bg-gray-200 transition-all px-5 py-2.5 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.15)] hover:shadow-[0_0_20px_rgba(255,255,255,0.25)]"
             >
-              Get Started
+              Sign up
             </a>
           </div>
 
@@ -82,12 +81,13 @@ export default function LandingPage() {
             <a href="#pricing" onClick={() => setMobileMenuOpen(false)} className="text-lg font-medium text-gray-300">Pricing</a>
             <a href="#faq" onClick={() => setMobileMenuOpen(false)} className="text-lg font-medium text-gray-300">FAQ</a>
             <hr className="border-white/5 my-2" />
-            <a href="/login" className="text-lg font-medium text-gray-300">Sign In</a>
+            <a href="/login" onClick={() => setMobileMenuOpen(false)} className="text-lg font-medium text-gray-300">Log in</a>
             <a 
-              href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa"
+              href="/signup"
+              onClick={() => setMobileMenuOpen(false)}
               className="w-full text-center py-3 bg-white text-black font-bold rounded-full"
             >
-              Get Started
+              Sign up
             </a>
           </div>
         )}
@@ -121,25 +121,15 @@ export default function LandingPage() {
             BooTube automatically ghosts profanity and blasphemy in real-time. Muting the language, never the video.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full sm:w-auto mb-6">
+          <div className="flex justify-center items-center w-full mb-16">
             <a 
               href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa" 
               target="_blank"
-              className="w-full sm:w-auto text-center px-10 py-4.5 bg-white text-black font-extrabold rounded-full shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:shadow-[0_0_45px_rgba(255,255,255,0.35)] transition-all hover:bg-gray-100 text-base"
+              className="w-full sm:w-auto text-center px-12 py-5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-extrabold rounded-full shadow-[0_0_30px_rgba(6,182,212,0.3)] hover:shadow-[0_0_45px_rgba(6,182,212,0.5)] transition-all hover:from-cyan-400 hover:to-blue-400 text-base cursor-pointer border-none"
             >
               Get BooTube — It&apos;s Free
             </a>
-            <a 
-              href="#pricing" 
-              className="w-full sm:w-auto text-center px-10 py-4.5 border border-white/15 hover:border-white/25 bg-black/45 hover:bg-black/60 backdrop-blur-sm text-white font-semibold rounded-full transition-all text-base"
-            >
-              View Premium Plans
-            </a>
           </div>
-
-          <p className="text-sm text-gray-400 mb-12 italic drop-shadow-[0_1px_5px_rgba(0,0,0,0.9)]">
-            Blasphemy filtering is 100% free. Upgrade to filter profanity, blur screens, and add custom words for just $3.99/month.
-          </p>
 
 
 
