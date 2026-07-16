@@ -72,7 +72,7 @@ export default function LoginPage() {
 
       <div className="max-w-md w-full relative z-10">
         
-        {/* Logo and branding */}
+        {/* Logo and branding (Centered above container) */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center group">
             <img 
@@ -81,12 +81,17 @@ export default function LoginPage() {
               className="h-9 w-auto transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]"
             />
           </Link>
-          <h2 className="text-xl font-bold text-white mt-4 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Welcome back</h2>
-          <p className="text-xs text-gray-300 mt-1 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">Sign in to manage your filters and account settings.</p>
         </div>
 
         {/* Form Card */}
         <div className="bg-black/50 border border-white/10 backdrop-blur-xl rounded-2xl p-8 shadow-2xl">
+          
+          {/* Welcome Header (Left-aligned, inside container) */}
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-white">Welcome back</h2>
+            <p className="text-xs text-gray-400 mt-1">Sign in to manage your filters and account settings.</p>
+          </div>
+
           <form onSubmit={handleLogin} noValidate className="space-y-5">
             
             {error && (
