@@ -446,9 +446,9 @@ export default function DashboardPage() {
                     <button
                       onClick={handleUpgrade}
                       disabled={billingLoading}
-                      className="w-full md:w-auto shrink-0 px-8 py-3.5 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-400 hover:to-cyan-400 text-black font-black text-xs rounded-xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.2)] disabled:opacity-50 cursor-pointer"
+                      className="w-full md:w-auto shrink-0 px-8 py-3.5 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-400 hover:to-cyan-400 text-white font-black text-xs rounded-xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.2)] disabled:opacity-50 cursor-pointer"
                     >
-                      {billingLoading ? 'Redirecting...' : 'Upgrade to Premium'}
+                      {billingLoading ? 'Redirecting...' : 'Upgrade to premium'}
                     </button>
                   </div>
                 )}
