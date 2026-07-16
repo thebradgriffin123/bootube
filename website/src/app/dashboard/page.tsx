@@ -253,8 +253,12 @@ export default function DashboardPage() {
   const isPremium = profile?.subscription_status === 'active';
 
   return (
-    <div className="min-h-screen bg-[#050505] text-gray-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black">
+    <div className="min-h-screen bg-gradient-to-b from-[#08080a] via-[#050505] to-[#030304] text-gray-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black relative overflow-hidden">
       
+      {/* Subtle Background Glows */}
+      <div className="absolute top-[-100px] right-[-100px] w-[500px] h-[500px] rounded-full bg-cyan-950/15 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-blue-950/10 blur-[120px] pointer-events-none" />
+
       {/* Header */}
       <header className="border-b border-white/5 bg-[#050505]/80 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -279,7 +283,7 @@ export default function DashboardPage() {
       </header>
 
       {/* Main Body */}
-      <main className="max-w-4xl mx-auto w-full px-6 py-12 flex-grow">
+      <main className="max-w-4xl mx-auto w-full px-6 py-12 flex-grow relative z-10">
         
         {/* Title row */}
         <div className="mb-10">
