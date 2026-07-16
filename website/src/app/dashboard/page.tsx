@@ -13,19 +13,46 @@ interface UserProfile {
   buffer_timer: number;
 }
 
+interface SubscriptionDetails {
+  plan: 'free' | 'premium';
+  nextPayment?: string;
+  amount?: string;
+  autoRenew?: boolean;
+}
+
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [billingLoading, setBillingLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [subLoading, setSubLoading] = useState(true);
+  
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
-
-  // Form states
-  const [customBlockedWords, setCustomBlockedWords] = useState('');
-  const [blurScreens, setBlurScreens] = useState(false);
-  const [bufferTimer, setBufferTimer] = useState(1);
+  const [subDetails, setSubDetails] = useState<SubscriptionDetails | null>(null);
 
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const router = useRouter();
+
+  const fetchSubscriptionDetails = async (token: string) => {
+    try {
+      const res = await fetch('/api/subscription', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSubDetails(data);
+      } else {
+        setSubDetails({ plan: 'free' });
+      }
+    } catch (e) {
+      console.error('Error fetching subscription details:', e);
+      setSubDetails({ plan: 'free' });
+    } finally {
+      setSubLoading(false);
+    }
+  };
 
   useEffect(() => {
     const checkUser = async () => {
@@ -48,7 +75,6 @@ export default function DashboardPage() {
 
         if (error) {
           console.error('Error fetching profile:', error);
-          // If profile row doesn't exist yet, we can create one or handle gracefully
           setProfile({
             id: session.user.id,
             subscription_status: 'free',
@@ -56,6 +82,8 @@ export default function DashboardPage() {
             blur_screens: false,
             buffer_timer: 1
           });
+          setSubDetails({ plan: 'free' });
+          setSubLoading(false);
         } else if (data) {
           const mappedProfile: UserProfile = {
             id: data.id,
@@ -65,9 +93,7 @@ export default function DashboardPage() {
             buffer_timer: data.buffer_timer_seconds ?? 1
           };
           setProfile(mappedProfile);
-          setCustomBlockedWords((mappedProfile.custom_blocked_words ?? []).join(', '));
-          setBlurScreens(mappedProfile.blur_screens ?? false);
-          setBufferTimer(mappedProfile.buffer_timer ?? 1);
+          await fetchSubscriptionDetails(session.access_token);
         }
       } catch (err) {
         console.error('Auth check error:', err);
@@ -81,8 +107,6 @@ export default function DashboardPage() {
 
     checkUser();
   }, [router]);
-
-  const [billingLoading, setBillingLoading] = useState(false);
 
   const handleUpgrade = async () => {
     setBillingLoading(true);
@@ -158,59 +182,43 @@ export default function DashboardPage() {
     }
   };
 
-  const handleSaveSettings = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!profile) return;
-    
-    const isPremium = profile.subscription_status === 'active';
-    
-    // Safety guard: Non-premium users cannot save premium fields
-    if (!isPremium) {
-      setNotification({
-        type: 'error',
-        message: 'Upgrade to Premium to enable custom words, video blurring, and buffer timers!'
-      });
+  const handleDeleteAccount = async () => {
+    if (!confirm("⚠️ WARNING: Are you sure you want to delete your account? This action is permanent. Your database settings will be deleted, and any active premium subscriptions on Stripe will be cancelled immediately to prevent further billing.")) {
       return;
     }
 
-    setSaving(true);
+    setDeleteLoading(true);
     setNotification(null);
 
-    // Clean and split words
-    const wordsArray = customBlockedWords
-      .split(',')
-      .map(w => w.trim())
-      .filter(Boolean);
-
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          custom_filter_words: wordsArray,
-          blur_screen_enabled: blurScreens,
-          buffer_timer_seconds: bufferTimer,
-        })
-        .eq('id', profile.id);
-
-      if (error) {
-        setNotification({ type: 'error', message: error.message });
-      } else {
-        setNotification({ type: 'success', message: 'Settings successfully synced to the cloud!' });
-        // Update local state profile ref
-        setProfile(prev => prev ? {
-          ...prev,
-          custom_blocked_words: wordsArray,
-          blur_screens: blurScreens,
-          buffer_timer: bufferTimer
-        } : null);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        setNotification({ type: 'error', message: 'You must be logged in to delete your account.' });
+        return;
       }
-    } catch (err: unknown) {
-      setNotification({
-        type: 'error',
-        message: err instanceof Error ? err.message : 'Failed to save settings.'
+
+      const res = await fetch('/api/account/delete', {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
       });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || 'Failed to delete account.');
+      }
+
+      // Logout and redirect
+      await supabase.auth.signOut();
+      startTransition(() => {
+        router.push('/login?deleted=true');
+      });
+    } catch (err: any) {
+      console.error('Account deletion error:', err);
+      setNotification({ type: 'error', message: err.message || 'Failed to delete account.' });
     } finally {
-      setSaving(false);
+      setDeleteLoading(false);
     }
   };
 
@@ -257,7 +265,7 @@ export default function DashboardPage() {
               onClick={handleSignOut}
               className="px-4 py-2 border border-white/5 hover:border-white/10 hover:bg-white/[0.02] text-xs font-bold rounded-lg text-gray-300 transition-all cursor-pointer"
             >
-              Sign Out
+              Sign out
             </button>
           </div>
         </div>
@@ -267,201 +275,169 @@ export default function DashboardPage() {
       <main className="max-w-4xl mx-auto w-full px-6 py-12 flex-grow">
         
         {/* Title row */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-          <div>
-            <h1 className="text-3xl font-black tracking-tight text-white">Filter Dashboard</h1>
-            <p className="text-sm text-gray-400 mt-1">Configure your real-time censoring settings across all devices.</p>
-          </div>
-
-          {/* Tier HUD indicator */}
-          <div className={`p-4 rounded-xl border flex items-center gap-4 ${isPremium ? 'border-cyan-500/20 bg-cyan-950/10' : 'border-white/5 bg-white/[0.01]'}`}>
-            <div>
-              <div className="text-[10px] uppercase font-bold tracking-wider text-gray-500">Current Tier</div>
-              <div className="flex items-center gap-2 mt-1">
-                <span className={`text-base font-black uppercase tracking-wide ${isPremium ? 'text-cyan-400' : 'text-gray-300'}`}>
-                  {isPremium ? 'Premium Plan' : 'Free Plan'}
-                </span>
-                <span className={`w-2.5 h-2.5 rounded-full ${isPremium ? 'bg-cyan-400 animate-pulse' : 'bg-gray-500'}`} />
-              </div>
-            </div>
-            {!isPremium ? (
-              <button 
-                type="button"
-                onClick={handleUpgrade}
-                disabled={billingLoading}
-                className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-extrabold text-xs rounded-lg transition-all shadow-md disabled:opacity-50 cursor-pointer"
-              >
-                {billingLoading ? 'Loading...' : 'Upgrade'}
-              </button>
-            ) : (
-              <button 
-                type="button"
-                onClick={handleManageBilling}
-                disabled={billingLoading}
-                className="px-4 py-2 bg-white/[0.05] border border-white/10 hover:bg-white/[0.1] text-white font-extrabold text-xs rounded-lg transition-all shadow-md disabled:opacity-50 cursor-pointer"
-              >
-                {billingLoading ? 'Loading...' : 'Manage Billing'}
-              </button>
-            )}
-          </div>
+        <div className="mb-10">
+          <h1 className="text-3xl font-black tracking-tight text-white">Billing & Account</h1>
+          <p className="text-sm text-gray-400 mt-1">Manage your premium plans, billing auto-renewals, and settings.</p>
         </div>
 
-        {/* Global Alerts / Notification toasts */}
+        {/* Global Notifications */}
         {notification && (
-          <div className={`p-4 rounded-xl border mb-8 flex items-center justify-between text-sm ${notification.type === 'success' ? 'bg-cyan-950/20 border-cyan-500/20 text-cyan-400' : 'bg-red-950/20 border-red-500/20 text-red-400'}`}>
+          <div className={`p-4 rounded-xl border mb-8 flex items-center justify-between text-sm bg-red-950/20 border-red-500/20 text-red-400`}>
             <span className="font-semibold">{notification.message}</span>
             <button onClick={() => setNotification(null)} className="text-gray-500 hover:text-white font-bold px-2">×</button>
           </div>
         )}
 
-        <form onSubmit={handleSaveSettings} className="grid grid-cols-1 gap-8">
-
-          {/* Free Tier Settings Card */}
-          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 backdrop-blur-sm">
-            <h2 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
-              🛡️ Standard Censoring
+        <div className="grid grid-cols-1 gap-8">
+          
+          {/* Subscription Status Card */}
+          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 backdrop-blur-sm relative overflow-hidden">
+            <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              💳 Subscription Status
             </h2>
-            <p className="text-xs text-gray-400 mb-6">These rules are active on all devices running BooTube.</p>
-            
-            <div className="space-y-4">
-              <div className="flex items-start justify-between gap-6 p-4 rounded-xl bg-white/[0.02] border border-white/5">
-                <div>
-                  <h4 className="text-sm font-bold text-white">Mute Blasphemy</h4>
-                  <p className="text-xs text-gray-400 mt-0.5">Automatically mutes religious curses and slurs in real-time.</p>
-                </div>
-                <span className="px-2.5 py-1 rounded bg-cyan-950/40 border border-cyan-500/20 text-[10px] font-bold text-cyan-400 uppercase tracking-wider">
-                  Always Active
-                </span>
-              </div>
-              
-              <div className="flex items-start justify-between gap-6 p-4 rounded-xl bg-white/[0.02] border border-white/5">
-                <div>
-                  <h4 className="text-sm font-bold text-white">Real-Time CC Parser</h4>
-                  <p className="text-xs text-gray-400 mt-0.5">Automatically analyzes and tracks HTML5 subtitle overlays.</p>
-                </div>
-                <span className="px-2.5 py-1 rounded bg-cyan-950/40 border border-cyan-500/20 text-[10px] font-bold text-cyan-400 uppercase tracking-wider">
-                  Always Active
-                </span>
-              </div>
-            </div>
-          </div>
 
-          {/* Premium Settings Card */}
-          <div className={`bg-white/[0.01] border rounded-2xl p-6 backdrop-blur-sm relative overflow-hidden ${isPremium ? 'border-white/5' : 'border-white/5 opacity-55'}`}>
-            
-            {/* Lock Overlay if Free Tier */}
-            {!isPremium && (
-              <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center text-center p-6">
-                <div className="w-10 h-10 rounded-full bg-cyan-950/40 border border-cyan-500/20 flex items-center justify-center text-lg text-cyan-400 mb-3">
-                  🔒
+            {subLoading ? (
+              <div className="animate-pulse space-y-3">
+                <div className="h-4 bg-white/5 rounded w-1/3"></div>
+                <div className="h-4 bg-white/5 rounded w-1/4"></div>
+                <div className="h-10 bg-white/5 rounded w-full mt-4"></div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
+                    <div className="text-[10px] uppercase font-bold tracking-wider text-gray-500">Current Plan</div>
+                    <div className="text-lg font-black text-white mt-1 flex items-center gap-2">
+                      {subDetails?.plan === 'premium' ? (
+                        <>
+                          <span className="text-cyan-400 uppercase tracking-wide">BooTube Premium</span>
+                          <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse" />
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-gray-400 uppercase tracking-wide">BooTube Free</span>
+                          <span className="w-2.5 h-2.5 rounded-full bg-gray-500" />
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {subDetails?.plan === 'premium' && (
+                    <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
+                      <div className="text-[10px] uppercase font-bold tracking-wider text-gray-500">
+                        {subDetails.autoRenew ? 'Next Bill Date' : 'Expires On'}
+                      </div>
+                      <div className="text-lg font-black text-white mt-1">
+                        {subDetails.nextPayment}
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <h3 className="text-base font-bold text-white mb-1">Premium Filters Locked</h3>
-                <p className="text-xs text-gray-400 max-w-sm mb-4">
-                  Upgrade to Premium to enable custom words, visual blurring, and hold cooldown controls.
-                </p>
-                <a 
-                  href="/#pricing" 
-                  className="px-5 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-black rounded-lg transition-all shadow-[0_0_15px_rgba(6,182,212,0.25)]"
-                >
-                  Unlock Premium
-                </a>
+
+                {subDetails?.plan === 'premium' && (
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 rounded-xl bg-cyan-950/10 border border-cyan-500/10 gap-4">
+                    <div>
+                      <div className="text-xs font-bold text-gray-400">Recurring Price:</div>
+                      <div className="text-lg font-black text-cyan-400 mt-0.5">{subDetails.amount}</div>
+                      <p className="text-[10px] text-gray-500 mt-1">
+                        {subDetails.autoRenew 
+                          ? 'Your plan automatically renews. You can cancel at any time to let it expire at the end of the current period.' 
+                          : 'You have cancelled auto-renewal. Your premium access will expire at the end of this billing cycle.'}
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleManageBilling}
+                      disabled={billingLoading}
+                      className="w-full sm:w-auto px-6 py-2.5 bg-white/[0.05] border border-white/10 hover:bg-white/[0.1] text-white font-extrabold text-xs rounded-lg transition-all shadow-md disabled:opacity-50 cursor-pointer"
+                    >
+                      {billingLoading ? 'Syncing...' : 'Manage Billing'}
+                    </button>
+                  </div>
+                )}
+
+                {subDetails?.plan === 'free' && (
+                  <div className="p-6 rounded-xl bg-gradient-to-r from-blue-950/20 to-cyan-950/20 border border-cyan-500/15 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div>
+                      <h4 className="text-sm font-bold text-white">Unlock cross-platform censoring controls</h4>
+                      <p className="text-xs text-gray-400 mt-1">Filter profanity on YouTube, Disney+, Hulu, Plex, and Fandango. Access custom blocked words, timings, and blur features.</p>
+                    </div>
+                    <button
+                      onClick={handleUpgrade}
+                      disabled={billingLoading}
+                      className="w-full md:w-auto shrink-0 px-8 py-3.5 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-400 hover:to-cyan-400 text-black font-black text-xs rounded-xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.2)] disabled:opacity-50 cursor-pointer"
+                    >
+                      {billingLoading ? 'Redirecting...' : 'Upgrade to Premium'}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
+          </div>
 
-            <h2 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
-              ⭐ Premium Customizations
+          {/* Tier Feature Comparison Grid */}
+          <div className="bg-white/[0.01] border border-white/5 rounded-2xl p-6 backdrop-blur-sm">
+            <h2 className="text-lg font-bold text-white mb-6">
+              📊 Plan Comparisons
             </h2>
-            <p className="text-xs text-gray-400 mb-6">Manage advanced options and custom word blocks.</p>
 
-            <div className="space-y-6">
-              {/* Custom blocked words list */}
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">
-                  Custom Word Blocklist
-                </label>
-                <textarea
-                  disabled={!isPremium}
-                  value={customBlockedWords}
-                  onChange={(e) => setCustomBlockedWords(e.target.value)}
-                  placeholder="enter, bad, words, separated, by, commas"
-                  rows={4}
-                  className="w-full bg-white/[0.02] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all font-mono"
-                />
-                <p className="text-[10px] text-gray-500 mt-2">
-                  Enter specific words or phrases you want BooTube to mute. Separate each entry with a comma.
-                </p>
-              </div>
-
-              <hr className="border-white/5" />
-
-              {/* Blur toggle */}
-              <div className="flex items-center justify-between gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Free Tier Details */}
+              <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col justify-between">
                 <div>
-                  <h4 className="text-sm font-bold text-white">Visual Blurring</h4>
-                  <p className="text-xs text-gray-400 mt-0.5">Blur the video player screen during a mute event.</p>
+                  <h3 className="text-md font-extrabold text-gray-300 uppercase tracking-wide">Free Plan</h3>
+                  <div className="text-2xl font-black text-white mt-2 mb-4">$0.00 <span className="text-xs text-gray-500 font-medium">/ forever</span></div>
+                  <ul className="space-y-3 text-xs text-gray-400">
+                    <li className="flex items-center gap-2">🟢 YouTube censoring support</li>
+                    <li className="flex items-center gap-2">🟢 Standard blasphemy muting</li>
+                    <li className="flex items-center gap-2">🟢 Up to 10 custom words</li>
+                    <li className="flex items-center gap-2">🔴 Locked multi-channel support</li>
+                    <li className="flex items-center gap-2">🔴 Locked video blurring overlays</li>
+                    <li className="flex items-center gap-2">🔴 Locked adjustable timing buffer</li>
+                  </ul>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox"
-                    disabled={!isPremium}
-                    checked={blurScreens}
-                    onChange={(e) => setBlurScreens(e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-300 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500 peer-checked:after:bg-black peer-checked:after:border-cyan-500" />
-                </label>
               </div>
 
-              <hr className="border-white/5" />
-
-              {/* Slider / Range */}
-              <div>
-                <div className="flex justify-between items-center mb-2">
-                  <div>
-                    <h4 className="text-sm font-bold text-white">Filter Hold Cooldown</h4>
-                    <p className="text-xs text-gray-400 mt-0.5">Time to hold the mute state active after a word triggers.</p>
-                  </div>
-                  <span className="text-sm font-black text-cyan-400 font-mono bg-cyan-950/40 border border-cyan-500/20 px-2 py-0.5 rounded">
-                    {bufferTimer}s
-                  </span>
+              {/* Premium Tier Details */}
+              <div className="p-6 rounded-2xl bg-cyan-950/5 border border-cyan-500/20 flex flex-col justify-between relative shadow-[0_0_30px_rgba(6,182,212,0.05)]">
+                <div>
+                  <h3 className="text-md font-extrabold text-cyan-400 uppercase tracking-wide">Premium Plan</h3>
+                  <div className="text-2xl font-black text-white mt-2 mb-4">$3.99 <span className="text-xs text-cyan-500/50 font-medium">/ month</span></div>
+                  <ul className="space-y-3 text-xs text-gray-300">
+                    <li className="flex items-center gap-2 text-cyan-300">✨ Sync across YouTube, Hulu, Disney+, Plex & Vudu</li>
+                    <li className="flex items-center gap-2 text-cyan-300">✨ Unlimited custom blocked words</li>
+                    <li className="flex items-center gap-2 text-cyan-300">✨ Enable visual screen blurring filters</li>
+                    <li className="flex items-center gap-2 text-cyan-300">✨ Fine-tune timing sliders (0.5s - 1.5s)</li>
+                    <li className="flex items-center gap-2 text-cyan-300">✨ Sync settings automatically across all active devices</li>
+                    <li className="flex items-center gap-2 text-cyan-300">✨ Secure commercial-free billing portal</li>
+                  </ul>
                 </div>
-                <input 
-                  type="range" 
-                  min="0" 
-                  max="5" 
-                  step="0.5"
-                  disabled={!isPremium}
-                  value={bufferTimer}
-                  onChange={(e) => setBufferTimer(parseFloat(e.target.value))}
-                  className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-cyan-500"
-                />
               </div>
-
             </div>
           </div>
 
-          {/* Save Button row */}
-          {isPremium && (
-            <div className="flex justify-end mt-4">
-              <button 
-                type="submit"
-                disabled={saving}
-                className="px-8 py-3.5 bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold rounded-xl transition-all disabled:opacity-50 flex items-center gap-2 cursor-pointer shadow-[0_0_20px_rgba(6,182,212,0.2)]"
+          {/* Danger Zone / Account Deletion */}
+          <div className="bg-red-950/5 border border-red-500/10 rounded-2xl p-6 backdrop-blur-sm">
+            <h2 className="text-lg font-bold text-red-500 mb-2">
+              ⚠️ Danger Zone
+            </h2>
+            <p className="text-xs text-gray-400 mb-6">Irreversible settings actions for your account.</p>
+
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 rounded-xl bg-red-950/10 border border-red-500/10 gap-4">
+              <div>
+                <h4 className="text-sm font-bold text-white">Delete Account</h4>
+                <p className="text-xs text-gray-500 mt-1">Permanently deletes your account profile, custom lists, and cancels any active subscriptions.</p>
+              </div>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleteLoading}
+                className="w-full sm:w-auto px-6 py-2.5 bg-red-950/20 border border-red-500/20 hover:bg-red-500 hover:text-black text-red-500 font-extrabold text-xs rounded-lg transition-all disabled:opacity-50 cursor-pointer"
               >
-                {saving ? (
-                  <>
-                    <svg className="animate-spin h-4 w-4 text-black" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                    </svg>
-                    Syncing settings...
-                  </>
-                ) : 'Save & Sync Settings'}
+                {deleteLoading ? 'Deleting...' : 'Delete Account'}
               </button>
             </div>
-          )}
+          </div>
 
-        </form>
+        </div>
 
       </main>
     </div>
