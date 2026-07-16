@@ -54,9 +54,21 @@ export default function LoginPage() {
   return (
     <div className="relative min-h-screen bg-[#050505] flex items-center justify-center px-6 overflow-hidden">
       
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center z-0"
+        style={{ 
+          backgroundImage: "url('/login-bg.png')"
+        }}
+      />
+      
+      {/* Cinematic Overlays */}
+      <div className="absolute inset-0 bg-black/70 z-1" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-transparent to-[#050505] z-1" />
+
       {/* Subtle Background Glows */}
-      <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-cyan-950/10 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-red-950/10 blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-cyan-950/10 blur-[120px] pointer-events-none z-1" />
+      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-red-950/10 blur-[120px] pointer-events-none z-1" />
 
       <div className="max-w-md w-full relative z-10">
         
@@ -69,12 +81,12 @@ export default function LoginPage() {
               className="h-9 w-auto transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]"
             />
           </Link>
-          <h2 className="text-xl font-bold text-white mt-4">Welcome back</h2>
-          <p className="text-xs text-gray-400 mt-1">Sign in to manage your filters and account settings.</p>
+          <h2 className="text-xl font-bold text-white mt-4 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">Welcome back</h2>
+          <p className="text-xs text-gray-300 mt-1 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">Sign in to manage your filters and account settings.</p>
         </div>
 
         {/* Form Card */}
-        <div className="bg-white/[0.02] border border-white/5 backdrop-blur-md rounded-2xl p-8 shadow-2xl">
+        <div className="bg-black/50 border border-white/10 backdrop-blur-xl rounded-2xl p-8 shadow-2xl">
           <form onSubmit={handleLogin} noValidate className="space-y-5">
             
             {error && (
@@ -148,7 +160,7 @@ export default function LoginPage() {
         </div>
 
         <div className="text-center mt-6">
-          <Link href="/" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">
+          <Link href="/" className="text-xs text-gray-400 hover:text-gray-200 transition-colors">
             ← Back to Home
           </Link>
         </div>
