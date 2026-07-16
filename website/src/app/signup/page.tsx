@@ -77,9 +77,21 @@ export default function SignupPage() {
   return (
     <div className="relative min-h-screen bg-[#050505] flex items-center justify-center px-6 overflow-hidden">
       
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center z-0"
+        style={{ 
+          backgroundImage: "url('/login-background.jpeg')"
+        }}
+      />
+      
+      {/* Cinematic Overlays */}
+      <div className="absolute inset-0 bg-black/70 z-1" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#050505] via-transparent to-[#050505] z-1" />
+
       {/* Subtle Background Glows */}
-      <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-cyan-950/10 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-red-950/10 blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full bg-cyan-950/10 blur-[120px] pointer-events-none z-1" />
+      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-red-950/10 blur-[120px] pointer-events-none z-1" />
 
       <div className="max-w-md w-full relative z-10">
         
