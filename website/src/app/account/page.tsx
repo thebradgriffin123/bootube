@@ -31,6 +31,7 @@ export default function DashboardPage() {
   const [subDetails, setSubDetails] = useState<SubscriptionDetails | null>(null);
 
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const router = useRouter();
 
   const fetchSubscriptionDetails = async (token: string) => {
@@ -270,14 +271,84 @@ export default function DashboardPage() {
             />
           </Link>
           
-          <div className="flex items-center gap-4">
-            <span className="hidden sm:inline text-xs text-gray-500">{userEmail}</span>
-            <button 
-              onClick={handleSignOut}
-              className="px-4 py-2 border border-white/5 hover:border-white/10 hover:bg-white/[0.02] text-xs font-bold rounded-lg text-gray-300 transition-all cursor-pointer"
-            >
-              Sign out
-            </button>
+          <div className="flex items-center gap-4 relative z-50">
+            <div className="relative">
+              <button 
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="w-8 h-8 rounded-full border border-white bg-[#191b22] hover:bg-[#252833] text-white text-xs font-black flex items-center justify-center uppercase transition-all shadow-[0_0_8px_rgba(255,255,255,0.1)] hover:scale-105 active:scale-95 cursor-pointer outline-none"
+              >
+                {userEmail ? userEmail.charAt(0).toUpperCase() : 'U'}
+              </button>
+              
+              {dropdownOpen && (
+                <>
+                  {/* Backdrop overlay to close when clicking outside */}
+                  <div 
+                    className="fixed inset-0 z-40 cursor-default" 
+                    onClick={() => setDropdownOpen(false)}
+                  />
+                  
+                  <div className="absolute right-0 mt-2.5 w-56 bg-[#0d0e12] border border-[#1f222d] rounded-2xl shadow-[0_12px_32px_rgba(0,0,0,0.6)] p-4 z-50 flex flex-col text-left">
+                    <div className="flex flex-col items-center text-center mb-1">
+                      <div className="w-12 h-12 rounded-full border-2 border-white bg-[#191b22] text-white text-lg font-black flex items-center justify-center uppercase mb-2">
+                        {userEmail ? userEmail.charAt(0).toUpperCase() : 'U'}
+                      </div>
+                      <div className="text-sm font-black text-white leading-none">Account</div>
+                      <div className="text-[11px] text-gray-400 mt-1.5 word-break-all select-all">{userEmail}</div>
+                    </div>
+                    
+                    <hr className="border-[#1f222d] my-3 w-full" />
+                    
+                    <button 
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        if (isPremium) {
+                          handleManageBilling();
+                        } else {
+                          handleUpgrade();
+                        }
+                      }}
+                      disabled={billingLoading}
+                      className="flex items-center justify-center w-full py-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 disabled:opacity-50 text-white text-xs font-black rounded-lg cursor-pointer transition-all duration-200 outline-none"
+                    >
+                      {billingLoading ? (
+                        <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                      ) : (
+                        isPremium ? 'Manage subscription' : 'Upgrade to premium'
+                      )}
+                    </button>
+                    
+                    <div className="bg-[#151821] border border-[#1f222d] rounded-lg p-2.5 mt-3 flex flex-col gap-1.5">
+                      <div className="flex justify-between items-center text-[11px]">
+                        <span className="text-gray-400">Account tier:</span>
+                        <span className={`font-black ${isPremium ? 'bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent' : 'text-white'}`}>
+                          {isPremium ? 'Premium' : 'Free'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center text-[11px]">
+                        <span className="text-gray-400">App status:</span>
+                        <span className="text-white font-semibold">Active</span>
+                      </div>
+                    </div>
+                    
+                    <hr className="border-[#1f222d] my-3 w-full" />
+                    
+                    <button 
+                      onClick={() => {
+                        setDropdownOpen(false);
+                        handleSignOut();
+                      }}
+                      className="w-full text-left py-2 text-xs font-bold text-red-500 hover:text-red-400 transition-colors cursor-pointer outline-none"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </header>
