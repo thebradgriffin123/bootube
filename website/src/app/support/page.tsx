@@ -168,20 +168,27 @@ export default function SupportPage() {
               <label htmlFor="supportPlatform" className="block text-[10px] uppercase font-bold tracking-wider text-gray-400 mb-1.5">
                 Streaming Platform
               </label>
-              <select
-                id="supportPlatform"
-                value={platform}
-                onChange={(e) => setPlatform(e.target.value)}
-                required
-                className="w-full bg-[#151821] border border-[#1f222d] rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-cyan-500/50"
-              >
-                <option value="" disabled>Select active platform</option>
-                <option value="youtube">YouTube</option>
-                <option value="disney">Disney+</option>
-                <option value="hulu">Hulu</option>
-                <option value="plex">Plex</option>
-                <option value="other">Other / Setup Issue</option>
-              </select>
+              <div className="relative">
+                <select
+                  id="supportPlatform"
+                  value={platform}
+                  onChange={(e) => setPlatform(e.target.value)}
+                  required
+                  className="w-full bg-[#151821] border border-[#1f222d] rounded-xl pl-3 pr-10 py-2.5 text-xs text-white appearance-none focus:outline-none focus:border-cyan-500/50"
+                >
+                  <option value="" disabled>Select active platform</option>
+                  <option value="youtube">YouTube</option>
+                  <option value="disney">Disney+</option>
+                  <option value="hulu">Hulu</option>
+                  <option value="plex">Plex</option>
+                  <option value="other">Other / Setup Issue</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                  <svg className="h-3 w-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
             </div>
 
             <div>
