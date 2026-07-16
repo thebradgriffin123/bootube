@@ -183,7 +183,14 @@ export default function DashboardPage() {
   };
 
   const handleDeleteAccount = async () => {
-    if (!confirm("⚠️ WARNING: Are you sure you want to delete your account? This action is permanent. Your database settings will be deleted, and any active premium subscriptions on Stripe will be cancelled immediately to prevent further billing.")) {
+    const emailConfirm = prompt(
+      "We're sorry to see you go! 😢\n\nTo confirm deletion and prevent accidental mistakes, please type your account email below:"
+    );
+    
+    if (!emailConfirm) return;
+
+    if (emailConfirm.trim().toLowerCase() !== userEmail?.trim().toLowerCase()) {
+      alert("The email entered does not match your account email. Account deletion cancelled.");
       return;
     }
 
@@ -415,28 +422,20 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Danger Zone / Account Deletion */}
-          <div className="bg-red-950/5 border border-red-500/10 rounded-2xl p-6 backdrop-blur-sm">
-            <h2 className="text-lg font-bold text-red-500 mb-2">
-              ⚠️ Danger Zone
-            </h2>
-            <p className="text-xs text-gray-400 mb-6">Irreversible settings actions for your account.</p>
+        </div>
 
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 rounded-xl bg-red-950/10 border border-red-500/10 gap-4">
-              <div>
-                <h4 className="text-sm font-bold text-white">Delete Account</h4>
-                <p className="text-xs text-gray-500 mt-1">Permanently deletes your account profile, custom lists, and cancels any active subscriptions.</p>
-              </div>
-              <button
-                onClick={handleDeleteAccount}
-                disabled={deleteLoading}
-                className="w-full sm:w-auto px-6 py-2.5 bg-red-950/20 border border-red-500/20 hover:bg-red-500 hover:text-black text-red-500 font-extrabold text-xs rounded-lg transition-all disabled:opacity-50 cursor-pointer"
-              >
-                {deleteLoading ? 'Deleting...' : 'Delete Account'}
-              </button>
-            </div>
-          </div>
-
+        {/* Footer Account Deletion link */}
+        <div className="mt-16 border-t border-white/5 pt-8 text-center">
+          <p className="text-xs text-gray-600">
+            Need to permanently close your account?{' '}
+            <button
+              onClick={handleDeleteAccount}
+              disabled={deleteLoading}
+              className="text-gray-500 hover:text-red-400 underline transition-colors cursor-pointer bg-transparent border-none p-0 inline font-medium"
+            >
+              {deleteLoading ? 'Deleting account...' : 'Delete account'}
+            </button>
+          </p>
         </div>
 
       </main>
