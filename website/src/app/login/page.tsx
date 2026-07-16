@@ -41,7 +41,7 @@ export default function LoginPage() {
         const msg = loginError.message;
         setError(msg && msg !== '{}' ? msg : 'Sign in failed. Please check your credentials or try again.');
       } else {
-        router.push('/dashboard');
+        router.push('/account');
       }
     } catch (err: unknown) {
       console.error("Login exception caught:", err);

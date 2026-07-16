@@ -266,7 +266,7 @@ export default function DashboardPage() {
             <img 
               src="/boo-tube-icon.svg" 
               alt="BooTube Logo" 
-              className="h-7 w-auto"
+              className="h-8 w-auto transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]"
             />
           </Link>
           
