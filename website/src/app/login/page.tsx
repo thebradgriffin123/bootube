@@ -78,7 +78,7 @@ export default function LoginPage() {
             <img 
               src="/boo-tube-icon.svg" 
               alt="BooTube Logo" 
-              className="h-9 w-auto transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]"
+              className="h-12 w-auto transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_0_12px_rgba(6,182,212,0.45)]"
             />
           </Link>
         </div>
@@ -88,8 +88,10 @@ export default function LoginPage() {
           
           {/* Welcome Header (Left-aligned, inside container) */}
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-white">Welcome back</h2>
-            <p className="text-xs text-gray-400 mt-1">Sign in to manage your filters and account settings.</p>
+            <h2 className="text-xl font-bold text-white">Enter your info to sign in</h2>
+            <p className="text-xs text-gray-400 mt-1">
+              Or <Link href="/signup" className="text-cyan-400 hover:text-cyan-300 underline font-semibold transition-colors">get started with a new account</Link>.
+            </p>
           </div>
 
           <form onSubmit={handleLogin} noValidate className="space-y-5">
@@ -108,10 +110,10 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 onBlur={() => setEmailTouched(true)}
                 placeholder="name@domain.com"
-                className={`w-full bg-white/[0.03] border rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-1 transition-all ${
+                className={`w-full bg-white/[0.03] border rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:ring-2 transition-all ${
                   (emailTouched || showValidation) && !isEmailValid
-                    ? 'border-red-500/50 focus:border-red-500/50 focus:ring-red-500/50'
-                    : 'border-white/10 focus:border-cyan-500/50 focus:ring-cyan-500/50'
+                    ? 'border-red-500/50 focus:border-red-500/50 focus:ring-red-500/15'
+                    : 'border-white/10 focus:border-cyan-400/50 focus:ring-cyan-500/15 focus:shadow-[0_0_15px_rgba(6,182,212,0.1)]'
                 }`}
               />
               {(emailTouched || showValidation) && !isEmailValid && (
@@ -128,7 +130,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all"
+                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-cyan-400/50 focus:ring-2 focus:ring-cyan-500/15 focus:shadow-[0_0_15px_rgba(6,182,212,0.1)] transition-all"
               />
             </div>
 
@@ -141,7 +143,7 @@ export default function LoginPage() {
             <button 
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-extrabold rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_4px_15px_rgba(6,182,212,0.25)] hover:shadow-[0_4px_25px_rgba(6,182,212,0.4)]"
             >
               {loading ? (
                 <>
@@ -155,13 +157,6 @@ export default function LoginPage() {
             </button>
 
           </form>
-
-          <div className="mt-6 text-center text-xs text-gray-500">
-            Don&apos;t have an account yet?{' '}
-            <Link href="/signup" className="text-cyan-400 font-bold hover:underline">
-              Create Account
-            </Link>
-          </div>
         </div>
 
         <div className="text-center mt-6">
