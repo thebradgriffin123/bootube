@@ -32,6 +32,12 @@ export default function DashboardPage() {
 
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [exitModalOpen, setExitModalOpen] = useState(false);
+  const [cancelOption, setCancelOption] = useState<'cancel_only' | 'cancel_and_refund'>('cancel_only');
+  const [reasonCategory, setReasonCategory] = useState<'technical_issue' | 'missing_features' | 'too_expensive' | 'temporary_use' | 'other'>('technical_issue');
+  const [userExplanation, setUserExplanation] = useState('');
+  const [exitLoading, setExitLoading] = useState(false);
+  const [exitError, setExitError] = useState<string | null>(null);
   const router = useRouter();
 
   const fetchSubscriptionDetails = async (token: string) => {
@@ -237,6 +243,60 @@ export default function DashboardPage() {
     });
   };
 
+  const handleExitSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setExitLoading(true);
+    setExitError(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('You must be logged in to submit request.');
+      }
+
+      const res = await fetch('/api/subscription/cancel-request', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          request_type: cancelOption,
+          reason_category: reasonCategory,
+          user_explanation: userExplanation
+        })
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || 'Failed to submit cancellation request.');
+      }
+
+      const data = await res.json();
+      setExitModalOpen(false);
+      
+      // Update local state to reflect success
+      if (cancelOption === 'cancel_only') {
+        setNotification({ type: 'success', message: 'Your auto-renewal has been cancelled successfully.' });
+        if (subDetails) {
+          setSubDetails({ ...subDetails, autoRenew: false });
+        }
+      } else {
+        setNotification({ type: 'success', message: 'Your premium membership has been cancelled. Your refund request is now under review!' });
+        if (subDetails) {
+          setSubDetails({ ...subDetails, plan: 'free' });
+        }
+        if (profile) {
+          setProfile({ ...profile, subscription_status: 'free' });
+        }
+      }
+    } catch (err: any) {
+      console.error('Exit submission error:', err);
+      setExitError(err.message || 'An error occurred.');
+    } finally {
+      setExitLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#050505] flex items-center justify-center">
@@ -422,9 +482,25 @@ export default function DashboardPage() {
                       <div className="text-xs font-bold text-gray-400">Recurring Price:</div>
                       <div className="text-lg font-black text-cyan-400 mt-0.5">{subDetails.amount}</div>
                       <p className="text-[10px] text-gray-500 mt-1">
-                        {subDetails.autoRenew 
-                          ? 'Your plan automatically renews. You can cancel at any time to let it expire at the end of the current period.' 
-                          : 'You have cancelled auto-renewal. Your premium access will expire at the end of this billing cycle.'}
+                        {subDetails.autoRenew ? (
+                          <>
+                            Your plan automatically renews. You can cancel at any time to let it expire at the end of the current period.{' '}
+                            <button 
+                              onClick={() => {
+                                setCancelOption('cancel_only');
+                                setReasonCategory('technical_issue');
+                                setUserExplanation('');
+                                setExitError(null);
+                                setExitModalOpen(true);
+                              }}
+                              className="text-cyan-400 hover:text-cyan-300 font-semibold hover:underline inline ml-1 cursor-pointer bg-none border-none p-0"
+                            >
+                              Cancel membership
+                            </button>
+                          </>
+                        ) : (
+                          'You have cancelled auto-renewal. Your premium access will expire at the end of this billing cycle.'
+                        )}
                       </p>
                     </div>
                     <button
@@ -512,6 +588,121 @@ export default function DashboardPage() {
             </button>
           </p>
         </div>
+
+        {/* Cancellation / Refund Exit Modal */}
+        {exitModalOpen && (
+          <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <div className="bg-[#0d0e12] border border-[#1f222d] rounded-2xl w-full max-w-md p-6 shadow-2xl relative text-left">
+              <h3 className="text-lg font-black text-white mb-2">Cancel Membership</h3>
+              <p className="text-xs text-gray-400 mb-6">
+                We're sorry to see you go! Let us know how we can improve.
+              </p>
+
+              {exitError && (
+                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-xs text-red-400">
+                  {exitError}
+                </div>
+              )}
+
+              <form onSubmit={handleExitSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-[10px] uppercase font-bold tracking-wider text-gray-400 mb-1.5">
+                    Choose cancellation option
+                  </label>
+                  <div className="space-y-2">
+                    <label className="flex items-start gap-3 p-3 rounded-lg border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-colors cursor-pointer">
+                      <input 
+                        type="radio" 
+                        name="cancelOption" 
+                        value="cancel_only"
+                        checked={cancelOption === 'cancel_only'}
+                        onChange={() => setCancelOption('cancel_only')}
+                        className="mt-0.5"
+                      />
+                      <div>
+                        <div className="text-xs font-bold text-white">Just cancel auto-renewal</div>
+                        <div className="text-[10px] text-gray-400 mt-0.5">Keep premium access active until the end of the billing period.</div>
+                      </div>
+                    </label>
+                    
+                    <label className="flex items-start gap-3 p-3 rounded-lg border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] transition-colors cursor-pointer">
+                      <input 
+                        type="radio" 
+                        name="cancelOption" 
+                        value="cancel_and_refund"
+                        checked={cancelOption === 'cancel_and_refund'}
+                        onChange={() => setCancelOption('cancel_and_refund')}
+                        className="mt-0.5"
+                      />
+                      <div>
+                        <div className="text-xs font-bold text-white">Cancel immediately & request refund</div>
+                        <div className="text-[10px] text-gray-400 mt-0.5">Terminate access immediately and request review for a full refund of this month's charge.</div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] uppercase font-bold tracking-wider text-gray-400 mb-1.5">
+                    Why are you cancelling?
+                  </label>
+                  <select
+                    value={reasonCategory}
+                    onChange={(e) => setReasonCategory(e.target.value as any)}
+                    className="w-full bg-[#151821] border border-[#1f222d] rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500/50"
+                  >
+                    <option value="technical_issue">Technical issue / Page fails</option>
+                    <option value="missing_features">Missing required feature</option>
+                    <option value="too_expensive">Too expensive / Pricing</option>
+                    <option value="temporary_use">Temporary or one-time use</option>
+                    <option value="other">Other reason</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] uppercase font-bold tracking-wider text-gray-400 mb-1.5">
+                    Please describe the issues you faced {cancelOption === 'cancel_and_refund' && '(required)'}
+                  </label>
+                  <textarea
+                    value={userExplanation}
+                    onChange={(e) => setUserExplanation(e.target.value)}
+                    placeholder="Tell us what went wrong..."
+                    rows={3}
+                    required={cancelOption === 'cancel_and_refund'}
+                    className="w-full bg-[#151821] border border-[#1f222d] rounded-xl px-3 py-2 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500/50"
+                  />
+                </div>
+
+                <div className="flex gap-3 justify-end pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setExitModalOpen(false)}
+                    className="px-4 py-2 border border-white/5 hover:bg-white/[0.02] text-xs font-bold rounded-lg text-gray-400 cursor-pointer"
+                  >
+                    Keep premium
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={exitLoading}
+                    className="px-5 py-2.5 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-400 hover:to-pink-400 text-white font-extrabold text-xs rounded-lg cursor-pointer transition-all disabled:opacity-50 flex items-center gap-1.5"
+                  >
+                    {exitLoading ? (
+                      <>
+                        <svg className="animate-spin h-3 w-3 text-white" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Processing...
+                      </>
+                    ) : (
+                      cancelOption === 'cancel_and_refund' ? 'Request Refund' : 'Confirm Cancellation'
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
       </main>
     </div>
