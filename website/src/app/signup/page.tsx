@@ -101,15 +101,13 @@ export default function SignupPage() {
             <img 
               src="/boo-tube-icon.svg" 
               alt="BooTube Logo" 
-              className="h-9 w-auto transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]"
+              className="h-12 w-auto transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_0_12px_rgba(6,182,212,0.45)]"
             />
           </Link>
-          <h2 className="text-xl font-bold text-white mt-4">Create your account</h2>
-          <p className="text-xs text-gray-400 mt-1">Get started with custom, clean streaming.</p>
         </div>
 
         {/* Form Card */}
-        <div className="bg-white/[0.02] border border-white/5 backdrop-blur-md rounded-2xl p-8 shadow-2xl">
+        <div className="bg-black/50 border border-white/10 backdrop-blur-xl rounded-2xl p-8 shadow-2xl">
           {success ? (
             <div className="text-center py-4">
               <div className="w-12 h-12 rounded-full bg-cyan-950/40 border border-cyan-500/30 flex items-center justify-center text-xl text-cyan-400 mx-auto mb-4">
@@ -123,11 +121,19 @@ export default function SignupPage() {
                 href="/login"
                 className="mt-6 inline-block w-full text-center py-3 bg-white text-black font-bold rounded-xl hover:bg-gray-100 transition-all"
               >
-                Go to Sign In
+                Go to Log in
               </Link>
             </div>
           ) : (
-            <form onSubmit={handleSignup} noValidate className="space-y-5">
+            <>
+              <div className="mb-6">
+                <h2 className="text-xl font-bold text-white">Create your account</h2>
+                <p className="text-xs text-gray-400 mt-1">
+                  Or <Link href="/login" className="text-cyan-400 hover:text-cyan-300 underline font-semibold transition-colors">log in to an existing account</Link>.
+                </p>
+              </div>
+
+              <form onSubmit={handleSignup} noValidate className="space-y-5">
               
               {error && (
                 <div className="p-3 rounded-lg bg-red-950/20 border border-red-500/20 text-xs text-red-400">
@@ -230,32 +236,27 @@ export default function SignupPage() {
               <button 
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-extrabold rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-[0_4px_15px_rgba(6,182,212,0.25)] hover:shadow-[0_4px_25px_rgba(6,182,212,0.4)]"
               >
                 {loading ? (
                   <>
-                    <svg className="animate-spin h-4 w-4 text-black" fill="none" viewBox="0 0 24 24">
+                    <svg className="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
                     Creating account...
                   </>
-                ) : 'Sign Up'}
+                ) : 'Sign up'}
               </button>
 
             </form>
+            </>
           )}
 
-          <div className="mt-6 text-center text-xs text-gray-500">
-            Already have an account?{' '}
-            <Link href="/login" className="text-cyan-400 font-bold hover:underline">
-              Sign In
-            </Link>
-          </div>
         </div>
 
         <div className="text-center mt-6">
-          <Link href="/" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">
+          <Link href="/" className="text-xs text-gray-400 hover:text-gray-200 transition-colors">
             ← Back to Home
           </Link>
         </div>
