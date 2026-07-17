@@ -8,6 +8,14 @@ export default function HowItWorks() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoTime, setVideoTime] = useState(0);
+  const [lastStep, setLastStep] = useState(1);
+
+  const formatTime = (time: number) => {
+    const min = Math.floor(time / 60);
+    const sec = Math.floor(time % 60);
+    return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+  };
 
   // Responsive check
   useEffect(() => {
@@ -60,6 +68,40 @@ export default function HowItWorks() {
     }
   }, [scrollProgress, isMobile]);
 
+  // Step calculations for triggers
+  const currentStep = scrollProgress < 0.55 ? 1 : scrollProgress < 0.74 ? 2 : 3;
+  const isCensoringOn = scrollProgress >= 0.65;
+  const isHideCaptionsOn = scrollProgress >= 0.74;
+
+  // Rewind video on step 3 transition
+  useEffect(() => {
+    if (isMobile) return;
+    if (currentStep === 3 && lastStep !== 3) {
+      if (videoRef.current) {
+        videoRef.current.currentTime = 0;
+      }
+    }
+    setLastStep(currentStep);
+  }, [currentStep, lastStep, isMobile]);
+
+  // Programmatic muting based on timestamps in Step 3
+  useEffect(() => {
+    if (isMobile) return;
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (currentStep === 3) {
+      const shouldMute = 
+        (videoTime >= 1.0 && videoTime <= 2.0) || 
+        (videoTime >= 3.3 && videoTime <= 4.3) || 
+        (videoTime >= 4.8 && videoTime <= 5.6);
+      
+      video.muted = shouldMute;
+    } else {
+      video.muted = false;
+    }
+  }, [videoTime, currentStep, isMobile]);
+
   // Mobile layout fallback
   if (isMobile) {
     return (
@@ -73,53 +115,58 @@ export default function HowItWorks() {
             <p className="text-sm text-gray-400 mt-2">Filter your streams in three quick steps.</p>
           </div>
 
-          {/* Mobile Step 1 */}
           <div className="bg-[#0d0e12] border border-white/10 rounded-2xl p-6 space-y-4">
             <div className="flex items-center gap-3">
               <span className="w-8 h-8 rounded-full bg-cyan-950/50 border border-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-sm">1</span>
-              <h3 className="font-extrabold text-white">Click the Extensions Icon</h3>
+              <h3 className="font-extrabold text-white">Click the BooTube Icon</h3>
             </div>
             <p className="text-xs text-gray-400 leading-relaxed">
-              Click the jigsaw puzzle icon (🧩) in the top-right corner of your Chrome browser toolbar to manage your active browser extensions.
+              Locate and click the BooTube ghost icon directly in your Chrome browser toolbar to open the active settings console.
             </p>
             <div className="border border-white/5 rounded-xl overflow-hidden bg-black/40 p-4 flex items-center justify-between text-xs text-gray-500">
               <span>Extensions</span>
-              <span className="text-base">🧩</span>
+              <img src="/boo-tube-icon.svg" alt="BooTube Icon" className="h-5 w-auto" />
             </div>
           </div>
 
-          {/* Mobile Step 2 */}
           <div className="bg-[#0d0e12] border border-white/10 rounded-2xl p-6 space-y-4">
             <div className="flex items-center gap-3">
               <span className="w-8 h-8 rounded-full bg-cyan-950/50 border border-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-sm">2</span>
-              <h3 className="font-extrabold text-white">Open the Control Panel</h3>
+              <h3 className="font-extrabold text-white">Turn On Censoring & Hide Captions</h3>
             </div>
             <p className="text-xs text-gray-400 leading-relaxed">
-              Select **BooTube** from the dropdown list to slide open the custom control panel directly on top of your active streaming site.
+              Toggle **Censoring** to ON (Spaghetti Western) and toggle **Hide Captions** to ON. These settings apply immediately to clean the stream.
             </p>
-            <div className="border border-white/5 rounded-xl overflow-hidden bg-black/60 p-4 flex items-center gap-3">
-              <img src="/boo-tube-icon.svg" alt="BooTube Logo" className="h-6 w-auto" />
-              <div className="text-left">
-                <p className="text-xs font-bold text-white">BooTube Controller</p>
-                <p className="text-[10px] text-gray-500">Click to slide open overlay</p>
+            <div className="border border-white/5 rounded-xl overflow-hidden bg-[#0d0e12] p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-bold text-white">Censoring</p>
+                  <p className="text-[10px] text-gray-500">Spaghetti Western</p>
+                </div>
+                <span className="w-8 h-4.5 bg-cyan-500 rounded-full flex items-center px-0.5 justify-end">
+                  <span className="w-3.5 h-3.5 bg-white rounded-full" />
+                </span>
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                <p className="text-xs font-bold text-white">Hide Captions</p>
+                <span className="w-8 h-4.5 bg-cyan-500 rounded-full flex items-center px-0.5 justify-end">
+                  <span className="w-3.5 h-3.5 bg-white rounded-full" />
+                </span>
               </div>
             </div>
           </div>
 
-          {/* Mobile Step 3 */}
           <div className="bg-[#0d0e12] border border-white/10 rounded-2xl p-6 space-y-4">
             <div className="flex items-center gap-3">
               <span className="w-8 h-8 rounded-full bg-cyan-950/50 border border-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-sm">3</span>
-              <h3 className="font-extrabold text-white">Enable Censoring</h3>
+              <h3 className="font-extrabold text-white">Censored Playback</h3>
             </div>
             <p className="text-xs text-gray-400 leading-relaxed">
-              Toggle the filter switch to **ON**. Blasphemy filtering activates immediately. Customize blocklists to filter additional profane phrases instantly.
+              The video automatically plays with audio seamlessly muted at the exact moments of profanity, and the captions are completely hidden.
             </p>
             <div className="border border-cyan-500/20 bg-cyan-950/10 rounded-xl p-4 flex items-center justify-between">
-              <span className="text-xs font-bold text-cyan-400">BooTube Censoring</span>
-              <span className="w-10 h-6 bg-cyan-500 rounded-full flex items-center px-1 justify-end">
-                <span className="w-4 h-4 bg-black rounded-full" />
-              </span>
+              <span className="text-xs font-bold text-cyan-400">Stream Cleaned</span>
+              <span className="text-xs font-bold text-gray-400">🔇 Muted Real-Time</span>
             </div>
           </div>
         </div>
@@ -128,33 +175,25 @@ export default function HowItWorks() {
   }
 
   // Calculate scrolling ranges to drive mock states
-  // 1. Zoom TV Phase: progress 0.0 to 0.40
   const zoomProgress = Math.min(1, scrollProgress / 0.40);
-  const scale = 1 + zoomProgress * 3.8; // Scales background image up (from 1 to 4.8)
-  const bgOpacity = Math.max(0, 1 - Math.max(0, (scrollProgress - 0.35) / 0.08)); // Fades out background room image on transition
-  const bgOverlayOpacity = Math.max(0.1, 0.65 - zoomProgress * 0.55); // Fades dark overlay to bright/warm as camera zooms in
+  const scale = 1 + zoomProgress * 3.8;
+  const bgOpacity = Math.max(0, 1 - Math.max(0, (scrollProgress - 0.35) / 0.08));
+  const bgOverlayOpacity = Math.max(0.1, 0.65 - zoomProgress * 0.55);
 
-  // Hero Copy Fades
   const heroOpacity = Math.max(0, 1 - Math.min(1, scrollProgress / 0.20));
 
-  // Chrome Browser Window fades in
   const browserOpacity = scrollProgress < 0.35 ? 0 : Math.min(1, Math.max(0, (scrollProgress - 0.35) / 0.08));
-  const browserScale = scrollProgress < 0.35 ? 0.9 : 0.9 + Math.min(1, (scrollProgress - 0.35) / 0.08) * 0.1; // scale from 0.9 to 1.0
+  const browserScale = scrollProgress < 0.35 ? 0.9 : 0.9 + Math.min(1, (scrollProgress - 0.35) / 0.08) * 0.1;
 
-  // 3. Right-side Copy Transitions (instant transition, no overlap)
-  // Step 1: progress 0.35 to 0.55
   const step1Active = scrollProgress >= 0.35 && scrollProgress < 0.55;
   const step1Opacity = step1Active ? 1 : 0;
 
-  // Step 2: progress 0.55 to 0.74
   const step2Active = scrollProgress >= 0.55 && scrollProgress < 0.74;
   const step2Opacity = step2Active ? 1 : 0;
 
-  // Step 3: progress 0.74 to 1.00
   const step3Active = scrollProgress >= 0.74;
   const step3Opacity = step3Active ? 1 : 0;
 
-  // 4. Interactive pointer/mouse coordinates
   let cursorX = 75; 
   let cursorY = 85; 
   let cursorOpacity = 0;
@@ -162,44 +201,85 @@ export default function HowItWorks() {
   if (scrollProgress >= 0.38 && scrollProgress < 0.55) {
     cursorOpacity = 1;
     const t = (scrollProgress - 0.38) / 0.17; 
-    cursorX = 75 + t * 17; // Moves from 75 to 92
-    cursorY = 85 - t * 80; // Moves from 85 to 5 (Jigsaw Puzzle Icon)
-  } else if (scrollProgress >= 0.55 && scrollProgress < 0.74) {
+    cursorX = 75 + t * 17;
+    cursorY = 85 - t * 80;
+  } else if (scrollProgress >= 0.55 && scrollProgress < 0.65) {
     cursorOpacity = 1;
-    const t = (scrollProgress - 0.55) / 0.19;
-    cursorX = 92 - t * 4;  // Moves from 92 to 88
-    cursorY = 5 + t * 19;  // Moves from 5 to 24 (BooTube List Item)
-  } else if (scrollProgress >= 0.74 && scrollProgress < 0.88) {
+    const t = (scrollProgress - 0.55) / 0.10;
+    cursorX = 92 - t * 4;
+    cursorY = 5 + t * 17;
+  } else if (scrollProgress >= 0.65 && scrollProgress < 0.74) {
     cursorOpacity = 1;
-    const t = (scrollProgress - 0.74) / 0.14;
-    cursorX = 88 - t * 18; // Moves from 88 to 70
-    cursorY = 24 + t * 24; // Moves from 24 to 48 (BooTube Popup Toggle Switch)
+    const t = (scrollProgress - 0.65) / 0.09;
+    cursorX = 88;
+    cursorY = 22 + t * 10;
   }
+
+  const getCaptionText = () => {
+    if (isHideCaptionsOn) return null;
+
+    if (videoTime >= 0 && videoTime < 3.0) {
+      if (isCensoringOn) {
+        return (
+          <>
+            You are a <span className="bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-1.5 py-0.5 rounded font-extrabold uppercase text-[10px] md:text-[11px] animate-pulse font-sans">🚫 MUTED</span> liar,
+          </>
+        );
+      }
+      return <>You are a darn liar,</>;
+    }
+    
+    if (videoTime >= 3.0 && videoTime < 4.8) {
+      if (isCensoringOn) {
+        return (
+          <>
+            and I will see you in <span className="bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-1.5 py-0.5 rounded font-extrabold uppercase text-[10px] md:text-[11px] animate-pulse font-sans">🚫 MUTED</span>!
+          </>
+        );
+      }
+      return <>and I will see you in heck!</>;
+    }
+
+    if (videoTime >= 4.8 && videoTime < 7.0) {
+      if (isCensoringOn) {
+        return (
+          <>
+            <span className="bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-1.5 py-0.5 rounded font-extrabold uppercase text-[10px] md:text-[11px] animate-pulse font-sans">🚫 MUTED</span> you!
+          </>
+        );
+      }
+      return <>Forget you!</>;
+    }
+
+    return null;
+  };
+
+  const videoMuted = currentStep === 3 && (
+    (videoTime >= 1.0 && videoTime <= 2.0) || 
+    (videoTime >= 3.3 && videoTime <= 4.3) || 
+    (videoTime >= 4.8 && videoTime <= 5.6)
+  );
 
   return (
     <div ref={containerRef} className="relative min-h-[400vh] bg-black text-gray-100 selection:bg-cyan-500 selection:text-black">
       
-      {/* Sticky view box */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
         
-        {/* Living Room Background Image (Fully unblurred, scales up on scroll) */}
         <div 
           className="absolute inset-0 bg-cover bg-center pointer-events-none transition-transform will-change-transform"
           style={{ 
             backgroundImage: "url('/gemini-hero.jpeg')",
             opacity: bgOpacity,
             transform: `scale(${scale})`,
-            transformOrigin: '50% 37.0%', // Center of the TV screen in the image
+            transformOrigin: '50% 37.0%',
           }}
         />
 
-        {/* Ambient Overlay Layer (fades out as we zoom in) */}
         <div 
           className="absolute inset-0 bg-black pointer-events-none z-10" 
           style={{ opacity: bgOverlayOpacity }}
         />
 
-        {/* Centered Hero Copy Overlay (Fades out quickly at start of scroll) */}
         <div 
           className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-6 pointer-events-none"
           style={{ opacity: heroOpacity }}
@@ -218,13 +298,11 @@ export default function HowItWorks() {
           </div>
         </div>
 
-        {/* Two-column layout container for Walkthrough Steps */}
         {scrollProgress >= 0.35 && (
           <div 
             className="absolute left-0 right-0 w-full flex items-center justify-between gap-8 md:gap-16 z-20"
             style={{ height: 'calc(100vh - 80px)', marginTop: '80px' }}
           >
-            {/* LEFT SIDE: Chrome Web Browser Mockup */}
             <div 
               className="w-[55vw] aspect-[16/9] max-w-[1050px] transition-all duration-300 will-change-transform relative"
               style={{ 
@@ -233,184 +311,153 @@ export default function HowItWorks() {
                 transformOrigin: 'left center',
               }}
             >
-              {/* SCREEN CONTAINER (Chrome Browser Window) */}
               <div className="w-full h-full bg-black overflow-hidden relative rounded-r-xl border-y border-r border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.85)] flex flex-col">
                 
-                {/* MOCK CHROME BROWSER WINDOW LAYOUT */}
                 <div className="absolute inset-0 bg-[#0c0d12] flex flex-col z-0">
                   
-                  {/* Chrome Browser Address Bar Header */}
                   <div className="h-10 bg-[#181920] border-b border-white/5 flex items-center px-4 justify-between select-none flex-shrink-0">
                     
-                    {/* OS Controls */}
                     <div className="flex gap-1.5 items-center w-20">
                       <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
                       <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
                       <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
                     </div>
                     
-                    {/* URL Input Bar */}
                     <div className="bg-[#0f1016] border border-white/5 rounded-md px-3 py-1 text-[10px] text-gray-500 w-80 text-center truncate flex items-center justify-center gap-1.5">
-                      <span className="text-cyan-500 text-[8px]">🔒</span> youtube.com/watch?v=powerfuljre
+                      <span className="text-cyan-500 text-[8px]">🔒</span> youtube.com/watch?v=spaghettiwestern
                     </div>
 
-                    {/* Chrome Extensions bar */}
-                    <div className="flex gap-3 items-center justify-end w-20 relative">
+                    <div className="flex gap-3 items-center justify-end w-24 relative">
                       
-                      {/* Jigsaw Extensions puzzle icon */}
-                      <div 
-                        className={`text-[12px] p-0.5 rounded cursor-pointer transition-colors ${
-                          scrollProgress >= 0.55 && scrollProgress < 0.74 
-                            ? 'bg-white/10 text-cyan-400' 
-                            : 'text-gray-400 hover:text-white'
+                      <img 
+                        src="/boo-tube-icon.svg" 
+                        alt="BooTube Extension" 
+                        className={`h-5 w-auto cursor-pointer p-0.5 rounded transition-all duration-200 ${
+                          scrollProgress >= 0.55 && scrollProgress < 0.74
+                            ? 'bg-white/10 filter drop-shadow-[0_0_5px_rgba(6,182,212,0.8)] scale-110' 
+                            : 'opacity-70 hover:opacity-100 hover:scale-105'
                         }`}
-                      >
-                        🧩
-                      </div>
+                      />
 
-                      {/* Active BooTube shortcut logo in chrome navbar */}
-                      {scrollProgress >= 0.74 && (
-                        <img 
-                          src="/boo-tube-icon.svg" 
-                          alt="Icon" 
-                          className="h-4.5 w-auto animate-fade-in filter drop-shadow-[0_0_3px_rgba(6,182,212,0.65)]"
-                        />
-                      )}
-                      
-                      <div className="w-4 h-4 rounded-full bg-gray-600" />
+                      <div className="w-4 h-4 rounded-full bg-gray-600 flex-shrink-0" />
                     </div>
 
                   </div>
 
-                  {/* Web Page Body */}
                   <div className="flex-grow w-full h-0 relative">
                     
-                    {/* Video Player Box */}
                     <div className="w-full h-full bg-black/60 relative overflow-hidden flex items-center justify-center">
                       
-                      {/* Looping video stream */}
                       {scrollProgress >= 0.35 && (
                         <video
                           ref={videoRef}
-                          src="/powerfuljre-adam.mov"
+                          src="/cowboys.mp4"
                           loop
                           muted
                           playsInline
+                          onTimeUpdate={(e) => setVideoTime(e.currentTarget.currentTime)}
                           className="w-full h-full object-cover"
                         />
                       )}
 
-                      {/* Realtime Caption overlays */}
-                      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 w-full px-6 text-center">
-                        <div className="bg-black/80 px-4 py-2 rounded border border-white/10 max-w-[85%] mx-auto inline-block">
-                          <p className="text-[12px] md:text-[14px] text-white leading-relaxed font-medium">
-                            {scrollProgress >= 0.88 ? (
-                              <>
-                                ... maintainable and then / o that&apos;s the <span className="bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-1.5 py-0.5 rounded font-extrabold uppercase text-[10px] md:text-[11px] animate-pulse">🚫 MUTED</span> so
-                              </>
-                            ) : (
-                              <>
-                                ... maintainable and then / o that&apos;s the <span className="text-red-400 font-bold underline">key</span> so
-                              </>
-                            )}
-                          </p>
+                      {getCaptionText() && (
+                        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 w-full px-6 text-center pointer-events-none select-none">
+                          <div className="bg-black/80 px-4 py-2 rounded border border-white/10 max-w-[85%] mx-auto inline-block">
+                            <p className="text-[12px] md:text-[14px] text-white leading-relaxed font-semibold">
+                              {getCaptionText()}
+                            </p>
+                          </div>
                         </div>
-                      </div>
+                      )}
 
-                      {/* HTML5 Player Bar Controls */}
                       <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 to-transparent p-3 flex items-center justify-between text-white text-[10px] md:text-[11px] select-none">
                         <div className="flex gap-3 items-center">
                           <span>⏸</span>
-                          <span>{scrollProgress >= 0.88 ? '🔇' : '🔊'}</span>
+                          <span>{videoMuted ? '🔇' : '🔊'}</span>
                           <span className="w-20 h-1 bg-gray-600 rounded relative">
                             <span 
                               className="absolute left-0 top-0 bottom-0 bg-cyan-400 transition-all duration-300"
-                              style={{ width: scrollProgress >= 0.88 ? '0%' : '65%' }} 
+                              style={{ width: videoMuted ? '0%' : '65%' }} 
                             />
                           </span>
-                          <span>0:42 / 10:15</span>
+                          <span>{formatTime(videoTime)} / 0:07</span>
                         </div>
                         <div className="flex gap-3 items-center text-gray-400">
-                          <span>CC</span>
+                          <span className={isHideCaptionsOn ? 'line-through opacity-40' : 'text-cyan-400 font-extrabold'}>CC</span>
                           <span>⚙️</span>
                           <span>⛶</span>
                         </div>
                       </div>
 
-                      {/* Mute Visual Notification Overlay */}
-                      {scrollProgress >= 0.88 && (
-                        <div className="absolute top-3 right-3 bg-cyan-950/85 border border-cyan-500/30 px-3 py-1 rounded text-cyan-400 text-[10px] font-black tracking-wider animate-bounce shadow-[0_0_8px_rgba(6,182,212,0.2)]">
-                          🔇 AUDIO AUTO-MUTED
-                        </div>
-                      )}
-
                     </div>
 
-                    {/* EXTENSIONS LIST DROPDOWN */}
-                    {scrollProgress >= 0.55 && scrollProgress < 0.74 && (
-                      <div className="absolute top-11 right-12 w-52 bg-[#14151c] border border-white/10 rounded-lg p-2.5 shadow-2xl z-40 select-none animate-in fade-in slide-in-from-top-1 duration-150">
-                        <p className="text-[9px] font-extrabold text-gray-500 uppercase tracking-wider mb-1.5 px-1">Extensions</p>
-                        
-                        <div className={`flex items-center justify-between p-1.5 rounded ${scrollProgress >= 0.66 ? 'bg-white/5' : ''}`}>
-                          <div className="flex items-center gap-2">
-                            <img src="/boo-tube-icon.svg" alt="Icon" className="h-4 w-auto filter brightness-90" />
-                            <span className="text-[11px] font-bold text-white">BooTube Controller</span>
-                          </div>
-                          <span className="text-[9px] text-gray-400">📌</span>
-                        </div>
-
-                        <div className="flex items-center justify-between p-1.5 rounded mt-1 text-gray-400">
-                          <div className="flex items-center gap-2">
-                            <span className="text-[11px]">🛡️</span>
-                            <span className="text-[11px]">Ad Blocker Plus</span>
-                          </div>
-                          <span className="text-[9px] opacity-15">📌</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* MOCK BOOTUBE GLASSMORPHIC POPUP PANEL */}
-                    {scrollProgress >= 0.70 && (
+                    {scrollProgress >= 0.55 && (
                       <div 
-                        className="absolute top-11 right-6 w-56 bg-[#0d0e12]/95 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-2xl z-50 select-none animate-in fade-in slide-in-from-top-2 duration-300"
+                        className="absolute top-11 right-6 w-60 bg-[#0d0e12]/95 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-2xl z-50 select-none animate-in fade-in slide-in-from-top-2 duration-300"
                         style={{ 
                           boxShadow: '0 10px 30px rgba(0,0,0,0.8), 0 0 15px rgba(6,182,212,0.05)',
                         }}
                       >
                         
-                        {/* Header */}
-                        <div className="flex items-center justify-between border-b border-white/5 pb-2.5 mb-2.5">
+                        <div className="flex items-center justify-between border-b border-white/5 pb-2.5 mb-3">
                           <div className="flex items-center gap-1.5">
-                            <img src="/boo-tube-icon.svg" alt="Logo" className="h-4 w-auto" />
+                            <img src="/boo-tube-icon.svg" alt="Logo" className="h-4.5 w-auto" />
                             <span className="text-[11px] font-extrabold text-white">BooTube</span>
                           </div>
                           <span className="text-[9px] text-gray-500 uppercase font-black bg-white/5 px-1.5 py-0.5 rounded border border-white/5">v1.26</span>
                         </div>
 
-                        {/* Filter Toggle Row */}
-                        <div className="flex items-center justify-between py-1.5">
-                          <span className="text-[11px] font-bold text-gray-300">Enable Filters</span>
+                        <div className="flex items-center justify-between py-2 border-b border-white/5">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="w-7 h-7 rounded flex items-center justify-center bg-red-950/20 border border-red-500/30 text-[12px] flex-shrink-0">
+                              📺
+                            </div>
+                            <div className="min-w-0">
+                              <h4 className="text-[11px] font-extrabold text-white leading-tight">Censoring</h4>
+                              <p className="text-[9px] text-gray-400 truncate">Spaghetti Western</p>
+                            </div>
+                          </div>
                           
-                          {/* Switch Toggle */}
                           <button 
-                            className={`w-8 h-4.5 rounded-full flex items-center px-0.5 transition-all duration-300 ${
-                              scrollProgress >= 0.88
-                                ? 'bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.5)]' 
-                                : 'bg-white/10'
-                            }`}
+                            className="w-10 h-5.5 rounded-full flex items-center px-0.5 transition-all duration-300 relative border-none cursor-pointer outline-none"
+                            style={{
+                              background: isCensoringOn
+                                ? 'linear-gradient(135deg, #4789F0, #3AA5C2)' 
+                                : 'linear-gradient(135deg, #D7361F, #FD533B)'
+                            }}
                           >
                             <span 
-                              className={`w-3.5 h-3.5 rounded-full bg-black transition-all duration-300 transform ${
-                                scrollProgress >= 0.88 ? 'translate-x-3.5 bg-white' : 'translate-x-0'
+                              className={`w-4.5 h-4.5 rounded-full bg-white transition-all duration-300 transform shadow-md ${
+                                isCensoringOn ? 'translate-x-4.5' : 'translate-x-0'
                               }`}
                             />
                           </button>
                         </div>
 
-                        {/* Presets List */}
-                        <div className="mt-3 pt-3 border-t border-white/5 flex gap-2 justify-center">
-                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded border ${scrollProgress >= 0.88 ? 'bg-cyan-950/40 text-cyan-400 border-cyan-800/30' : 'bg-white/5 text-gray-400 border-white/5'}`}>Blasphemy</span>
-                          <span className={`text-[9px] font-bold px-2 py-0.5 rounded border ${scrollProgress >= 0.88 ? 'bg-cyan-950/40 text-cyan-400 border-cyan-800/30 font-extrabold' : 'bg-white/5 text-gray-400 border-white/5'}`}>Profanity</span>
+                        <div className="flex items-center justify-between py-2">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-7 h-7 rounded flex items-center justify-center bg-cyan-950/20 border border-cyan-500/30 text-[12px] flex-shrink-0">
+                              CC
+                            </div>
+                            <div>
+                              <h4 className="text-[11px] font-extrabold text-white leading-tight">Hide Captions</h4>
+                            </div>
+                          </div>
+                          
+                          <button 
+                            className="w-10 h-5.5 rounded-full flex items-center px-0.5 transition-all duration-300 relative border-none cursor-pointer outline-none"
+                            style={{
+                              background: isHideCaptionsOn
+                                ? 'linear-gradient(135deg, #4789F0, #3AA5C2)' 
+                                : 'linear-gradient(135deg, #D7361F, #FD533B)'
+                            }}
+                          >
+                            <span 
+                              className={`w-4.5 h-4.5 rounded-full bg-white transition-all duration-300 transform shadow-md ${
+                                isHideCaptionsOn ? 'translate-x-4.5' : 'translate-x-0'
+                              }`}
+                            />
+                          </button>
                         </div>
 
                       </div>
@@ -419,7 +466,6 @@ export default function HowItWorks() {
                   </div>
                 </div>
 
-                {/* CURSOR MOUSE POINTER */}
                 <div 
                   className="absolute w-4 h-4 z-50 pointer-events-none transition-all duration-75"
                   style={{ 
@@ -438,10 +484,8 @@ export default function HowItWorks() {
 
             </div>
 
-            {/* RIGHT SIDE: Interactive Copy Steps */}
             <div className="w-[35vw] max-w-[450px] pr-8 md:pr-16 relative h-[400px]">
               
-              {/* Step 1 */}
               <div 
                 className="space-y-4 absolute inset-0 flex flex-col justify-center"
                 style={{ 
@@ -453,18 +497,17 @@ export default function HowItWorks() {
                   Step 1
                 </span>
                 <h3 className="text-3xl sm:text-4xl font-black text-white leading-tight">
-                  Click the Extensions Icon
+                  Click the BooTube Icon
                 </h3>
                 <p className="text-sm sm:text-base text-gray-400 leading-relaxed font-medium">
-                  Click the jigsaw puzzle icon in the top-right corner of your Chrome browser toolbar. This displays your active extensions.
+                  Locate and click the BooTube ghost icon directly in your Chrome browser toolbar to open the active settings console.
                 </p>
                 <ul className="space-y-2 text-xs sm:text-sm text-gray-500 font-semibold">
-                  <li className="flex items-center gap-2">🧩 View installed tools</li>
-                  <li className="flex items-center gap-2">🔍 Pin shortcuts for easy access</li>
+                  <li className="flex items-center gap-2">👻 Access settings instantly</li>
+                  <li className="flex items-center gap-2">🔒 Privacy-first local filtering</li>
                 </ul>
               </div>
 
-              {/* Step 2 */}
               <div 
                 className="space-y-4 absolute inset-0 flex flex-col justify-center"
                 style={{ 
@@ -476,18 +519,17 @@ export default function HowItWorks() {
                   Step 2
                 </span>
                 <h3 className="text-3xl sm:text-4xl font-black text-white leading-tight">
-                  Open the Control Panel
+                  Turn On Censoring & Hide Captions
                 </h3>
                 <p className="text-sm sm:text-base text-gray-400 leading-relaxed font-medium">
-                  Locate **BooTube** in the dropdown list and click it. This slides open your custom settings console right on the page.
+                  Toggle **Censoring** to ON (Spaghetti Western) and toggle **Hide Captions** to ON. These settings apply immediately to clean the stream.
                 </p>
                 <ul className="space-y-2 text-xs sm:text-sm text-gray-500 font-semibold">
-                  <li className="flex items-center gap-2">👻 Launches the overlay dashboard</li>
-                  <li className="flex items-center gap-2">⚙️ Direct access to filter preferences</li>
+                  <li className="flex items-center gap-2">⚡ Real-time client-side scanning</li>
+                  <li className="flex items-center gap-2">💬 Hide subtitles dynamically</li>
                 </ul>
               </div>
 
-              {/* Step 3 */}
               <div 
                 className="space-y-4 absolute inset-0 flex flex-col justify-center"
                 style={{ 
@@ -499,14 +541,14 @@ export default function HowItWorks() {
                   Step 3
                 </span>
                 <h3 className="text-3xl sm:text-4xl font-black text-white leading-tight">
-                  Turn On Censoring
+                  Censored Playback
                 </h3>
                 <p className="text-sm sm:text-base text-gray-400 leading-relaxed font-medium">
-                  Toggle the master switch to **ON**. Blasphemy filtering activates immediately. Audio will automatically mute and video will blur when blocked words are detected.
+                  The video automatically rewinds and plays again. The audio is seamlessly muted at 1.5s (*darn*), 3.7s (*heck*), and 5.0s (*forget*), and the captions are hidden.
                 </p>
                 <ul className="space-y-2 text-xs sm:text-sm text-gray-500 font-semibold">
-                  <li className="flex items-center gap-2">⚡ Real-time client-side scanning</li>
-                  <li className="flex items-center gap-2">🔒 Privacy-first: No tracking, no latency</li>
+                  <li className="flex items-center gap-2">🔇 Mutes audio, never cuts video</li>
+                  <li className="flex items-center gap-2">🤠 Cohesive demo experience</li>
                 </ul>
               </div>
 
