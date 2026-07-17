@@ -12,7 +12,7 @@ export default function HowItWorks() {
   // Responsive check
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024); // Fallback for tablets and mobile below 1024px
+      setIsMobile(window.innerWidth < 1024); // Mobile/Tablet layout
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -49,7 +49,7 @@ export default function HowItWorks() {
     const video = videoRef.current;
     if (!video) return;
 
-    if (scrollProgress >= 0.40) {
+    if (scrollProgress >= 0.38) {
       if (video.paused) {
         video.play().catch((err) => console.log('Video play interrupted:', err));
       }
@@ -130,16 +130,23 @@ export default function HowItWorks() {
   // Calculate scrolling ranges to drive mock states
   // 1. Zoom TV Phase: progress 0.0 to 0.40
   const zoomProgress = Math.min(1, scrollProgress / 0.40);
-  const scale = 1 + zoomProgress * 3.4; // Scales from 1 to 4.4
-  const bgOpacity = Math.max(0, 1 - zoomProgress * 1.5); // Fades living room out
-  const tvBezelOpacity = Math.max(0, 1 - Math.max(0, (scrollProgress - 0.20) / 0.18)); // TV frame vanishes on transition
+  const scale = 1 + zoomProgress * 3.8; // Scales background image up (from 1 to 4.8)
+  const bgOpacity = Math.max(0, 1 - Math.max(0, (scrollProgress - 0.35) / 0.08)); // Fades out background room image on transition
+  const bgOverlayOpacity = Math.max(0.1, 0.65 - zoomProgress * 0.55); // Fades dark overlay to bright/warm as camera zooms in
+
+  // Hero Copy Fades
+  const heroOpacity = Math.max(0, 1 - Math.min(1, scrollProgress / 0.20));
 
   // 2. Slide Browser Left: progress 0.40 to 0.52
   let translateX = 0;
   if (scrollProgress >= 0.40) {
     const t = Math.min(1, (scrollProgress - 0.40) / 0.12);
-    translateX = -t * 18; // Slide left by 18% of view space
+    translateX = -t * 18; 
   }
+
+  // Chrome Browser Window fades in
+  const browserOpacity = scrollProgress < 0.35 ? 0 : Math.min(1, Math.max(0, (scrollProgress - 0.35) / 0.08));
+  const browserScale = scrollProgress < 0.35 ? 0.9 : 0.9 + Math.min(1, (scrollProgress - 0.35) / 0.08) * 0.1; // scale from 0.9 to 1.0
 
   // 3. Right-side Copy Fades
   // Step 1: progress 0.50 to 0.70
@@ -155,70 +162,71 @@ export default function HowItWorks() {
   const step3Opacity = scrollProgress >= 0.83 ? 1 : 0;
 
   // 4. Interactive pointer/mouse coordinates
-  let cursorX = 75; // Initial centered-right percentage
+  let cursorX = 75; 
   let cursorY = 85; 
   let cursorOpacity = 0;
 
   if (scrollProgress >= 0.48 && scrollProgress < 0.64) {
-    // Moves towards jigsaw icon (top right of browser toolbar)
     cursorOpacity = 1;
-    const t = (scrollProgress - 0.48) / 0.16; // 0 to 1
-    cursorX = 75 - t * 28; // Moves from right-center to Extensions bar (~93% width)
-    cursorY = 85 - t * 81; // Moves up to toolbar (~4% height)
+    const t = (scrollProgress - 0.48) / 0.16; 
+    cursorX = 75 - t * 28; 
+    cursorY = 85 - t * 81; 
   } else if (scrollProgress >= 0.64 && scrollProgress < 0.80) {
-    // Clicks extensions, moves down to click BooTube row
     cursorOpacity = 1;
     const t = (scrollProgress - 0.64) / 0.16;
-    cursorX = 47 + t * 41; // Focuses on the BooTube row click (~88%)
-    cursorY = 4 + t * 20;  // Moves down standard dropdown menu
+    cursorX = 47 + t * 41; 
+    cursorY = 4 + t * 20; 
   } else if (scrollProgress >= 0.80 && scrollProgress < 0.94) {
-    // Moves to toggle inside the BooTube popup panel
     cursorOpacity = 1;
     const t = (scrollProgress - 0.80) / 0.14;
-    cursorX = 88 - t * 18; // Moves towards the enable toggle button
-    cursorY = 24 + t * 24; // Moves down to toggle row
+    cursorX = 88 - t * 18; 
+    cursorY = 24 + t * 24; 
   }
 
   return (
-    <div ref={containerRef} className="relative min-h-[400vh] bg-[#050505] text-gray-100">
+    <div ref={containerRef} className="relative min-h-[400vh] bg-black text-gray-100 selection:bg-cyan-500 selection:text-black">
       
       {/* Sticky view box */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
         
-        {/* Backdrop living room environment */}
+        {/* Living Room Background Image (Fully unblurred, scales up on scroll) */}
         <div 
-          className="absolute inset-0 bg-cover bg-center pointer-events-none transition-opacity duration-300"
+          className="absolute inset-0 bg-cover bg-center pointer-events-none transition-transform will-change-transform"
           style={{ 
             backgroundImage: "url('/login-background.jpeg')",
             opacity: bgOpacity,
-            transform: `scale(${1 + zoomProgress * 0.4})`,
-            filter: 'brightness(0.35) contrast(1.1) blur(2px)',
+            transform: `scale(${scale})`,
+            transformOrigin: '50% 46.8%', // Center of the TV screen in the image
           }}
         />
 
-        {/* Cinematic Vignette Overlay */}
+        {/* Ambient Overlay Layer (fades out as we zoom in) */}
         <div 
-          className="absolute inset-0 bg-radial-gradient from-transparent via-black/45 to-black pointer-events-none z-10" 
-          style={{ opacity: bgOpacity }}
+          className="absolute inset-0 bg-black pointer-events-none z-10" 
+          style={{ opacity: bgOverlayOpacity }}
         />
 
-        {/* LEFT SIDE: Heading Overlay during initial scroll */}
-        {scrollProgress < 0.35 && (
-          <div className="absolute left-10 md:left-24 top-1/2 -translate-y-1/2 w-80 md:w-96 space-y-4 z-30 pointer-events-none transition-opacity duration-500">
-            <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400 bg-cyan-950/40 border border-cyan-800/30 px-3 py-1 rounded-full">
-              Walkthrough Showcase
-            </span>
-            <h3 className="text-3xl font-black text-white leading-tight">
-              Watch how simple it is to activate.
-            </h3>
-            <p className="text-sm text-gray-400 leading-relaxed">
-              Scroll down to zoom directly into the TV screen and explore how our Chrome extension controls filtering.
-            </p>
-            <div className="text-xs text-cyan-500 font-bold animate-pulse flex items-center gap-1.5">
-              <span>↓ Scroll down to begin</span>
-            </div>
+        {/* Centered Hero Copy Overlay (Fades out quickly at start of scroll) */}
+        <div 
+          className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-6 pointer-events-none"
+          style={{ opacity: heroOpacity }}
+        >
+          <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400 bg-cyan-950/40 border border-cyan-800/30 px-3.5 py-1.5 rounded-full mb-6">
+            Censorship Simulator
+          </span>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white mb-6 max-w-3xl leading-none">
+            Keep your streams clean.
+          </h1>
+          <p className="text-base sm:text-lg text-gray-300 max-w-2xl leading-relaxed mb-10">
+            BooTube automatically ghosts profanity and blasphemy in real-time. Muting the language, never the video.
+          </p>
+          <div className="px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-extrabold rounded-full shadow-[0_0_20px_rgba(6,182,212,0.3)] text-sm">
+            Get BooTube — It&apos;s Free
           </div>
-        )}
+          <div className="text-xs text-gray-400 mt-6 animate-pulse">
+            ↓ Scroll down to zoom in
+          </div>
+        </div>
 
         {/* RIGHT SIDE: Interactive Copy Steps */}
         {scrollProgress >= 0.35 && (
@@ -238,10 +246,10 @@ export default function HowItWorks() {
               <h3 className="text-3xl font-black text-white leading-tight">
                 Click the Extensions Icon
               </h3>
-              <p className="text-sm text-gray-400 leading-relaxed">
-                Click the jigsaw puzzle icon in the top-right corner of your browser toolbar. This displays your active extensions.
+              <p className="text-sm text-gray-400 leading-relaxed font-medium">
+                Click the jigsaw puzzle icon in the top-right corner of your Chrome browser toolbar. This displays your active extensions.
               </p>
-              <ul className="space-y-2 text-xs text-gray-500 font-medium">
+              <ul className="space-y-2 text-xs text-gray-500 font-semibold">
                 <li className="flex items-center gap-2">🧩 View installed tools</li>
                 <li className="flex items-center gap-2">🔍 Pin shortcuts for easy access</li>
               </ul>
@@ -261,10 +269,10 @@ export default function HowItWorks() {
               <h3 className="text-3xl font-black text-white leading-tight">
                 Open the Control Panel
               </h3>
-              <p className="text-sm text-gray-400 leading-relaxed">
+              <p className="text-sm text-gray-400 leading-relaxed font-medium">
                 Locate **BooTube** in the dropdown list and click it. This slides open your custom settings console right on the page.
               </p>
-              <ul className="space-y-2 text-xs text-gray-500 font-medium">
+              <ul className="space-y-2 text-xs text-gray-500 font-semibold">
                 <li className="flex items-center gap-2">👻 Launches the overlay dashboard</li>
                 <li className="flex items-center gap-2">⚙️ Direct access to filter preferences</li>
               </ul>
@@ -284,10 +292,10 @@ export default function HowItWorks() {
               <h3 className="text-3xl font-black text-white leading-tight">
                 Turn On Censoring
               </h3>
-              <p className="text-sm text-gray-400 leading-relaxed">
+              <p className="text-sm text-gray-400 leading-relaxed font-medium">
                 Toggle the master switch to **ON**. Blasphemy filtering activates immediately. Audio will automatically mute and video will blur when blocked words are detected.
               </p>
-              <ul className="space-y-2 text-xs text-gray-500 font-medium">
+              <ul className="space-y-2 text-xs text-gray-500 font-semibold">
                 <li className="flex items-center gap-2">⚡ Real-time client-side scanning</li>
                 <li className="flex items-center gap-2">🔒 Privacy-first: No tracking, no latency</li>
               </ul>
@@ -296,46 +304,17 @@ export default function HowItWorks() {
           </div>
         )}
 
-        {/* LEFT / CENTER: The Zooming TV and Chrome Web Browser frame */}
+        {/* LEFT / CENTER: Chrome Web Browser Mockup */}
         <div 
           className="relative z-20 flex items-center justify-center transition-all duration-300 will-change-transform"
           style={{ 
-            transform: `scale(${scale}) translateX(${translateX}px)`,
+            transform: `scale(${browserScale}) translateX(${translateX}px)`,
+            opacity: browserOpacity,
           }}
         >
-          {/* TV Frame border (fades as camera moves through screen) */}
-          <div 
-            className="absolute -inset-x-8 -inset-y-6 border-[12px] border-neutral-800 bg-neutral-900 rounded-3xl shadow-[0_0_60px_rgba(0,0,0,0.85)] z-10 pointer-events-none"
-            style={{ 
-              opacity: tvBezelOpacity,
-              boxShadow: 'inset 0 0 12px rgba(255,255,255,0.08)'
-            }}
-          />
-
-          {/* TV Base Stand */}
-          <div 
-            className="absolute bottom-[-45px] w-32 h-10 bg-neutral-800 border-t-2 border-neutral-700 rounded-b-lg z-0 pointer-events-none"
-            style={{ opacity: tvBezelOpacity }}
-          />
-
-          {/* Core TV / Chrome browser screen content */}
-          <div className="w-[500px] h-[281px] bg-black overflow-hidden relative rounded-xl border border-white/5 z-20">
+          {/* SCREEN CONTAINER (Chrome Browser Window) */}
+          <div className="w-[500px] h-[281px] bg-black overflow-hidden relative rounded-xl border border-white/10 z-20 shadow-[0_20px_50px_rgba(0,0,0,0.85)]">
             
-            {/* TV Screen playing standoff (pre-transition) */}
-            <div 
-              className="absolute inset-0 bg-cover bg-center transition-opacity duration-500 z-10"
-              style={{ 
-                backgroundImage: "url('/login-background.jpeg')",
-                opacity: scrollProgress < 0.40 ? 1 : 0 
-              }}
-            >
-              <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-                <div className="w-12 h-12 rounded-full bg-cyan-500/80 flex items-center justify-center text-white pl-1 shadow-[0_0_20px_rgba(6,182,212,0.4)] animate-pulse">
-                  ▶
-                </div>
-              </div>
-            </div>
-
             {/* MOCK CHROME BROWSER WINDOW LAYOUT */}
             <div className="absolute inset-0 bg-[#0c0d12] flex flex-col z-0">
               
@@ -389,7 +368,7 @@ export default function HowItWorks() {
                 <div className="w-full h-[180px] bg-black/60 rounded-lg relative overflow-hidden border border-white/5 flex items-center justify-center">
                   
                   {/* Looping video stream */}
-                  {scrollProgress >= 0.38 && (
+                  {scrollProgress >= 0.35 && (
                     <video
                       ref={videoRef}
                       src="/powerfuljre-adam.mov"
@@ -439,7 +418,7 @@ export default function HowItWorks() {
 
                   {/* Mute Visual Notification Overlay */}
                   {scrollProgress >= 0.88 && (
-                    <div className="absolute top-2 left-2 bg-cyan-950/85 border border-cyan-500/30 px-2 py-0.5 rounded text-cyan-400 text-[6.5px] font-black tracking-wider animate-bounce shadow-[0_0_8px_rgba(6,182,212,0.2)]">
+                    <div className="absolute top-2 right-2 bg-cyan-950/85 border border-cyan-500/30 px-2 py-0.5 rounded text-cyan-400 text-[6.5px] font-black tracking-wider animate-bounce shadow-[0_0_8px_rgba(6,182,212,0.2)]">
                       🔇 AUDIO AUTO-MUTED
                     </div>
                   )}
