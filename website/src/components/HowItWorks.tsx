@@ -10,6 +10,7 @@ export default function HowItWorks() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoTime, setVideoTime] = useState(0);
   const [lastStep, setLastStep] = useState(1);
+  const [demoTime, setDemoTime] = useState(0);
 
   const formatTime = (time: number) => {
     const min = Math.floor(time / 60);
@@ -51,27 +52,61 @@ export default function HowItWorks() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isMobile]);
 
-  // Synchronize video play state with scroll trigger
+  // Master timer to drive the walkthrough demo state automatically on screen enter
+  useEffect(() => {
+    if (isMobile || scrollProgress < 0.35) {
+      setDemoTime(0);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setDemoTime((prev) => {
+        const next = prev + 0.05;
+        return next >= 15.0 ? 0 : next;
+      });
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, [scrollProgress, isMobile]);
+
+  // Synchronize video play state with master demoTime triggers
   useEffect(() => {
     if (isMobile) return;
     const video = videoRef.current;
     if (!video) return;
 
-    if (scrollProgress >= 0.38) {
-      if (video.paused) {
-        video.play().catch((err) => console.log('Video play interrupted:', err));
+    if (scrollProgress >= 0.35) {
+      if (demoTime < 5.5) {
+        if (video.paused) video.play().catch(() => {});
+      } else if (demoTime >= 5.5 && demoTime < 8.0) {
+        if (!video.paused) video.pause();
+      } else if (demoTime >= 8.0 && demoTime < 15.0) {
+        if (video.paused) video.play().catch(() => {});
       }
     } else {
-      if (!video.paused) {
-        video.pause();
-      }
+      if (!video.paused) video.pause();
     }
-  }, [scrollProgress, isMobile]);
+  }, [demoTime, scrollProgress, isMobile]);
 
-  // Step calculations for triggers
-  const currentStep = scrollProgress < 0.55 ? 1 : scrollProgress < 0.74 ? 2 : 3;
-  const isCensoringOn = scrollProgress >= 0.65;
-  const isHideCaptionsOn = scrollProgress >= 0.74;
+  // Handle seeks at phase boundaries
+  useEffect(() => {
+    if (isMobile) return;
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (demoTime === 0) {
+      video.currentTime = 0;
+    } else if (demoTime >= 5.5 && demoTime < 5.6) {
+      video.currentTime = 5.5;
+    } else if (demoTime >= 8.0 && demoTime < 8.1) {
+      video.currentTime = 0;
+    }
+  }, [demoTime, isMobile]);
+
+  // Step calculations for triggers (driven automatically by demoTime)
+  const currentStep = demoTime < 5.5 ? 1 : demoTime < 8.0 ? 2 : 3;
+  const isCensoringOn = demoTime >= 6.5;
+  const isHideCaptionsOn = demoTime >= 7.5;
 
   // Rewind video on step 3 transition
   useEffect(() => {
@@ -185,34 +220,36 @@ export default function HowItWorks() {
   const browserOpacity = scrollProgress < 0.35 ? 0 : Math.min(1, Math.max(0, (scrollProgress - 0.35) / 0.08));
   const browserScale = scrollProgress < 0.35 ? 0.9 : 0.9 + Math.min(1, (scrollProgress - 0.35) / 0.08) * 0.1;
 
-  const step1Active = scrollProgress >= 0.35 && scrollProgress < 0.55;
+  // 3. Right-side Copy Transitions (instant transition, no overlap)
+  const step1Active = currentStep === 1;
   const step1Opacity = step1Active ? 1 : 0;
 
-  const step2Active = scrollProgress >= 0.55 && scrollProgress < 0.74;
+  const step2Active = currentStep === 2;
   const step2Opacity = step2Active ? 1 : 0;
 
-  const step3Active = scrollProgress >= 0.74;
+  const step3Active = currentStep === 3;
   const step3Opacity = step3Active ? 1 : 0;
 
+  // 4. Interactive pointer/mouse coordinates (driven by automated demoTime)
   let cursorX = 75; 
   let cursorY = 85; 
   let cursorOpacity = 0;
 
-  if (scrollProgress >= 0.38 && scrollProgress < 0.55) {
+  if (demoTime >= 0.5 && demoTime < 5.5) {
     cursorOpacity = 1;
-    const t = (scrollProgress - 0.38) / 0.17; 
-    cursorX = 75 + t * 17;
-    cursorY = 85 - t * 80;
-  } else if (scrollProgress >= 0.55 && scrollProgress < 0.65) {
+    const t = (demoTime - 0.5) / 5.0; 
+    cursorX = 75 + t * 17; // Moves from 75 to 92 (BooTube Icon)
+    cursorY = 85 - t * 80; // Moves from 85 to 5
+  } else if (demoTime >= 5.5 && demoTime < 6.5) {
     cursorOpacity = 1;
-    const t = (scrollProgress - 0.55) / 0.10;
-    cursorX = 92 - t * 4;
-    cursorY = 5 + t * 17;
-  } else if (scrollProgress >= 0.65 && scrollProgress < 0.74) {
+    const t = (demoTime - 5.5) / 1.0;
+    cursorX = 92 - t * 4;  // Moves from 92 to 88
+    cursorY = 5 + t * 17;  // Moves from 5 to 22 (Censoring Switch)
+  } else if (demoTime >= 6.5 && demoTime < 7.5) {
     cursorOpacity = 1;
-    const t = (scrollProgress - 0.65) / 0.09;
+    const t = (demoTime - 6.5) / 1.0;
     cursorX = 88;
-    cursorY = 22 + t * 10;
+    cursorY = 22 + t * 10; // Moves from 22 to 32 (Hide Captions Switch)
   }
 
   const getCaptionText = () => {
@@ -226,7 +263,7 @@ export default function HowItWorks() {
           </>
         );
       }
-      return <>You are a darn liar,</>;
+      return <>You are a dang liar,</>;
     }
     
     if (videoTime >= 3.0 && videoTime < 4.8) {
@@ -300,11 +337,11 @@ export default function HowItWorks() {
 
         {scrollProgress >= 0.35 && (
           <div 
-            className="absolute left-0 right-0 w-full flex items-center justify-between gap-8 md:gap-16 z-20"
+            className="absolute left-0 right-0 w-full flex items-center justify-between pl-0 pr-12 md:pr-24 lg:pr-32 gap-10 md:gap-16 z-20"
             style={{ height: 'calc(100vh - 80px)', marginTop: '80px' }}
           >
             <div 
-              className="w-[55vw] aspect-[16/9] max-w-[1050px] transition-all duration-300 will-change-transform relative"
+              className="w-[60vw] aspect-[16/9] max-w-[1150px] transition-all duration-300 will-change-transform relative"
               style={{ 
                 transform: `scale(${browserScale})`,
                 opacity: browserOpacity,
@@ -333,7 +370,7 @@ export default function HowItWorks() {
                         src="/boo-tube-icon.svg" 
                         alt="BooTube Extension" 
                         className={`h-5 w-auto cursor-pointer p-0.5 rounded transition-all duration-200 ${
-                          scrollProgress >= 0.55 && scrollProgress < 0.74
+                          currentStep === 2
                             ? 'bg-white/10 filter drop-shadow-[0_0_5px_rgba(6,182,212,0.8)] scale-110' 
                             : 'opacity-70 hover:opacity-100 hover:scale-105'
                         }`}
@@ -391,7 +428,7 @@ export default function HowItWorks() {
 
                     </div>
 
-                    {scrollProgress >= 0.55 && (
+                    {currentStep >= 2 && (
                       <div 
                         className="absolute top-11 right-6 w-60 bg-[#0d0e12]/95 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-2xl z-50 select-none animate-in fade-in slide-in-from-top-2 duration-300"
                         style={{ 
@@ -484,7 +521,7 @@ export default function HowItWorks() {
 
             </div>
 
-            <div className="w-[35vw] max-w-[450px] pr-8 md:pr-16 relative h-[400px]">
+            <div className="w-[30vw] max-w-[420px] relative h-[400px]">
               
               <div 
                 className="space-y-4 absolute inset-0 flex flex-col justify-center"
@@ -544,7 +581,7 @@ export default function HowItWorks() {
                   Censored Playback
                 </h3>
                 <p className="text-sm sm:text-base text-gray-400 leading-relaxed font-medium">
-                  The video automatically rewinds and plays again. The audio is seamlessly muted at 1.5s (*darn*), 3.7s (*heck*), and 5.0s (*forget*), and the captions are hidden.
+                  The video automatically rewinds and plays again. The audio is seamlessly muted at 1.5s (*dang*), 3.7s (*heck*), and 5.0s (*forget*), and the captions are hidden.
                 </p>
                 <ul className="space-y-2 text-xs sm:text-sm text-gray-500 font-semibold">
                   <li className="flex items-center gap-2">🔇 Mutes audio, never cuts video</li>
