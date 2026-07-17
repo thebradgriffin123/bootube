@@ -193,7 +193,7 @@ export default function HowItWorks() {
         <div 
           className="absolute inset-0 bg-cover bg-center pointer-events-none transition-transform will-change-transform"
           style={{ 
-            backgroundImage: "url('/login-background.jpeg')",
+            backgroundImage: "url('/gemini-hero.jpeg')",
             opacity: bgOpacity,
             transform: `scale(${scale})`,
             transformOrigin: '50% 46.8%', // Center of the TV screen in the image
@@ -211,9 +211,6 @@ export default function HowItWorks() {
           className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-6 pointer-events-none"
           style={{ opacity: heroOpacity }}
         >
-          <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400 bg-cyan-950/40 border border-cyan-800/30 px-3.5 py-1.5 rounded-full mb-6">
-            Censorship Simulator
-          </span>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white mb-6 max-w-3xl leading-none">
             Keep your streams clean.
           </h1>

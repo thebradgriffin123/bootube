@@ -8,14 +8,6 @@ export default function HowItWorksPreviewPage() {
   return (
     <div className="min-h-screen bg-black text-white flex flex-col font-sans select-none relative">
       
-      {/* Sticky Top-Bar Notification Badge */}
-      <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-cyan-950/90 border border-cyan-500/30 px-5 py-2.5 rounded-full shadow-[0_4px_20px_rgba(6,182,212,0.25)] backdrop-blur-md flex items-center gap-3">
-        <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
-        <span className="text-xs font-bold text-cyan-400">
-          STAGING PREVIEW: Scroll down to test the TV Zoom & Extension Tutorial
-        </span>
-      </div>
-
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-40 border-b border-white/5 bg-[#050505]/60 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
