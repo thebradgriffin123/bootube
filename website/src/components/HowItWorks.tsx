@@ -196,7 +196,7 @@ export default function HowItWorks() {
             backgroundImage: "url('/gemini-hero.jpeg')",
             opacity: bgOpacity,
             transform: `scale(${scale})`,
-            transformOrigin: '50% 46.8%', // Center of the TV screen in the image
+            transformOrigin: '50% 37.0%', // Center of the TV screen in the image
           }}
         />
 
