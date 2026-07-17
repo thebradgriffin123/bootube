@@ -221,19 +221,20 @@ export default function HowItWorks() {
         {/* Two-column layout container for Walkthrough Steps */}
         {scrollProgress >= 0.35 && (
           <div 
-            className="absolute inset-x-0 w-full max-w-7xl mx-auto px-6 flex items-center justify-between gap-12 z-20"
+            className="absolute left-0 right-0 w-full flex items-center justify-between gap-8 md:gap-16 z-20"
             style={{ height: 'calc(100vh - 80px)', marginTop: '80px' }}
           >
             {/* LEFT SIDE: Chrome Web Browser Mockup */}
             <div 
-              className="w-[65%] aspect-[16/9] max-w-[950px] transition-all duration-300 will-change-transform relative"
+              className="w-[55vw] aspect-[16/9] max-w-[1050px] transition-all duration-300 will-change-transform relative"
               style={{ 
                 transform: `scale(${browserScale})`,
                 opacity: browserOpacity,
+                transformOrigin: 'left center',
               }}
             >
               {/* SCREEN CONTAINER (Chrome Browser Window) */}
-              <div className="w-full h-full bg-black overflow-hidden relative rounded-xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.85)] flex flex-col">
+              <div className="w-full h-full bg-black overflow-hidden relative rounded-r-xl border-y border-r border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.85)] flex flex-col">
                 
                 {/* MOCK CHROME BROWSER WINDOW LAYOUT */}
                 <div className="absolute inset-0 bg-[#0c0d12] flex flex-col z-0">
@@ -438,7 +439,7 @@ export default function HowItWorks() {
             </div>
 
             {/* RIGHT SIDE: Interactive Copy Steps */}
-            <div className="w-[32%] max-w-[450px] relative h-[400px]">
+            <div className="w-[35vw] max-w-[450px] pr-8 md:pr-16 relative h-[400px]">
               
               {/* Step 1 */}
               <div 
