@@ -527,39 +527,39 @@ export default function HowItWorks() {
           </a>
 
           {/* Platform compatibility bar */}
-          <div className="w-full max-w-4xl mx-auto border-t border-white/10 mt-16 pt-8 pointer-events-auto">
-            <p className="text-center text-[10px] font-extrabold uppercase tracking-widest text-cyan-400/80 mb-6">
-              Works seamlessly with
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 md:gap-x-12 select-none">
-              <span className="text-gray-500 hover:text-gray-300 font-bold tracking-tight text-lg md:text-xl transition-colors cursor-default">
+          <div className="w-full max-w-4xl mx-auto border-t border-white/10 mt-28 pt-8 pointer-events-auto">
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 md:gap-x-8 lg:gap-x-10 select-none text-xs md:text-sm">
+              <span className="text-cyan-400/80 font-extrabold uppercase tracking-widest text-[9px] md:text-[10px] mr-2">
+                Works seamlessly with:
+              </span>
+              <span className="text-gray-400 hover:text-[#FF0000] font-bold tracking-tight text-base md:text-lg transition-colors cursor-default">
                 YouTube
               </span>
-              <span className="text-gray-500 hover:text-gray-300 font-black tracking-tighter text-lg md:text-xl transition-colors cursor-default">
+              <span className="text-gray-400 hover:text-[#00d4ff] font-black tracking-tighter text-base md:text-lg transition-colors cursor-default">
                 DISNEY+
               </span>
-              <span className="text-gray-500 hover:text-gray-300 font-bold tracking-tight text-lg md:text-xl transition-colors cursor-default italic">
+              <span className="text-gray-400 hover:text-[#1CE783] font-bold tracking-tight text-base md:text-lg transition-colors cursor-default italic">
                 hulu
               </span>
-              <span className="text-gray-500 hover:text-gray-300 font-black tracking-normal text-lg md:text-xl transition-colors cursor-default">
+              <span className="text-gray-400 hover:text-[#E5A93B] font-black tracking-normal text-base md:text-lg transition-colors cursor-default">
                 PLEX
               </span>
-              <span className="text-gray-500 hover:text-gray-300 font-extrabold tracking-wide text-lg md:text-xl transition-colors cursor-default">
+              <span className="text-gray-400 hover:text-[#F15A24] font-extrabold tracking-wide text-base md:text-lg transition-colors cursor-default">
                 Fandango
               </span>
-              <div className="flex items-center gap-1">
-                <span className="text-gray-600 font-semibold text-sm line-through tracking-normal opacity-50 cursor-default">
+              <div className="flex items-center gap-1 opacity-55">
+                <span className="text-gray-500 font-semibold text-xs line-through tracking-normal cursor-default">
                   Netflix
                 </span>
-                <span className="text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-white/5 text-gray-500 border border-white/5">
+                <span className="text-[7px] font-extrabold uppercase px-1 py-0.2 rounded bg-white/5 text-gray-500 border border-white/5">
                   Soon
                 </span>
               </div>
-              <div className="flex items-center gap-1">
-                <span className="text-gray-600 font-semibold text-sm line-through tracking-normal opacity-50 cursor-default">
+              <div className="flex items-center gap-1 opacity-55">
+                <span className="text-gray-500 font-semibold text-xs line-through tracking-normal cursor-default">
                   Prime Video
                 </span>
-                <span className="text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-white/5 text-gray-500 border border-white/5">
+                <span className="text-[7px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-white/5 text-gray-500 border border-white/5">
                   Soon
                 </span>
               </div>
