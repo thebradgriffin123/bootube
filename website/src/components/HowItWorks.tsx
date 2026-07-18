@@ -69,53 +69,31 @@ export default function HowItWorks() {
     return () => clearInterval(interval);
   }, [scrollProgress, isMobile]);
 
-  // Synchronize video play state with master demoTime triggers
+  // Step calculations for triggers (driven automatically by demoTime)
+  const currentStep = demoTime < 9.2 ? 1 : demoTime < 14.0 ? 2 : 3;
+  const isCensoringOn = demoTime >= 10.5;
+  const isHideCaptionsOn = demoTime >= 11.5;
+
+  // Synchronize video play state with master currentStep changes
   useEffect(() => {
     if (isMobile) return;
     const video = videoRef.current;
     if (!video) return;
 
     if (scrollProgress >= 0.35) {
-      if (demoTime < 7.0) {
-        if (video.paused) video.play().catch(() => {});
-      } else if (demoTime >= 7.0 && demoTime < 14.0) {
-        if (!video.paused) video.pause();
-      } else if (demoTime >= 14.0 && demoTime < 21.0) {
-        if (video.paused) video.play().catch(() => {});
+      if (currentStep === 1) {
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      } else if (currentStep === 2) {
+        video.pause();
+      } else if (currentStep === 3) {
+        video.currentTime = 0;
+        video.play().catch(() => {});
       }
     } else {
       if (!video.paused) video.pause();
     }
-  }, [demoTime, scrollProgress, isMobile]);
-
-  // Handle seeks at phase boundaries
-  useEffect(() => {
-    if (isMobile) return;
-    const video = videoRef.current;
-    if (!video) return;
-
-    if (demoTime === 0) {
-      video.currentTime = 0;
-    } else if (demoTime >= 14.0 && demoTime < 14.1) {
-      video.currentTime = 0;
-    }
-  }, [demoTime, isMobile]);
-
-  // Step calculations for triggers (driven automatically by demoTime)
-  const currentStep = demoTime < 9.2 ? 1 : demoTime < 14.0 ? 2 : 3;
-  const isCensoringOn = demoTime >= 10.5;
-  const isHideCaptionsOn = demoTime >= 11.5;
-
-  // Rewind video on step 3 transition
-  useEffect(() => {
-    if (isMobile) return;
-    if (currentStep === 3 && lastStep !== 3) {
-      if (videoRef.current) {
-        videoRef.current.currentTime = 0;
-      }
-    }
-    setLastStep(currentStep);
-  }, [currentStep, lastStep, isMobile]);
+  }, [currentStep, scrollProgress, isMobile]);
 
   // Programmatic muting based on timestamps in Step 3
   useEffect(() => {
@@ -241,55 +219,55 @@ export default function HowItWorks() {
   if (demoTime >= 7.0 && demoTime < 8.5) {
     cursorOpacity = 1;
     const t = (demoTime - 7.0) / 1.5; 
-    cursorX = 75 + t * (91.5 - 75);
+    cursorX = 75 + t * (94.5 - 75);
     cursorY = 85 + t * (5.5 - 85);
   } else if (demoTime >= 8.5 && demoTime < 8.8) {
     cursorOpacity = 1;
-    cursorX = 91.5;
+    cursorX = 94.5;
     cursorY = 5.5;
     isClicking = true;
   } else if (demoTime >= 8.8 && demoTime < 9.2) {
     cursorOpacity = 1;
-    cursorX = 91.5;
+    cursorX = 94.5;
     cursorY = 5.5;
   } else if (demoTime >= 9.2 && demoTime < 10.2) {
     cursorOpacity = 1;
     const t = (demoTime - 9.2) / 1.0;
-    cursorX = 91.5 + t * (94.5 - 91.5);
-    cursorY = 5.5 + t * (22.0 - 5.5);
+    cursorX = 94.5;
+    cursorY = 5.5 + t * (29.5 - 5.5);
   } else if (demoTime >= 10.2 && demoTime < 10.5) {
     cursorOpacity = 1;
     cursorX = 94.5;
-    cursorY = 22.0;
+    cursorY = 29.5;
     isClicking = true;
   } else if (demoTime >= 10.5 && demoTime < 11.2) {
     cursorOpacity = 1;
     const t = (demoTime - 10.5) / 0.7;
     cursorX = 94.5;
-    cursorY = 22.0 + t * (32.0 - 22.0);
+    cursorY = 29.5 + t * (39.5 - 29.5);
   } else if (demoTime >= 11.2 && demoTime < 11.5) {
     cursorOpacity = 1;
     cursorX = 94.5;
-    cursorY = 32.0;
+    cursorY = 39.5;
     isClicking = true;
   } else if (demoTime >= 11.5 && demoTime < 12.0) {
     cursorOpacity = 1;
     cursorX = 94.5;
-    cursorY = 32.0;
+    cursorY = 39.5;
   } else if (demoTime >= 12.0 && demoTime < 13.0) {
     cursorOpacity = 1;
     const t = (demoTime - 12.0) / 1.0;
-    cursorX = 94.5 + t * (91.5 - 94.5);
-    cursorY = 32.0 + t * (5.5 - 32.0);
+    cursorX = 94.5;
+    cursorY = 39.5 + t * (5.5 - 39.5);
   } else if (demoTime >= 13.0 && demoTime < 13.3) {
     cursorOpacity = 1;
-    cursorX = 91.5;
+    cursorX = 94.5;
     cursorY = 5.5;
     isClicking = true;
   } else if (demoTime >= 13.3 && demoTime < 14.0) {
     cursorOpacity = 1;
     const t = (demoTime - 13.3) / 0.7;
-    cursorX = 91.5 + t * (3.5 - 91.5);
+    cursorX = 94.5 + t * (3.5 - 94.5);
     cursorY = 5.5 + t * (96.0 - 5.5);
   } else if (demoTime >= 14.0 && demoTime < 14.3) {
     cursorOpacity = 1;
