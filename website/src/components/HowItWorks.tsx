@@ -12,7 +12,7 @@ export default function HowItWorks() {
   const [lastStep, setLastStep] = useState(1);
   const [demoTime, setDemoTime] = useState(0);
   
-  const isWalkthroughActive = scrollProgress >= 0.35;
+  const isWalkthroughActive = scrollProgress >= 0.25;
 
   const formatTime = (time: number) => {
     const min = Math.floor(time / 60);
@@ -212,13 +212,13 @@ export default function HowItWorks() {
   // Calculate scrolling ranges to drive mock states
   const zoomProgress = Math.min(1, scrollProgress / 0.40);
   const scale = 1 + zoomProgress * 3.8;
-  const bgOpacity = Math.max(0, 1 - Math.max(0, (scrollProgress - 0.35) / 0.08));
+  const bgOpacity = Math.max(0, 1 - Math.max(0, (scrollProgress - 0.25) / 0.08));
   const bgOverlayOpacity = Math.max(0.1, 0.65 - zoomProgress * 0.55);
 
   const heroOpacity = Math.max(0, 1 - Math.min(1, scrollProgress / 0.20));
 
-  const browserOpacity = scrollProgress < 0.35 ? 0 : Math.min(1, Math.max(0, (scrollProgress - 0.35) / 0.08));
-  const browserScale = scrollProgress < 0.35 ? 0.9 : 0.9 + Math.min(1, (scrollProgress - 0.35) / 0.08) * 0.1;
+  const browserOpacity = scrollProgress < 0.25 ? 0 : Math.min(1, Math.max(0, (scrollProgress - 0.25) / 0.08));
+  const browserScale = scrollProgress < 0.25 ? 0.9 : 0.9 + Math.min(1, (scrollProgress - 0.25) / 0.08) * 0.1;
 
   // 3. Right-side Copy Transitions (instant transition, no overlap)
   const step1Active = currentStep === 1;
@@ -385,7 +385,7 @@ export default function HowItWorks() {
           </div>
         </div>
 
-        {scrollProgress >= 0.35 && (
+        {scrollProgress >= 0.25 && (
           <div 
             className="absolute left-0 right-0 w-full flex items-center justify-between pl-0 pr-12 md:pr-24 lg:pr-32 gap-10 md:gap-16 z-20"
             style={{ height: 'calc(100vh - 80px)', marginTop: '80px' }}
@@ -435,7 +435,7 @@ export default function HowItWorks() {
                     
                     <div className="w-full h-full bg-black/60 relative overflow-hidden flex items-center justify-center">
                       
-                      {scrollProgress >= 0.35 && (
+                      {scrollProgress >= 0.25 && (
                         <video
                           ref={setVideoRef}
                           src="/cowboys.mp4"
@@ -443,6 +443,11 @@ export default function HowItWorks() {
                           preload="auto"
                           muted
                           playsInline
+                          onCanPlay={(e) => {
+                            if (scrollProgress >= 0.25 && currentStep === 1) {
+                              e.currentTarget.play().catch(() => {});
+                            }
+                          }}
                           onTimeUpdate={(e) => setVideoTime(e.currentTarget.currentTime)}
                           className="w-full h-full object-cover"
                         />
