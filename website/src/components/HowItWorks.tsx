@@ -11,6 +11,7 @@ export default function HowItWorks() {
   const [videoTime, setVideoTime] = useState(0);
   const [lastStep, setLastStep] = useState(1);
   const [demoTime, setDemoTime] = useState(0);
+  const [userUnmuted, setUserUnmuted] = useState(false);
   
   const isWalkthroughActive = scrollProgress >= 0.33;
 
@@ -147,17 +148,21 @@ export default function HowItWorks() {
     const video = videoRef.current;
     if (!video) return;
 
-    if (currentStep === 3) {
-      const shouldMute = 
-        (videoTime >= 1.0 && videoTime <= 2.0) || 
-        (videoTime >= 3.3 && videoTime <= 4.3) || 
-        (videoTime >= 4.8 && videoTime <= 5.6);
-      
-      video.muted = shouldMute;
+    if (!userUnmuted) {
+      video.muted = true;
     } else {
-      video.muted = false;
+      if (currentStep === 3) {
+        const shouldMute = 
+          (videoTime >= 1.0 && videoTime <= 2.0) || 
+          (videoTime >= 3.3 && videoTime <= 4.3) || 
+          (videoTime >= 4.8 && videoTime <= 5.6);
+        
+        video.muted = shouldMute;
+      } else {
+        video.muted = false;
+      }
     }
-  }, [videoTime, currentStep, isMobile]);
+  }, [videoTime, currentStep, userUnmuted, isMobile]);
 
   // Mobile layout fallback
   if (isMobile) {
@@ -361,10 +366,12 @@ export default function HowItWorks() {
     return null;
   };
 
-  const videoMuted = currentStep === 3 && (
-    (videoTime >= 1.0 && videoTime <= 2.0) || 
-    (videoTime >= 3.3 && videoTime <= 4.3) || 
-    (videoTime >= 4.8 && videoTime <= 5.6)
+  const videoMuted = !userUnmuted || (
+    currentStep === 3 && (
+      (videoTime >= 1.0 && videoTime <= 2.0) || 
+      (videoTime >= 3.3 && videoTime <= 4.3) || 
+      (videoTime >= 4.8 && videoTime <= 5.6)
+    )
   );
 
   return (
@@ -477,6 +484,15 @@ export default function HowItWorks() {
                         }`}
                       />
 
+                      {!userUnmuted && isWalkthroughActive && (
+                        <button
+                          onClick={() => setUserUnmuted(true)}
+                          className="absolute top-4 left-4 z-30 flex items-center gap-2 bg-[#0c0d12]/90 hover:bg-[#181920]/95 text-white border border-cyan-500/30 hover:border-cyan-400/50 px-3.5 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest transition-all duration-300 shadow-[0_4px_15px_rgba(6,182,212,0.15)] hover:scale-105 cursor-pointer select-none"
+                        >
+                          <span className="animate-pulse">🔊</span> Click for sound
+                        </button>
+                      )}
+
                       {getCaptionText() && (
                         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 w-full px-6 text-center pointer-events-none select-none">
                           <div className="bg-black/80 px-4 py-2 rounded border border-white/10 max-w-[85%] mx-auto inline-block">
@@ -490,8 +506,10 @@ export default function HowItWorks() {
                       <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 to-transparent p-3 flex items-center justify-between text-white text-[10px] md:text-[11px] select-none">
                         <div className="flex gap-3 items-center">
                           <span>⏸</span>
-                          <span>{videoMuted ? '🔇' : '🔊'}</span>
-                          <span className="w-20 h-1 bg-gray-600 rounded relative">
+                          <span className="cursor-pointer hover:text-cyan-400 transition-colors select-none" onClick={() => setUserUnmuted(prev => !prev)}>
+                            {videoMuted ? '🔇' : '🔊'}
+                          </span>
+                          <span className="w-20 h-1 bg-gray-600 rounded relative cursor-pointer" onClick={() => setUserUnmuted(prev => !prev)}>
                             <span 
                               className="absolute left-0 top-0 bottom-0 bg-cyan-400 transition-all duration-300"
                               style={{ width: videoMuted ? '0%' : '65%' }} 
