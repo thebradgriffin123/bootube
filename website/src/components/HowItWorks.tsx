@@ -13,6 +13,27 @@ export default function HowItWorks() {
   const [demoTime, setDemoTime] = useState(0);
   const [userUnmuted, setUserUnmuted] = useState(false);
   const [isDemoPlaying, setIsDemoPlaying] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeFaq, setActiveFaq] = useState<number | null>(null);
+
+  const faqs = [
+    {
+      q: "Does BooTube work on Netflix or Hulu?",
+      a: "Yes! BooTube currently supports YouTube, Disney+, Hulu, Plex, and Fandango at Home (Vudu). Support for Netflix and Amazon Prime Video is coming soon."
+    },
+    {
+      q: "Will streaming services ban my account for using this?",
+      a: "Absolutely not. BooTube does not violate any terms of service, decrypt media, or block ads. It simply reads official subtitle tracks locally inside your browser/app and adjusts the volume slider in real-time."
+    },
+    {
+      q: "Is my personal data sold to third parties?",
+      a: "Never. BooTube is built with privacy-first architecture. All parsing, scanning, and muting run 100% locally on your own device. Your custom settings and blocklists stay secure in your own account."
+    },
+    {
+      q: "What is the difference between Blasphemy and Profanity filters?",
+      a: "Our free tier includes 100% free filtering for blasphemous and religious exclamations. The Premium Plan unlocks advanced profanity (vulgarity, slurs), custom word blocklists, video player blurring, and cross-device sync."
+    }
+  ];
 
   const toggleDemo = () => {
     const nextPlaying = !isDemoPlaying;
@@ -83,10 +104,16 @@ export default function HowItWorks() {
     const interval = setInterval(() => {
       setDemoTime((prev) => {
         const next = prev + 0.05;
-        return next >= 21.0 ? 0 : next;
+        if (next >= 21.0) {
+          setIsDemoPlaying(false);
+          setUserUnmuted(false);
+          return 0;
+        }
+        return next;
       });
     }, 50);
 
+    return () => clearInterval(interval);
   }, [isWalkthroughActive, isDemoPlaying, isMobile]);
 
   // Reset demo state when scrolling away from walkthrough
@@ -204,7 +231,7 @@ export default function HowItWorks() {
             </p>
             <div className="border border-white/5 rounded-xl overflow-hidden bg-black/40 p-4 flex items-center justify-between text-xs text-gray-500">
               <span>Extensions</span>
-              <img src="/boo-tube-ghost-icon.svg" alt="BooTube Icon" className="h-5 w-auto" />
+              <img src="/boo-icon-glyph.svg" alt="BooTube Icon" className="h-5 w-auto" />
             </div>
           </div>
 
@@ -286,59 +313,59 @@ export default function HowItWorks() {
     cursorOpacity = 1;
     const t = (demoTime - 7.0) / 1.5; 
     cursorX = 75 + t * (94.5 - 75);
-    cursorY = 85 + t * (5.5 - 85);
+    cursorY = 85 + t * (6.5 - 85);
   } else if (demoTime >= 8.5 && demoTime < 8.8) {
     cursorOpacity = 1;
     cursorX = 94.5;
-    cursorY = 5.5;
+    cursorY = 6.5;
     isClicking = true;
   } else if (demoTime >= 8.8 && demoTime < 9.2) {
     cursorOpacity = 1;
     cursorX = 94.5;
-    cursorY = 5.5;
+    cursorY = 6.5;
   } else if (demoTime >= 9.2 && demoTime < 10.2) {
     cursorOpacity = 1;
     const t = (demoTime - 9.2) / 1.0;
     cursorX = 94.5;
-    cursorY = 5.5 + t * (31.5 - 5.5);
+    cursorY = 6.5 + t * (33.5 - 6.5);
   } else if (demoTime >= 10.2 && demoTime < 10.5) {
     cursorOpacity = 1;
     cursorX = 94.5;
-    cursorY = 31.5;
+    cursorY = 33.5;
     isClicking = true;
   } else if (demoTime >= 10.5 && demoTime < 11.2) {
     cursorOpacity = 1;
     const t = (demoTime - 10.5) / 0.7;
     cursorX = 94.5;
-    cursorY = 31.5 + t * (41.5 - 31.5);
+    cursorY = 33.5 + t * (43.5 - 33.5);
   } else if (demoTime >= 11.2 && demoTime < 11.5) {
     cursorOpacity = 1;
     cursorX = 94.5;
-    cursorY = 41.5;
+    cursorY = 43.5;
     isClicking = true;
   } else if (demoTime >= 11.5 && demoTime < 12.0) {
     cursorOpacity = 1;
     cursorX = 94.5;
-    cursorY = 41.5;
+    cursorY = 43.5;
   } else if (demoTime >= 12.0 && demoTime < 13.0) {
     cursorOpacity = 1;
     const t = (demoTime - 12.0) / 1.0;
     cursorX = 94.5;
-    cursorY = 41.5 + t * (5.5 - 41.5);
+    cursorY = 43.5 + t * (6.5 - 43.5);
   } else if (demoTime >= 13.0 && demoTime < 13.3) {
     cursorOpacity = 1;
     cursorX = 94.5;
-    cursorY = 5.5;
+    cursorY = 6.5;
     isClicking = true;
   } else if (demoTime >= 13.3 && demoTime < 14.0) {
     cursorOpacity = 1;
     const t = (demoTime - 13.3) / 0.7;
     cursorX = 94.5 + t * (3.5 - 94.5);
-    cursorY = 5.5 + t * (96.0 - 5.5);
+    cursorY = 6.5 + t * (96.5 - 6.5);
   } else if (demoTime >= 14.0 && demoTime < 14.3) {
     cursorOpacity = 1;
     cursorX = 3.5;
-    cursorY = 96.0;
+    cursorY = 96.5;
     isClicking = true;
   }
 
@@ -392,6 +419,71 @@ export default function HowItWorks() {
   return (
     <div ref={containerRef} className="relative min-h-[400vh] bg-black text-gray-100 selection:bg-cyan-500 selection:text-black">
       
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#050505]/60 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <Link href="#" className="flex items-center group">
+            <img 
+              src="/boo-tube-icon.svg" 
+              alt="BooTube Logo" 
+              className="h-8 w-auto transition-transform duration-300 group-hover:scale-105 filter drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]"
+            />
+          </Link>
+
+          {/* Desktop Nav Links */}
+          <div className="hidden md:flex items-center gap-8">
+            <Link href="#features" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Why BooTube</Link>
+            <Link href="#walkthrough" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">How it works</Link>
+            <Link href="#pricing" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Pricing</Link>
+            <Link href="#faq" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">FAQ</Link>
+          </div>
+
+          <div className="hidden md:flex items-center gap-4">
+            <Link href="/login" className="text-sm font-semibold hover:text-white transition-colors px-4 py-2 text-gray-300">Log in</Link>
+            <Link 
+              href="/signup" 
+              className="text-sm font-bold bg-white text-black hover:bg-gray-200 transition-all px-5 py-2.5 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.15)] hover:shadow-[0_0_20px_rgba(255,255,255,0.25)]"
+            >
+              Sign up
+            </Link>
+          </div>
+
+          {/* Mobile menu trigger */}
+          <button 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)} 
+            className="md:hidden p-2 text-gray-400 hover:text-white focus:outline-none"
+            aria-label="Toggle Menu"
+          >
+            <svg className="h-6 w-6 fill-none stroke-current" viewBox="0 0 24 24">
+              {mobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+        </div>
+
+        {/* Mobile Navigation Dropdown */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-b border-white/5 bg-[#050505] px-6 py-6 flex flex-col gap-4 animate-in slide-in-from-top-5 duration-200">
+            <Link href="#features" onClick={() => setMobileMenuOpen(false)} className="text-lg font-medium text-gray-300">Why BooTube</Link>
+            <Link href="#walkthrough" onClick={() => setMobileMenuOpen(false)} className="text-lg font-medium text-gray-300">How it works</Link>
+            <Link href="#pricing" onClick={() => setMobileMenuOpen(false)} className="text-lg font-medium text-gray-300">Pricing</Link>
+            <Link href="#faq" onClick={() => setMobileMenuOpen(false)} className="text-lg font-medium text-gray-300">FAQ</Link>
+            <hr className="border-white/5 my-2" />
+            <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="text-lg font-medium text-gray-300">Log in</Link>
+            <Link 
+              href="/signup"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full text-center py-3 bg-white text-black font-bold rounded-full"
+            >
+              Sign up
+            </Link>
+          </div>
+        )}
+      </nav>
+
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center bg-gradient-to-b from-[#08080a] via-[#050505] to-[#030304]">
         
         {/* Ambient background glows */}
@@ -423,10 +515,56 @@ export default function HowItWorks() {
           <p className="text-base sm:text-lg text-gray-300 max-w-2xl leading-relaxed mb-10">
             BooTube automatically ghosts profanity and blasphemy in real-time. Muting the language, never the video.
           </p>
-          <div className="px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-extrabold rounded-full shadow-[0_0_20px_rgba(6,182,212,0.3)] text-sm">
+          <a 
+            href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-extrabold rounded-full shadow-[0_0_20px_rgba(6,182,212,0.3)] text-sm pointer-events-auto transition-all cursor-pointer hover:scale-105"
+          >
             Get BooTube — It&apos;s Free
+          </a>
+
+          {/* Platform compatibility bar */}
+          <div className="w-full max-w-4xl mx-auto border-t border-white/10 mt-16 pt-8 pointer-events-auto">
+            <p className="text-center text-[10px] font-extrabold uppercase tracking-widest text-cyan-400/80 mb-6">
+              Works seamlessly with
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 md:gap-x-12 select-none">
+              <span className="text-gray-500 hover:text-gray-300 font-bold tracking-tight text-lg md:text-xl transition-colors cursor-default">
+                YouTube
+              </span>
+              <span className="text-gray-500 hover:text-gray-300 font-black tracking-tighter text-lg md:text-xl transition-colors cursor-default">
+                DISNEY+
+              </span>
+              <span className="text-gray-500 hover:text-gray-300 font-bold tracking-tight text-lg md:text-xl transition-colors cursor-default italic">
+                hulu
+              </span>
+              <span className="text-gray-500 hover:text-gray-300 font-black tracking-normal text-lg md:text-xl transition-colors cursor-default">
+                PLEX
+              </span>
+              <span className="text-gray-500 hover:text-gray-300 font-extrabold tracking-wide text-lg md:text-xl transition-colors cursor-default">
+                Fandango
+              </span>
+              <div className="flex items-center gap-1">
+                <span className="text-gray-600 font-semibold text-sm line-through tracking-normal opacity-50 cursor-default">
+                  Netflix
+                </span>
+                <span className="text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-white/5 text-gray-500 border border-white/5">
+                  Soon
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-gray-600 font-semibold text-sm line-through tracking-normal opacity-50 cursor-default">
+                  Prime Video
+                </span>
+                <span className="text-[8px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-white/5 text-gray-500 border border-white/5">
+                  Soon
+                </span>
+              </div>
+            </div>
           </div>
-          <div className="text-xs text-gray-400 mt-6 animate-pulse">
+
+          <div className="text-xs text-gray-400 mt-10 animate-pulse">
             ↓ Scroll down to zoom in
           </div>
         </div>
@@ -457,13 +595,13 @@ export default function HowItWorks() {
                     </div>
                     
                     <div className="bg-[#0f1016] border border-white/5 rounded-md px-3 py-1 text-[10px] text-gray-500 w-80 text-center truncate flex items-center justify-center gap-1.5">
-                      <span className="text-cyan-500 text-[8px]">🔒</span> youtube.com/watch?v=spaghettiwestern
+                      youtube.com/watch?v=spaghettiwestern
                     </div>
 
                     <div className="flex gap-3 items-center justify-end w-24 relative">
                       
                       <img 
-                        src="/boo-tube-ghost-icon.svg" 
+                        src="/boo-icon-glyph.svg" 
                         alt="BooTube Extension" 
                         className={`h-5 w-auto cursor-pointer p-0.5 rounded transition-all duration-200 ${
                           isPopupOpen
@@ -554,7 +692,7 @@ export default function HowItWorks() {
                         
                         <div className="flex items-center justify-between border-b border-white/5 pb-2.5 mb-3">
                           <div className="flex items-center gap-1.5">
-                            <img src="/boo-tube-ghost-icon.svg" alt="Logo" className="h-4.5 w-auto" />
+                            <img src="/boo-icon-glyph.svg" alt="Logo" className="h-4.5 w-auto" />
                             <span className="text-[11px] font-extrabold text-white">BooTube</span>
                           </div>
                           <span className="text-[9px] text-gray-500 uppercase font-black bg-white/5 px-1.5 py-0.5 rounded border border-white/5">v1.26</span>
@@ -640,96 +778,337 @@ export default function HowItWorks() {
 
             </div>
 
-            <div className="w-[30vw] max-w-[420px] relative h-[400px]">
+            <div className="w-[30vw] max-w-[420px] flex flex-col h-[400px] justify-between relative select-none">
               
-              <div 
-                className="space-y-4 absolute inset-0 flex flex-col justify-center transition-all duration-700 ease-out"
-                style={{ 
-                  opacity: step1Opacity,
-                  transform: step1Active ? 'translateY(0)' : (currentStep > 1 ? 'translateY(-20px)' : 'translateY(20px)'),
-                  pointerEvents: step1Active ? 'auto' : 'none',
-                }}
-              >
-                <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400 bg-cyan-950/40 border border-cyan-800/30 px-3 py-1 rounded-full self-start">
-                  Step 1
-                </span>
-                <h3 className="text-3xl sm:text-4xl font-black text-white leading-tight">
-                  Click the BooTube Icon
-                </h3>
-                <p className="text-sm sm:text-base text-gray-400 leading-relaxed font-medium">
-                  Locate and click the BooTube ghost icon directly in your Chrome browser toolbar to open the active settings console.
-                </p>
-                <ul className="space-y-2 text-xs sm:text-sm text-gray-500 font-semibold mb-2">
-                  <li className="flex items-center gap-2">👻 Access settings instantly</li>
-                  <li className="flex items-center gap-2">🔒 Privacy-first local filtering</li>
-                </ul>
+              <div className="relative flex-grow h-[320px]">
+                
+                <div 
+                  className="space-y-4 absolute inset-0 flex flex-col justify-center transition-all duration-700 ease-out"
+                  style={{ 
+                    opacity: step1Opacity,
+                    transform: step1Active ? 'translateY(0)' : (currentStep > 1 ? 'translateY(-20px)' : 'translateY(20px)'),
+                    pointerEvents: step1Active ? 'auto' : 'none',
+                  }}
+                >
+                  <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400 bg-cyan-950/40 border border-cyan-800/30 px-3 py-1 rounded-full self-start">
+                    Step 1
+                  </span>
+                  <h3 className="text-3xl sm:text-4xl font-black text-white leading-tight">
+                    Click the BooTube icon
+                  </h3>
+                  <p className="text-sm sm:text-base text-gray-400 leading-relaxed font-medium">
+                    When you are watching your streaming shows on YouTube and you want to filter out the bad words, here is how you do it. Simply locate and click the BooTube ghost icon directly in your Chrome browser toolbar to open the active settings console.
+                  </p>
+                </div>
 
+                <div 
+                  className="space-y-4 absolute inset-0 flex flex-col justify-center transition-all duration-700 ease-out"
+                  style={{ 
+                    opacity: step2Opacity,
+                    transform: step2Active ? 'translateY(0)' : (currentStep > 2 ? 'translateY(-20px)' : 'translateY(20px)'),
+                    pointerEvents: step2Active ? 'auto' : 'none',
+                  }}
+                >
+                  <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400 bg-cyan-950/40 border border-cyan-800/30 px-3 py-1 rounded-full self-start">
+                    Step 2
+                  </span>
+                  <h3 className="text-3xl sm:text-4xl font-black text-white leading-tight">
+                    Turn on censoring and hide captions
+                  </h3>
+                  <p className="text-sm sm:text-base text-gray-400 leading-relaxed font-medium">
+                    Toggle censoring to ON (Spaghetti Western) and toggle hide captions to ON. These settings apply immediately to clean the stream.
+                  </p>
+                </div>
+
+                <div 
+                  className="space-y-4 absolute inset-0 flex flex-col justify-center transition-all duration-700 ease-out"
+                  style={{ 
+                    opacity: step3Opacity,
+                    transform: step3Active ? 'translateY(0)' : (currentStep > 3 ? 'translateY(-20px)' : 'translateY(20px)'),
+                    pointerEvents: step3Active ? 'auto' : 'none',
+                  }}
+                >
+                  <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400 bg-cyan-950/40 border border-cyan-800/30 px-3 py-1 rounded-full self-start">
+                    Step 3
+                  </span>
+                  <h3 className="text-3xl sm:text-4xl font-black text-white leading-tight">
+                    Censored playback
+                  </h3>
+                  <p className="text-sm sm:text-base text-gray-400 leading-relaxed font-medium">
+                    The video automatically rewinds and plays again. The audio is seamlessly muted at the exact moments of profanity, and the captions are completely hidden.
+                  </p>
+                </div>
+
+              </div>
+
+              {/* Persistent Secondary Play Button */}
+              <div className="z-30 mt-4 pointer-events-auto">
                 <button
                   onClick={toggleDemo}
-                  className="mt-2 flex items-center gap-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-extrabold px-6 py-3 rounded-full text-xs uppercase tracking-widest transition-all duration-300 shadow-[0_4px_20px_rgba(6,182,212,0.35)] hover:scale-105 cursor-pointer z-40 relative select-none border-none outline-none self-start"
+                  className="flex items-center gap-2 bg-[#0c0d12]/60 hover:bg-[#181920]/80 border border-cyan-500/30 hover:border-cyan-400/60 text-cyan-400 font-extrabold px-6 py-2.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 hover:scale-105 cursor-pointer outline-none select-none border-none"
                 >
                   {isDemoPlaying ? (
                     <>
-                      <span>⏸</span> Pause Demo
+                      <span>⏸</span> Pause demo
                     </>
                   ) : (
                     <>
-                      <span>▶️</span> Play Demo
+                      <span>▶️</span> Play demo
                     </>
                   )}
                 </button>
-              </div>
-
-              <div 
-                className="space-y-4 absolute inset-0 flex flex-col justify-center transition-all duration-700 ease-out"
-                style={{ 
-                  opacity: step2Opacity,
-                  transform: step2Active ? 'translateY(0)' : (currentStep > 2 ? 'translateY(-20px)' : 'translateY(20px)'),
-                  pointerEvents: step2Active ? 'auto' : 'none',
-                }}
-              >
-                <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400 bg-cyan-950/40 border border-cyan-800/30 px-3 py-1 rounded-full self-start">
-                  Step 2
-                </span>
-                <h3 className="text-3xl sm:text-4xl font-black text-white leading-tight">
-                  Turn On Censoring & Hide Captions
-                </h3>
-                <p className="text-sm sm:text-base text-gray-400 leading-relaxed font-medium">
-                  Toggle **Censoring** to ON (Spaghetti Western) and toggle **Hide Captions** to ON. These settings apply immediately to clean the stream.
-                </p>
-                <ul className="space-y-2 text-xs sm:text-sm text-gray-500 font-semibold">
-                  <li className="flex items-center gap-2">⚡ Real-time client-side scanning</li>
-                  <li className="flex items-center gap-2">💬 Hide subtitles dynamically</li>
-                </ul>
-              </div>
-
-              <div 
-                className="space-y-4 absolute inset-0 flex flex-col justify-center transition-all duration-700 ease-out"
-                style={{ 
-                  opacity: step3Opacity,
-                  transform: step3Active ? 'translateY(0)' : (currentStep > 3 ? 'translateY(-20px)' : 'translateY(20px)'),
-                  pointerEvents: step3Active ? 'auto' : 'none',
-                }}
-              >
-                <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400 bg-cyan-950/40 border border-cyan-800/30 px-3 py-1 rounded-full self-start">
-                  Step 3
-                </span>
-                <h3 className="text-3xl sm:text-4xl font-black text-white leading-tight">
-                  Censored Playback
-                </h3>
-                <p className="text-sm sm:text-base text-gray-400 leading-relaxed font-medium">
-                  The video automatically rewinds and plays again. The audio is seamlessly muted at 1.5s (*dang*), 3.7s (*heck*), and 5.0s (*forget*), and the captions are hidden.
-                </p>
-                <ul className="space-y-2 text-xs sm:text-sm text-gray-500 font-semibold">
-                  <li className="flex items-center gap-2">🔇 Mutes audio, never cuts video</li>
-                  <li className="flex items-center gap-2">🤠 Cohesive demo experience</li>
-                </ul>
               </div>
 
             </div>
 
           </div>
         )}
+
+      </div>
+
+      {/* Standalone Landing Page Sections */}
+      <div className="relative bg-black z-30 w-full border-t border-white/5 select-text">
+        
+        {/* Section 2: Why BooTube is Different */}
+        <section id="features" className="py-24 px-6 max-w-7xl mx-auto">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
+              Censoring done right
+            </h2>
+            <p className="text-gray-400 text-sm sm:text-base">
+              Unlike heavy traditional filtering platforms, BooTube is designed for the modern streaming era.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            {/* Card 1 */}
+            <div className="p-8 rounded-2xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] hover:border-cyan-500/10 transition-all group">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-cyan-950/20 border border-cyan-500/20 text-cyan-400 mb-6 group-hover:scale-110 transition-transform">
+                🎙️
+              </div>
+              <h3 className="text-lg font-bold text-white mb-3">
+                Built for the modern internet (YouTube)
+              </h3>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                Traditional filters only work on Hollywood movies. BooTube cleans up the endless hours of YouTube-hosted podcasts, educational videos, and creators your family actually watches daily.
+              </p>
+            </div>
+
+            {/* Card 2 */}
+            <div className="p-8 rounded-2xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] hover:border-red-500/10 transition-all group">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-red-950/20 border border-red-500/20 text-red-400 mb-6 group-hover:scale-110 transition-transform">
+                ✂️
+              </div>
+              <h3 className="text-lg font-bold text-white mb-3">
+                Zero interrupted playback
+              </h3>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                We don&apos;t violently cut entire scenes or pause your video. We quietly mute the specific audio track in real-time for fractions of a second while the video plays seamlessly.
+              </p>
+            </div>
+
+            {/* Card 3 */}
+            <div className="p-8 rounded-2xl border border-white/5 bg-white/[0.01] hover:bg-white/[0.03] hover:border-cyan-500/10 transition-all group">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl bg-cyan-950/20 border border-cyan-500/20 text-cyan-400 mb-6 group-hover:scale-110 transition-transform">
+                ⚖️
+              </div>
+              <h3 className="text-lg font-bold text-white mb-3">
+                Unmatched platform access
+              </h3>
+              <p className="text-sm text-gray-400 leading-relaxed">
+                Because we operate via client-side scripts, we can filter services other platforms are legally blocked from—including Disney+, Hulu, and your personal Plex server files.
+              </p>
+            </div>
+
+          </div>
+        </section>
+
+        {/* Section: What Devices are Compatible */}
+        <section id="compatibility" className="py-24 px-6 border-t border-white/5 bg-white/[0.005]">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-6">
+              What devices are compatible?
+            </h2>
+            <p className="text-gray-400 max-w-2xl mx-auto mb-12 text-sm sm:text-base leading-relaxed">
+              Filter your content wherever you watch. BooTube is available as a Chrome extension for desktop browsers, and an Android app for mobile streaming.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-6">
+              <a 
+                href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-extrabold rounded-full transition-all hover:scale-105 shadow-[0_0_15px_rgba(255,255,255,0.05)] pointer-events-auto"
+              >
+                <img src="/boo-icon-glyph.svg" alt="Chrome Logo" className="h-5 w-auto" />
+                <span>Chrome extension</span>
+              </a>
+              <a 
+                href="https://play.google.com/apps/testing/com.bootube.app" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 bg-cyan-950/20 hover:bg-cyan-950/40 border border-cyan-500/30 hover:border-cyan-400/60 text-cyan-400 font-extrabold rounded-full transition-all hover:scale-105 shadow-[0_0_15px_rgba(6,182,212,0.1)] pointer-events-auto"
+              >
+                <span>🤖</span>
+                <span>Android app</span>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* Section 3: Simple Pricing Tiers */}
+        <section id="pricing" className="py-24 px-6 border-t border-white/5 bg-white/[0.01]">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4">
+                Simple, honest pricing
+              </h2>
+              <p className="text-gray-400 text-sm sm:text-base">
+                Get started with essential filtering for free, or unlock advanced features with a premium plan.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
+              
+              {/* Free Plan */}
+              <div className="flex flex-col p-8 rounded-2xl border border-white/5 bg-black/40 relative">
+                <h3 className="text-xl font-bold text-white mb-2">Free plan</h3>
+                <p className="text-sm text-gray-400 mb-6">Essential blasphemy censoring for everyone.</p>
+                
+                <div className="flex items-baseline gap-1 mb-8">
+                  <span className="text-4xl font-black text-white">$0</span>
+                  <span className="text-xs text-gray-500 font-medium">/ forever</span>
+                </div>
+
+                <hr className="border-white/5 mb-8" />
+
+                <ul className="space-y-4 mb-8 flex-grow">
+                  <li className="flex items-center gap-3 text-sm text-gray-300">
+                    <span className="text-cyan-400">✓</span> 100% free blasphemy filtering
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-gray-300">
+                    <span className="text-cyan-400">✓</span> Mutes YouTube & Podcasts
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-gray-300">
+                    <span className="text-cyan-400">✓</span> Mutes Disney+, Hulu, Plex & Vudu
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-gray-300">
+                    <span className="text-cyan-400">✓</span> Offline real-time processing
+                  </li>
+                </ul>
+
+                <a 
+                  href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full text-center py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold rounded-xl transition-all pointer-events-auto"
+                >
+                  Add to browser
+                </a>
+              </div>
+
+              {/* Premium Plan */}
+              <div className="flex flex-col p-8 rounded-2xl border border-cyan-500/20 bg-cyan-950/10 relative overflow-hidden">
+                <div className="absolute top-0 right-0 px-4 py-1.5 bg-cyan-500 text-black text-[10px] font-black uppercase tracking-widest rounded-bl-xl">
+                  Most popular
+                </div>
+
+                <h3 className="text-xl font-bold text-white mb-2">Premium plan</h3>
+                <p className="text-sm text-gray-400 mb-6">Full customization and syncing across devices.</p>
+                
+                <div className="flex items-baseline gap-1 mb-8">
+                  <span className="text-4xl font-black text-white">$3.99</span>
+                  <span className="text-xs text-cyan-400 font-medium">/ month</span>
+                </div>
+
+                <hr className="border-cyan-500/10 mb-8" />
+
+                <ul className="space-y-4 mb-8 flex-grow">
+                  <li className="flex items-center gap-3 text-sm text-gray-300">
+                    <span className="text-cyan-400">✓</span> <strong>Everything in Free</strong>
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-gray-300">
+                    <span className="text-cyan-400">✓</span> Full profanity & vulgarity filtering
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-gray-300">
+                    <span className="text-cyan-400">✓</span> Custom word & phrase blocklists
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-gray-300">
+                    <span className="text-cyan-400">✓</span> Smart screen blurring during alerts
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-gray-300">
+                    <span className="text-cyan-400">✓</span> Video buffer timer controls
+                  </li>
+                  <li className="flex items-center gap-3 text-sm text-gray-300">
+                    <span className="text-cyan-400">✓</span> <strong>Unified account cloud sync</strong>
+                  </li>
+                </ul>
+
+                <a 
+                  href="/signup" 
+                  className="w-full text-center py-3 bg-cyan-500 hover:bg-cyan-400 text-black font-extrabold rounded-xl transition-all shadow-[0_0_20px_rgba(6,182,212,0.25)] pointer-events-auto"
+                >
+                  Upgrade to premium
+                </a>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        {/* Section 4: FAQ Accordion */}
+        <section id="faq" className="py-24 px-6 max-w-4xl mx-auto border-t border-white/5">
+          <h2 className="text-3xl font-extrabold text-white text-center mb-12">
+            Frequently asked questions
+          </h2>
+          <div className="space-y-4">
+            {faqs.map((faq, index) => {
+              const isOpen = activeFaq === index;
+              return (
+                <div key={index} className="border border-white/5 rounded-xl bg-white/[0.01] overflow-hidden transition-all">
+                  <button
+                    onClick={() => setActiveFaq(isOpen ? null : index)}
+                    className="w-full text-left px-6 py-5 flex items-center justify-between text-base font-bold text-white hover:bg-white/[0.02] pointer-events-auto border-none outline-none bg-transparent cursor-pointer"
+                  >
+                    <span>{faq.q}</span>
+                    <span className="text-gray-500 font-normal">{isOpen ? '−' : '+'}</span>
+                  </button>
+                  {isOpen && (
+                    <div className="px-6 pb-5 text-sm text-gray-400 leading-relaxed border-t border-white/5 pt-4 bg-[#050505]/40">
+                      {faq.a}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="border-t border-white/5 py-16 px-6 bg-[#040406]">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center">
+              <img src="/boo-tube-icon.svg" alt="BooTube Logo" className="h-7 w-auto" />
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-8 text-xs text-gray-500 pointer-events-auto">
+              <Link href="/privacy" className="hover:text-gray-300">Privacy Policy</Link>
+              <Link href="/terms" className="hover:text-gray-300">Terms of Use</Link>
+              <Link href="/support" className="hover:text-gray-300">Support Desk</Link>
+              <a href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300">Chrome Store</a>
+            </div>
+          </div>
+
+          <div className="max-w-7xl mx-auto mt-10 pt-10 border-t border-white/5 text-center text-[10px] text-gray-400 leading-relaxed">
+            <p className="mb-4">
+              &copy; 2026 BooTube. Built for a cleaner internet.
+            </p>
+            <p className="max-w-4xl mx-auto italic">
+              Disclaimer: BooTube is an independent browser extension and mobile application. It is not affiliated with, sponsored by, or endorsed by Google LLC (YouTube), Disney Enterprises, Inc. (Disney+), Hulu LLC, Plex, Inc., Fandango Media, LLC, Netflix, Inc., Amazon.com, Inc., or any other third-party streaming service mentioned. All trademarks and registered trademarks are the property of their respective owners.
+            </p>
+          </div>
+        </footer>
 
       </div>
 
