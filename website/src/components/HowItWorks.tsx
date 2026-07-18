@@ -138,8 +138,10 @@ export default function HowItWorks() {
   // Mobile layout fallback
   if (isMobile) {
     return (
-      <section className="bg-[#020d09] bg-gradient-to-b from-[#020d09] via-[#051c14] to-black py-20 px-6 text-gray-100 relative border-t border-white/5">
-        <div className="max-w-xl mx-auto space-y-12">
+      <section className="bg-gradient-to-b from-[#08080a] via-[#050505] to-[#030304] py-20 px-6 text-gray-100 relative border-t border-white/5 overflow-hidden">
+        {/* Ambient background glows */}
+        <div className="absolute top-[-100px] right-[-100px] w-[300px] h-[300px] rounded-full bg-cyan-950/10 blur-[80px] pointer-events-none" />
+        <div className="max-w-xl mx-auto space-y-12 relative z-10">
           <div className="text-center mb-10">
             <span className="text-[10px] font-bold tracking-widest text-cyan-400 uppercase bg-cyan-950/40 border border-cyan-800/30 px-3 py-1 rounded-full">
               Setup Walkthrough
@@ -342,7 +344,11 @@ export default function HowItWorks() {
   );
 
   return (
-    <div ref={containerRef} className="relative min-h-[400vh] bg-[#020d09] bg-gradient-to-b from-[#020d09] via-[#051c14] to-black text-gray-100 selection:bg-cyan-500 selection:text-black">
+    <div ref={containerRef} className="relative min-h-[400vh] bg-gradient-to-b from-[#08080a] via-[#050505] to-[#030304] text-gray-100 selection:bg-cyan-500 selection:text-black">
+      
+      {/* Ambient background glows */}
+      <div className="absolute top-[10%] right-[-100px] w-[600px] h-[600px] rounded-full bg-cyan-950/12 blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-[20%] left-[-100px] w-[600px] h-[600px] rounded-full bg-blue-950/8 blur-[130px] pointer-events-none" />
       
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
         
