@@ -62,7 +62,7 @@ export default function HowItWorks() {
     const interval = setInterval(() => {
       setDemoTime((prev) => {
         const next = prev + 0.05;
-        return next >= 15.0 ? 0 : next;
+        return next >= 21.0 ? 0 : next;
       });
     }, 50);
 
@@ -76,11 +76,11 @@ export default function HowItWorks() {
     if (!video) return;
 
     if (scrollProgress >= 0.35) {
-      if (demoTime < 5.5) {
+      if (demoTime < 7.0) {
         if (video.paused) video.play().catch(() => {});
-      } else if (demoTime >= 5.5 && demoTime < 8.0) {
+      } else if (demoTime >= 7.0 && demoTime < 14.0) {
         if (!video.paused) video.pause();
-      } else if (demoTime >= 8.0 && demoTime < 15.0) {
+      } else if (demoTime >= 14.0 && demoTime < 21.0) {
         if (video.paused) video.play().catch(() => {});
       }
     } else {
@@ -96,17 +96,15 @@ export default function HowItWorks() {
 
     if (demoTime === 0) {
       video.currentTime = 0;
-    } else if (demoTime >= 5.5 && demoTime < 5.6) {
-      video.currentTime = 5.5;
-    } else if (demoTime >= 8.0 && demoTime < 8.1) {
+    } else if (demoTime >= 14.0 && demoTime < 14.1) {
       video.currentTime = 0;
     }
   }, [demoTime, isMobile]);
 
   // Step calculations for triggers (driven automatically by demoTime)
-  const currentStep = demoTime < 5.5 ? 1 : demoTime < 8.0 ? 2 : 3;
-  const isCensoringOn = demoTime >= 6.5;
-  const isHideCaptionsOn = demoTime >= 7.5;
+  const currentStep = demoTime < 9.2 ? 1 : demoTime < 14.0 ? 2 : 3;
+  const isCensoringOn = demoTime >= 10.5;
+  const isHideCaptionsOn = demoTime >= 11.5;
 
   // Rewind video on step 3 transition
   useEffect(() => {
@@ -140,7 +138,7 @@ export default function HowItWorks() {
   // Mobile layout fallback
   if (isMobile) {
     return (
-      <section className="bg-black py-20 px-6 text-gray-100 relative border-t border-white/5">
+      <section className="bg-[#020d09] bg-gradient-to-b from-[#020d09] via-[#051c14] to-black py-20 px-6 text-gray-100 relative border-t border-white/5">
         <div className="max-w-xl mx-auto space-y-12">
           <div className="text-center mb-10">
             <span className="text-[10px] font-bold tracking-widest text-cyan-400 uppercase bg-cyan-950/40 border border-cyan-800/30 px-3 py-1 rounded-full">
@@ -160,7 +158,7 @@ export default function HowItWorks() {
             </p>
             <div className="border border-white/5 rounded-xl overflow-hidden bg-black/40 p-4 flex items-center justify-between text-xs text-gray-500">
               <span>Extensions</span>
-              <img src="/boo-tube-icon.svg" alt="BooTube Icon" className="h-5 w-auto" />
+              <img src="/boo-tube-ghost-icon.svg" alt="BooTube Icon" className="h-5 w-auto" />
             </div>
           </div>
 
@@ -234,22 +232,68 @@ export default function HowItWorks() {
   let cursorX = 75; 
   let cursorY = 85; 
   let cursorOpacity = 0;
+  let isClicking = false;
 
-  if (demoTime >= 0.5 && demoTime < 5.5) {
+  const isPopupOpen = demoTime >= 8.8 && demoTime < 13.3;
+
+  if (demoTime >= 7.0 && demoTime < 8.5) {
     cursorOpacity = 1;
-    const t = (demoTime - 0.5) / 5.0; 
-    cursorX = 75 + t * 17; // Moves from 75 to 92 (BooTube Icon)
-    cursorY = 85 - t * 80; // Moves from 85 to 5
-  } else if (demoTime >= 5.5 && demoTime < 6.5) {
+    const t = (demoTime - 7.0) / 1.5; 
+    cursorX = 75 + t * (91.5 - 75);
+    cursorY = 85 + t * (5.5 - 85);
+  } else if (demoTime >= 8.5 && demoTime < 8.8) {
     cursorOpacity = 1;
-    const t = (demoTime - 5.5) / 1.0;
-    cursorX = 92 - t * 4;  // Moves from 92 to 88
-    cursorY = 5 + t * 17;  // Moves from 5 to 22 (Censoring Switch)
-  } else if (demoTime >= 6.5 && demoTime < 7.5) {
+    cursorX = 91.5;
+    cursorY = 5.5;
+    isClicking = true;
+  } else if (demoTime >= 8.8 && demoTime < 9.2) {
     cursorOpacity = 1;
-    const t = (demoTime - 6.5) / 1.0;
-    cursorX = 88;
-    cursorY = 22 + t * 10; // Moves from 22 to 32 (Hide Captions Switch)
+    cursorX = 91.5;
+    cursorY = 5.5;
+  } else if (demoTime >= 9.2 && demoTime < 10.2) {
+    cursorOpacity = 1;
+    const t = (demoTime - 9.2) / 1.0;
+    cursorX = 91.5 + t * (94.5 - 91.5);
+    cursorY = 5.5 + t * (22.0 - 5.5);
+  } else if (demoTime >= 10.2 && demoTime < 10.5) {
+    cursorOpacity = 1;
+    cursorX = 94.5;
+    cursorY = 22.0;
+    isClicking = true;
+  } else if (demoTime >= 10.5 && demoTime < 11.2) {
+    cursorOpacity = 1;
+    const t = (demoTime - 10.5) / 0.7;
+    cursorX = 94.5;
+    cursorY = 22.0 + t * (32.0 - 22.0);
+  } else if (demoTime >= 11.2 && demoTime < 11.5) {
+    cursorOpacity = 1;
+    cursorX = 94.5;
+    cursorY = 32.0;
+    isClicking = true;
+  } else if (demoTime >= 11.5 && demoTime < 12.0) {
+    cursorOpacity = 1;
+    cursorX = 94.5;
+    cursorY = 32.0;
+  } else if (demoTime >= 12.0 && demoTime < 13.0) {
+    cursorOpacity = 1;
+    const t = (demoTime - 12.0) / 1.0;
+    cursorX = 94.5 + t * (91.5 - 94.5);
+    cursorY = 32.0 + t * (5.5 - 32.0);
+  } else if (demoTime >= 13.0 && demoTime < 13.3) {
+    cursorOpacity = 1;
+    cursorX = 91.5;
+    cursorY = 5.5;
+    isClicking = true;
+  } else if (demoTime >= 13.3 && demoTime < 14.0) {
+    cursorOpacity = 1;
+    const t = (demoTime - 13.3) / 0.7;
+    cursorX = 91.5 + t * (3.5 - 91.5);
+    cursorY = 5.5 + t * (96.0 - 5.5);
+  } else if (demoTime >= 14.0 && demoTime < 14.3) {
+    cursorOpacity = 1;
+    cursorX = 3.5;
+    cursorY = 96.0;
+    isClicking = true;
   }
 
   const getCaptionText = () => {
@@ -298,7 +342,7 @@ export default function HowItWorks() {
   );
 
   return (
-    <div ref={containerRef} className="relative min-h-[400vh] bg-black text-gray-100 selection:bg-cyan-500 selection:text-black">
+    <div ref={containerRef} className="relative min-h-[400vh] bg-[#020d09] bg-gradient-to-b from-[#020d09] via-[#051c14] to-black text-gray-100 selection:bg-cyan-500 selection:text-black">
       
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
         
@@ -367,10 +411,10 @@ export default function HowItWorks() {
                     <div className="flex gap-3 items-center justify-end w-24 relative">
                       
                       <img 
-                        src="/boo-tube-icon.svg" 
+                        src="/boo-tube-ghost-icon.svg" 
                         alt="BooTube Extension" 
                         className={`h-5 w-auto cursor-pointer p-0.5 rounded transition-all duration-200 ${
-                          currentStep === 2
+                          isPopupOpen
                             ? 'bg-white/10 filter drop-shadow-[0_0_5px_rgba(6,182,212,0.8)] scale-110' 
                             : 'opacity-70 hover:opacity-100 hover:scale-105'
                         }`}
@@ -428,7 +472,7 @@ export default function HowItWorks() {
 
                     </div>
 
-                    {currentStep >= 2 && (
+                    {isPopupOpen && (
                       <div 
                         className="absolute top-11 right-6 w-60 bg-[#0d0e12]/95 border border-white/10 backdrop-blur-md rounded-xl p-4 shadow-2xl z-50 select-none animate-in fade-in slide-in-from-top-2 duration-300"
                         style={{ 
@@ -438,7 +482,7 @@ export default function HowItWorks() {
                         
                         <div className="flex items-center justify-between border-b border-white/5 pb-2.5 mb-3">
                           <div className="flex items-center gap-1.5">
-                            <img src="/boo-tube-icon.svg" alt="Logo" className="h-4.5 w-auto" />
+                            <img src="/boo-tube-ghost-icon.svg" alt="Logo" className="h-4.5 w-auto" />
                             <span className="text-[11px] font-extrabold text-white">BooTube</span>
                           </div>
                           <span className="text-[9px] text-gray-500 uppercase font-black bg-white/5 px-1.5 py-0.5 rounded border border-white/5">v1.26</span>
@@ -509,12 +553,15 @@ export default function HowItWorks() {
                     left: `${cursorX}%`, 
                     top: `${cursorY}%`,
                     opacity: cursorOpacity,
-                    transform: 'translate(-50%, -50%)',
+                    transform: `translate(-50%, -50%) ${isClicking ? 'scale(0.8)' : 'scale(1)'}`,
                   }}
                 >
                   <svg className="w-full h-full fill-white stroke-black stroke-[1.5px]" viewBox="0 0 100 100">
                     <polygon points="0,0 95,35 55,55 35,95" />
                   </svg>
+                  {isClicking && (
+                    <span className="absolute inset-0 rounded-full border border-cyan-500 animate-ping opacity-75" style={{ margin: '-4px' }} />
+                  )}
                 </div>
 
               </div>
@@ -524,9 +571,10 @@ export default function HowItWorks() {
             <div className="w-[30vw] max-w-[420px] relative h-[400px]">
               
               <div 
-                className="space-y-4 absolute inset-0 flex flex-col justify-center"
+                className="space-y-4 absolute inset-0 flex flex-col justify-center transition-all duration-700 ease-out"
                 style={{ 
                   opacity: step1Opacity,
+                  transform: step1Active ? 'translateY(0)' : (currentStep > 1 ? 'translateY(-20px)' : 'translateY(20px)'),
                   pointerEvents: step1Active ? 'auto' : 'none',
                 }}
               >
@@ -546,9 +594,10 @@ export default function HowItWorks() {
               </div>
 
               <div 
-                className="space-y-4 absolute inset-0 flex flex-col justify-center"
+                className="space-y-4 absolute inset-0 flex flex-col justify-center transition-all duration-700 ease-out"
                 style={{ 
                   opacity: step2Opacity,
+                  transform: step2Active ? 'translateY(0)' : (currentStep > 2 ? 'translateY(-20px)' : 'translateY(20px)'),
                   pointerEvents: step2Active ? 'auto' : 'none',
                 }}
               >
@@ -568,9 +617,10 @@ export default function HowItWorks() {
               </div>
 
               <div 
-                className="space-y-4 absolute inset-0 flex flex-col justify-center"
+                className="space-y-4 absolute inset-0 flex flex-col justify-center transition-all duration-700 ease-out"
                 style={{ 
                   opacity: step3Opacity,
+                  transform: step3Active ? 'translateY(0)' : (currentStep > 3 ? 'translateY(-20px)' : 'translateY(20px)'),
                   pointerEvents: step3Active ? 'auto' : 'none',
                 }}
               >
