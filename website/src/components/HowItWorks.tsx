@@ -25,9 +25,6 @@ export default function HowItWorks() {
     videoRef.current = node;
     if (node) {
       node.muted = true;
-      node.play().catch((err) => {
-        console.warn("Autoplay prevented:", err);
-      });
     }
   }, []);
 
@@ -93,15 +90,27 @@ export default function HowItWorks() {
     const video = videoRef.current;
     if (!video) return;
 
+    video.muted = true;
+
     if (isWalkthroughActive) {
       if (currentStep === 1) {
-        video.currentTime = 0;
-        video.play().catch(() => {});
+        if (video.currentTime !== 0) {
+          video.currentTime = 0;
+        }
+        if (video.paused) {
+          video.play().catch(() => {});
+        }
       } else if (currentStep === 2) {
-        video.pause();
+        if (!video.paused) {
+          video.pause();
+        }
       } else if (currentStep === 3) {
-        video.currentTime = 0;
-        video.play().catch(() => {});
+        if (video.currentTime !== 0) {
+          video.currentTime = 0;
+        }
+        if (video.paused) {
+          video.play().catch(() => {});
+        }
       }
     } else {
       if (!video.paused) video.pause();
