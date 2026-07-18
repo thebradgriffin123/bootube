@@ -417,7 +417,7 @@ export default function HowItWorks() {
   );
 
   return (
-    <div ref={containerRef} className="relative min-h-[400vh] bg-black text-gray-100 selection:bg-cyan-500 selection:text-black">
+    <div id="top" className="relative bg-black text-gray-100 selection:bg-cyan-500 selection:text-black font-sans">
       
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#050505]/60 backdrop-blur-md">
@@ -484,7 +484,9 @@ export default function HowItWorks() {
         )}
       </nav>
 
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center bg-gradient-to-b from-[#08080a] via-[#050505] to-[#030304]">
+      {/* Walkthrough Scrollytelling Container */}
+      <div id="walkthrough" ref={containerRef} className="relative h-[400vh] w-full">
+        <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center bg-gradient-to-b from-[#08080a] via-[#050505] to-[#030304]">
         
         {/* Ambient background glows */}
         <div className="absolute top-[-100px] right-[-100px] w-[500px] h-[500px] rounded-full bg-cyan-950/15 blur-[120px] pointer-events-none z-0" />
@@ -864,6 +866,7 @@ export default function HowItWorks() {
           </div>
         )}
 
+      </div>
       </div>
 
       {/* Standalone Landing Page Sections */}
