@@ -12,7 +12,7 @@ export default function HowItWorks() {
   const [lastStep, setLastStep] = useState(1);
   const [demoTime, setDemoTime] = useState(0);
   
-  const isWalkthroughActive = scrollProgress >= 0.25;
+  const isWalkthroughActive = scrollProgress >= 0.33;
 
   const formatTime = (time: number) => {
     const min = Math.floor(time / 60);
@@ -130,17 +130,14 @@ export default function HowItWorks() {
       // Clean up event listeners immediately after first gesture
       document.removeEventListener('click', unlockPlayback);
       document.removeEventListener('touchstart', unlockPlayback);
-      document.removeEventListener('scroll', unlockPlayback);
     };
 
     document.addEventListener('click', unlockPlayback);
     document.addEventListener('touchstart', unlockPlayback);
-    document.addEventListener('scroll', unlockPlayback);
 
     return () => {
       document.removeEventListener('click', unlockPlayback);
       document.removeEventListener('touchstart', unlockPlayback);
-      document.removeEventListener('scroll', unlockPlayback);
     };
   }, [isWalkthroughActive, currentStep, isMobile]);
 
@@ -470,13 +467,13 @@ export default function HowItWorks() {
                         muted
                         playsInline
                         onCanPlay={(e) => {
-                          if (scrollProgress >= 0.25 && currentStep === 1) {
+                          if (isWalkthroughActive && currentStep === 1) {
                             e.currentTarget.play().catch(() => {});
                           }
                         }}
                         onTimeUpdate={(e) => setVideoTime(e.currentTarget.currentTime)}
                         className={`w-full h-full object-cover transition-opacity duration-300 ${
-                          scrollProgress >= 0.25 ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                          isWalkthroughActive ? 'opacity-100' : 'opacity-0 pointer-events-none'
                         }`}
                       />
 
