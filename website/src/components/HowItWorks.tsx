@@ -12,6 +12,15 @@ export default function HowItWorks() {
   const [lastStep, setLastStep] = useState(1);
   const [demoTime, setDemoTime] = useState(0);
   const [userUnmuted, setUserUnmuted] = useState(false);
+  const [isDemoPlaying, setIsDemoPlaying] = useState(false);
+
+  const toggleDemo = () => {
+    const nextPlaying = !isDemoPlaying;
+    setIsDemoPlaying(nextPlaying);
+    if (nextPlaying) {
+      setUserUnmuted(true);
+    }
+  };
   
   const isWalkthroughActive = scrollProgress >= 0.33;
 
@@ -69,6 +78,7 @@ export default function HowItWorks() {
       setDemoTime(0);
       return;
     }
+    if (!isDemoPlaying) return;
 
     const interval = setInterval(() => {
       setDemoTime((prev) => {
@@ -77,8 +87,15 @@ export default function HowItWorks() {
       });
     }, 50);
 
-    return () => clearInterval(interval);
-  }, [isWalkthroughActive, isMobile]);
+  }, [isWalkthroughActive, isDemoPlaying, isMobile]);
+
+  // Reset demo state when scrolling away from walkthrough
+  useEffect(() => {
+    if (!isWalkthroughActive) {
+      setIsDemoPlaying(false);
+      setDemoTime(0);
+    }
+  }, [isWalkthroughActive]);
 
   // Step calculations for triggers (driven automatically by demoTime)
   const currentStep = demoTime < 9.2 ? 1 : demoTime < 14.0 ? 2 : 3;
@@ -91,9 +108,7 @@ export default function HowItWorks() {
     const video = videoRef.current;
     if (!video) return;
 
-    video.muted = true;
-
-    if (isWalkthroughActive) {
+    if (isWalkthroughActive && isDemoPlaying) {
       if (currentStep === 1) {
         if (video.currentTime !== 0) {
           video.currentTime = 0;
@@ -116,7 +131,7 @@ export default function HowItWorks() {
     } else {
       if (!video.paused) video.pause();
     }
-  }, [currentStep, isWalkthroughActive, isMobile]);
+  }, [currentStep, isWalkthroughActive, isDemoPlaying, isMobile]);
 
   // Unlock audio/video playback on first user gesture anywhere on the page
   useEffect(() => {
@@ -474,12 +489,13 @@ export default function HowItWorks() {
                         muted
                         playsInline
                         onCanPlay={(e) => {
-                          if (isWalkthroughActive && currentStep === 1) {
+                          if (isWalkthroughActive && isDemoPlaying && currentStep === 1) {
                             e.currentTarget.play().catch(() => {});
                           }
                         }}
                         onTimeUpdate={(e) => setVideoTime(e.currentTarget.currentTime)}
-                        className={`w-full h-full object-cover transition-opacity duration-300 ${
+                        onClick={toggleDemo}
+                        className={`w-full h-full object-cover transition-opacity duration-300 cursor-pointer ${
                           isWalkthroughActive ? 'opacity-100' : 'opacity-0 pointer-events-none'
                         }`}
                       />
@@ -505,7 +521,9 @@ export default function HowItWorks() {
 
                       <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 to-transparent p-3 flex items-center justify-between text-white text-[10px] md:text-[11px] select-none">
                         <div className="flex gap-3 items-center">
-                          <span>⏸</span>
+                          <span className="cursor-pointer hover:text-cyan-400 transition-colors select-none mr-0.5" onClick={toggleDemo}>
+                            {isDemoPlaying ? '⏸' : '▶️'}
+                          </span>
                           <span className="cursor-pointer hover:text-cyan-400 transition-colors select-none" onClick={() => setUserUnmuted(prev => !prev)}>
                             {videoMuted ? '🔇' : '🔊'}
                           </span>
@@ -641,10 +659,25 @@ export default function HowItWorks() {
                 <p className="text-sm sm:text-base text-gray-400 leading-relaxed font-medium">
                   Locate and click the BooTube ghost icon directly in your Chrome browser toolbar to open the active settings console.
                 </p>
-                <ul className="space-y-2 text-xs sm:text-sm text-gray-500 font-semibold">
+                <ul className="space-y-2 text-xs sm:text-sm text-gray-500 font-semibold mb-2">
                   <li className="flex items-center gap-2">👻 Access settings instantly</li>
                   <li className="flex items-center gap-2">🔒 Privacy-first local filtering</li>
                 </ul>
+
+                <button
+                  onClick={toggleDemo}
+                  className="mt-2 flex items-center gap-2.5 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-extrabold px-6 py-3 rounded-full text-xs uppercase tracking-widest transition-all duration-300 shadow-[0_4px_20px_rgba(6,182,212,0.35)] hover:scale-105 cursor-pointer z-40 relative select-none border-none outline-none self-start"
+                >
+                  {isDemoPlaying ? (
+                    <>
+                      <span>⏸</span> Pause Demo
+                    </>
+                  ) : (
+                    <>
+                      <span>▶️</span> Play Demo
+                    </>
+                  )}
+                </button>
               </div>
 
               <div 
