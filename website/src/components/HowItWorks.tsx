@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 
 export default function HowItWorks() {
@@ -11,12 +11,25 @@ export default function HowItWorks() {
   const [videoTime, setVideoTime] = useState(0);
   const [lastStep, setLastStep] = useState(1);
   const [demoTime, setDemoTime] = useState(0);
+  
+  const isWalkthroughActive = scrollProgress >= 0.35;
 
   const formatTime = (time: number) => {
     const min = Math.floor(time / 60);
     const sec = Math.floor(time % 60);
     return `${min}:${sec < 10 ? '0' : ''}${sec}`;
   };
+
+  // Callback ref to guarantee browser autoplay is permitted on mount
+  const setVideoRef = useCallback((node: HTMLVideoElement | null) => {
+    videoRef.current = node;
+    if (node) {
+      node.muted = true;
+      node.play().catch((err) => {
+        console.warn("Autoplay prevented:", err);
+      });
+    }
+  }, []);
 
   // Responsive check
   useEffect(() => {
@@ -54,7 +67,7 @@ export default function HowItWorks() {
 
   // Master timer to drive the walkthrough demo state automatically on screen enter
   useEffect(() => {
-    if (isMobile || scrollProgress < 0.35) {
+    if (isMobile || !isWalkthroughActive) {
       setDemoTime(0);
       return;
     }
@@ -67,14 +80,12 @@ export default function HowItWorks() {
     }, 50);
 
     return () => clearInterval(interval);
-  }, [scrollProgress, isMobile]);
+  }, [isWalkthroughActive, isMobile]);
 
   // Step calculations for triggers (driven automatically by demoTime)
   const currentStep = demoTime < 9.2 ? 1 : demoTime < 14.0 ? 2 : 3;
   const isCensoringOn = demoTime >= 10.5;
   const isHideCaptionsOn = demoTime >= 11.5;
-
-  const isWalkthroughActive = scrollProgress >= 0.35;
 
   // Synchronize video play state with master currentStep changes
   useEffect(() => {
@@ -417,9 +428,8 @@ export default function HowItWorks() {
                       
                       {scrollProgress >= 0.35 && (
                         <video
-                          ref={videoRef}
+                          ref={setVideoRef}
                           src="/cowboys.mp4"
-                          loop
                           muted
                           playsInline
                           onTimeUpdate={(e) => setVideoTime(e.currentTarget.currentTime)}
