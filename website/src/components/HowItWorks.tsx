@@ -74,13 +74,15 @@ export default function HowItWorks() {
   const isCensoringOn = demoTime >= 10.5;
   const isHideCaptionsOn = demoTime >= 11.5;
 
+  const isWalkthroughActive = scrollProgress >= 0.35;
+
   // Synchronize video play state with master currentStep changes
   useEffect(() => {
     if (isMobile) return;
     const video = videoRef.current;
     if (!video) return;
 
-    if (scrollProgress >= 0.35) {
+    if (isWalkthroughActive) {
       if (currentStep === 1) {
         video.currentTime = 0;
         video.play().catch(() => {});
@@ -93,7 +95,7 @@ export default function HowItWorks() {
     } else {
       if (!video.paused) video.pause();
     }
-  }, [currentStep, scrollProgress, isMobile]);
+  }, [currentStep, isWalkthroughActive, isMobile]);
 
   // Programmatic muting based on timestamps in Step 3
   useEffect(() => {
@@ -234,31 +236,31 @@ export default function HowItWorks() {
     cursorOpacity = 1;
     const t = (demoTime - 9.2) / 1.0;
     cursorX = 94.5;
-    cursorY = 5.5 + t * (29.5 - 5.5);
+    cursorY = 5.5 + t * (31.5 - 5.5);
   } else if (demoTime >= 10.2 && demoTime < 10.5) {
     cursorOpacity = 1;
     cursorX = 94.5;
-    cursorY = 29.5;
+    cursorY = 31.5;
     isClicking = true;
   } else if (demoTime >= 10.5 && demoTime < 11.2) {
     cursorOpacity = 1;
     const t = (demoTime - 10.5) / 0.7;
     cursorX = 94.5;
-    cursorY = 29.5 + t * (39.5 - 29.5);
+    cursorY = 31.5 + t * (41.5 - 31.5);
   } else if (demoTime >= 11.2 && demoTime < 11.5) {
     cursorOpacity = 1;
     cursorX = 94.5;
-    cursorY = 39.5;
+    cursorY = 41.5;
     isClicking = true;
   } else if (demoTime >= 11.5 && demoTime < 12.0) {
     cursorOpacity = 1;
     cursorX = 94.5;
-    cursorY = 39.5;
+    cursorY = 41.5;
   } else if (demoTime >= 12.0 && demoTime < 13.0) {
     cursorOpacity = 1;
     const t = (demoTime - 12.0) / 1.0;
     cursorX = 94.5;
-    cursorY = 39.5 + t * (5.5 - 39.5);
+    cursorY = 41.5 + t * (5.5 - 41.5);
   } else if (demoTime >= 13.0 && demoTime < 13.3) {
     cursorOpacity = 1;
     cursorX = 94.5;
@@ -322,13 +324,13 @@ export default function HowItWorks() {
   );
 
   return (
-    <div ref={containerRef} className="relative min-h-[400vh] bg-gradient-to-b from-[#08080a] via-[#050505] to-[#030304] text-gray-100 selection:bg-cyan-500 selection:text-black">
+    <div ref={containerRef} className="relative min-h-[400vh] bg-black text-gray-100 selection:bg-cyan-500 selection:text-black">
       
-      {/* Ambient background glows */}
-      <div className="absolute top-[10%] right-[-100px] w-[600px] h-[600px] rounded-full bg-cyan-950/12 blur-[130px] pointer-events-none" />
-      <div className="absolute bottom-[20%] left-[-100px] w-[600px] h-[600px] rounded-full bg-blue-950/8 blur-[130px] pointer-events-none" />
-      
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
+      <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center bg-gradient-to-b from-[#08080a] via-[#050505] to-[#030304]">
+        
+        {/* Ambient background glows */}
+        <div className="absolute top-[-100px] right-[-100px] w-[500px] h-[500px] rounded-full bg-cyan-950/15 blur-[120px] pointer-events-none z-0" />
+        <div className="absolute bottom-[-100px] left-[-100px] w-[500px] h-[500px] rounded-full bg-blue-950/10 blur-[120px] pointer-events-none z-0" />
         
         <div 
           className="absolute inset-0 bg-cover bg-center pointer-events-none transition-transform will-change-transform"
