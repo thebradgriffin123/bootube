@@ -508,47 +508,50 @@ export default function HowItWorks() {
         />
 
         <div 
-          className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-6 pointer-events-none"
+          className="absolute inset-0 z-20 flex flex-col items-center justify-between text-center px-6 pt-24 pb-8 pointer-events-none"
           style={{ opacity: heroOpacity }}
         >
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white mb-6 max-w-3xl leading-none">
-            Keep your streams clean.
-          </h1>
-          <p className="text-base sm:text-lg text-gray-300 max-w-2xl leading-relaxed mb-10">
-            BooTube automatically ghosts profanity and blasphemy in real-time. Muting the language, never the video.
-          </p>
-          <a 
-            href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-extrabold rounded-full shadow-[0_0_20px_rgba(6,182,212,0.3)] text-sm pointer-events-auto transition-all cursor-pointer hover:scale-105"
-          >
-            Get BooTube — It&apos;s Free
-          </a>
+          {/* Centered Hero Content */}
+          <div className="flex-grow flex flex-col items-center justify-center pointer-events-none">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white mb-6 max-w-3xl leading-none">
+              Keep your streams clean.
+            </h1>
+            <p className="text-base sm:text-lg text-gray-300 max-w-2xl leading-relaxed mb-10">
+              BooTube automatically ghosts profanity and blasphemy in real-time. Muting the language, never the video.
+            </p>
+            <a 
+              href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-extrabold rounded-full shadow-[0_0_20px_rgba(6,182,212,0.3)] text-sm pointer-events-auto transition-all cursor-pointer hover:scale-105"
+            >
+              Get BooTube — It&apos;s Free
+            </a>
+          </div>
 
-          {/* Platform compatibility bar */}
-          <div className="w-full max-w-4xl mx-auto border-t border-white/10 mt-28 pt-8 pointer-events-auto">
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 md:gap-x-8 lg:gap-x-10 select-none text-xs md:text-sm">
-              <span className="text-cyan-400/80 font-extrabold uppercase tracking-widest text-[9px] md:text-[10px] mr-2">
-                Works seamlessly with:
-              </span>
-              <span className="text-gray-400 hover:text-[#FF0000] font-bold tracking-tight text-base md:text-lg transition-colors cursor-default">
+          {/* Platform compatibility bar (acting like a footer) */}
+          <div className="w-full max-w-4xl mx-auto mb-4 pointer-events-auto flex flex-col items-center gap-4">
+            <p className="text-center text-[10px] sm:text-[11px] font-extrabold tracking-wider text-cyan-400/80">
+              Works seamlessly with
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 md:gap-x-12 select-none">
+              <span className="text-gray-400 hover:text-[#FF0000] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-default">
                 YouTube
               </span>
-              <span className="text-gray-400 hover:text-[#00d4ff] font-black tracking-tighter text-base md:text-lg transition-colors cursor-default">
+              <span className="text-gray-400 hover:text-[#00d4ff] font-black tracking-tighter text-lg md:text-xl transition-colors cursor-default">
                 DISNEY+
               </span>
-              <span className="text-gray-400 hover:text-[#1CE783] font-bold tracking-tight text-base md:text-lg transition-colors cursor-default italic">
+              <span className="text-gray-400 hover:text-[#1CE783] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-default italic">
                 hulu
               </span>
-              <span className="text-gray-400 hover:text-[#E5A93B] font-black tracking-normal text-base md:text-lg transition-colors cursor-default">
+              <span className="text-gray-400 hover:text-[#E5A93B] font-black tracking-normal text-lg md:text-xl transition-colors cursor-default">
                 PLEX
               </span>
-              <span className="text-gray-400 hover:text-[#F15A24] font-extrabold tracking-wide text-base md:text-lg transition-colors cursor-default">
+              <span className="text-gray-400 hover:text-[#F15A24] font-extrabold tracking-wide text-lg md:text-xl transition-colors cursor-default">
                 Fandango
               </span>
               <div className="flex items-center gap-1 opacity-55">
-                <span className="text-gray-500 font-semibold text-xs line-through tracking-normal cursor-default">
+                <span className="text-gray-500 font-semibold text-sm line-through tracking-normal cursor-default">
                   Netflix
                 </span>
                 <span className="text-[7px] font-extrabold uppercase px-1 py-0.2 rounded bg-white/5 text-gray-500 border border-white/5">
@@ -556,7 +559,7 @@ export default function HowItWorks() {
                 </span>
               </div>
               <div className="flex items-center gap-1 opacity-55">
-                <span className="text-gray-500 font-semibold text-xs line-through tracking-normal cursor-default">
+                <span className="text-gray-500 font-semibold text-sm line-through tracking-normal cursor-default">
                   Prime Video
                 </span>
                 <span className="text-[7px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-white/5 text-gray-500 border border-white/5">
@@ -564,10 +567,10 @@ export default function HowItWorks() {
                 </span>
               </div>
             </div>
-          </div>
-
-          <div className="text-xs text-gray-400 mt-10 animate-pulse">
-            ↓ Scroll down to zoom in
+            
+            <div className="text-xs text-gray-400 mt-6 animate-pulse select-none pointer-events-none">
+              ↓ Scroll down to zoom in
+            </div>
           </div>
         </div>
 
