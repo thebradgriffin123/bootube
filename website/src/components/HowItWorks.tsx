@@ -439,6 +439,8 @@ export default function HowItWorks() {
                         <video
                           ref={setVideoRef}
                           src="/cowboys.mp4"
+                          autoPlay
+                          preload="auto"
                           muted
                           playsInline
                           onTimeUpdate={(e) => setVideoTime(e.currentTarget.currentTime)}
