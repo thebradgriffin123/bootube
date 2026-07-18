@@ -117,6 +117,33 @@ export default function HowItWorks() {
     }
   }, [currentStep, isWalkthroughActive, isMobile]);
 
+  // Unlock audio/video playback on first user gesture anywhere on the page
+  useEffect(() => {
+    if (isMobile) return;
+
+    const unlockPlayback = () => {
+      const video = videoRef.current;
+      if (video && video.paused && isWalkthroughActive && currentStep !== 2) {
+        video.play().catch(() => {});
+      }
+      
+      // Clean up event listeners immediately after first gesture
+      document.removeEventListener('click', unlockPlayback);
+      document.removeEventListener('touchstart', unlockPlayback);
+      document.removeEventListener('scroll', unlockPlayback);
+    };
+
+    document.addEventListener('click', unlockPlayback);
+    document.addEventListener('touchstart', unlockPlayback);
+    document.addEventListener('scroll', unlockPlayback);
+
+    return () => {
+      document.removeEventListener('click', unlockPlayback);
+      document.removeEventListener('touchstart', unlockPlayback);
+      document.removeEventListener('scroll', unlockPlayback);
+    };
+  }, [isWalkthroughActive, currentStep, isMobile]);
+
   // Programmatic muting based on timestamps in Step 3
   useEffect(() => {
     if (isMobile) return;
@@ -435,23 +462,23 @@ export default function HowItWorks() {
                     
                     <div className="w-full h-full bg-black/60 relative overflow-hidden flex items-center justify-center">
                       
-                      {scrollProgress >= 0.25 && (
-                        <video
-                          ref={setVideoRef}
-                          src="/cowboys.mp4"
-                          autoPlay
-                          preload="auto"
-                          muted
-                          playsInline
-                          onCanPlay={(e) => {
-                            if (scrollProgress >= 0.25 && currentStep === 1) {
-                              e.currentTarget.play().catch(() => {});
-                            }
-                          }}
-                          onTimeUpdate={(e) => setVideoTime(e.currentTarget.currentTime)}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
+                      <video
+                        ref={setVideoRef}
+                        src="/cowboys.mp4"
+                        autoPlay
+                        preload="auto"
+                        muted
+                        playsInline
+                        onCanPlay={(e) => {
+                          if (scrollProgress >= 0.25 && currentStep === 1) {
+                            e.currentTarget.play().catch(() => {});
+                          }
+                        }}
+                        onTimeUpdate={(e) => setVideoTime(e.currentTarget.currentTime)}
+                        className={`w-full h-full object-cover transition-opacity duration-300 ${
+                          scrollProgress >= 0.25 ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                        }`}
+                      />
 
                       {getCaptionText() && (
                         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 w-full px-6 text-center pointer-events-none select-none">
