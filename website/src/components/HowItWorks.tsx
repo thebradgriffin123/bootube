@@ -535,24 +535,54 @@ export default function HowItWorks() {
               Works seamlessly with
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 md:gap-x-12 select-none">
-              <span className="text-gray-400 hover:text-[#FF0000] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-default">
+              <a 
+                href="https://www.youtube.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-white font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer"
+              >
                 YouTube
-              </span>
-              <span className="text-gray-400 hover:text-[#00d4ff] font-black tracking-tighter text-lg md:text-xl transition-colors cursor-default">
+              </a>
+              <a 
+                href="https://www.disneyplus.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-[#00d4ff] font-black tracking-tighter text-lg md:text-xl transition-colors cursor-pointer"
+              >
                 DISNEY+
-              </span>
-              <span className="text-gray-400 hover:text-[#1CE783] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-default italic">
+              </a>
+              <a 
+                href="https://www.hulu.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-[#1CE783] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer italic"
+              >
                 hulu
-              </span>
-              <span className="text-gray-400 hover:text-[#E5A93B] font-black tracking-normal text-lg md:text-xl transition-colors cursor-default">
+              </a>
+              <a 
+                href="https://www.plex.tv"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-[#E5A93B] font-black tracking-normal text-lg md:text-xl transition-colors cursor-pointer"
+              >
                 PLEX
-              </span>
-              <span className="text-gray-400 hover:text-[#F15A24] font-extrabold tracking-wide text-lg md:text-xl transition-colors cursor-default">
+              </a>
+              <a 
+                href="https://www.vudu.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-[#F15A24] font-extrabold tracking-wide text-lg md:text-xl transition-colors cursor-pointer"
+              >
                 Fandango
-              </span>
-              <span className="text-gray-400 hover:text-[#E50914] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-default">
+              </a>
+              <a 
+                href="https://www.netflix.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-[#E50914] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer"
+              >
                 Netflix
-              </span>
+              </a>
               <div className="flex items-center gap-1 opacity-55">
                 <span className="text-gray-500 font-semibold text-sm line-through tracking-normal cursor-default">
                   Prime Video
