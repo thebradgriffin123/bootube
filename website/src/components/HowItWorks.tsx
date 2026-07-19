@@ -19,7 +19,7 @@ export default function HowItWorks() {
   const faqs = [
     {
       q: "Does BooTube work on Netflix or Hulu?",
-      a: "Yes! BooTube currently supports YouTube, Disney+, Hulu, Plex, and Fandango at Home (Vudu). Support for Netflix and Amazon Prime Video is coming soon."
+      a: "Yes! BooTube currently supports YouTube, Netflix, Disney+, Hulu, Plex, and Fandango at Home (Vudu). Support for Amazon Prime Video is coming soon."
     },
     {
       q: "Will streaming services ban my account for using this?",
@@ -550,14 +550,9 @@ export default function HowItWorks() {
               <span className="text-gray-400 hover:text-[#F15A24] font-extrabold tracking-wide text-lg md:text-xl transition-colors cursor-default">
                 Fandango
               </span>
-              <div className="flex items-center gap-1 opacity-55">
-                <span className="text-gray-500 font-semibold text-sm line-through tracking-normal cursor-default">
-                  Netflix
-                </span>
-                <span className="text-[7px] font-extrabold uppercase px-1 py-0.2 rounded bg-white/5 text-gray-500 border border-white/5">
-                  Soon
-                </span>
-              </div>
+              <span className="text-gray-400 hover:text-[#E50914] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-default">
+                Netflix
+              </span>
               <div className="flex items-center gap-1 opacity-55">
                 <span className="text-gray-500 font-semibold text-sm line-through tracking-normal cursor-default">
                   Prime Video
