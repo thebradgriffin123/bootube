@@ -42,6 +42,44 @@ export default function HowItWorks() {
       setUserUnmuted(true);
     }
   };
+
+  const handleHowItWorksClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const container = containerRef.current;
+    if (!container) return;
+
+    const viewportHeight = window.innerHeight;
+    const totalHeight = container.clientHeight - viewportHeight;
+    const targetScrollY = container.offsetTop + 0.35 * totalHeight;
+
+    window.scrollTo({
+      top: targetScrollY,
+      behavior: 'smooth'
+    });
+
+    setIsDemoPlaying(true);
+    setUserUnmuted(true);
+  };
+
+  const handleHowItWorksMobileClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setMobileMenuOpen(false);
+    
+    const container = containerRef.current;
+    if (!container) return;
+
+    const viewportHeight = window.innerHeight;
+    const totalHeight = container.clientHeight - viewportHeight;
+    const targetScrollY = container.offsetTop + 0.35 * totalHeight;
+
+    window.scrollTo({
+      top: targetScrollY,
+      behavior: 'smooth'
+    });
+
+    setIsDemoPlaying(true);
+    setUserUnmuted(true);
+  };
   
   const isWalkthroughActive = scrollProgress >= 0.33;
 
@@ -432,8 +470,8 @@ export default function HowItWorks() {
 
           {/* Desktop Nav Links */}
           <div className="hidden md:flex items-center gap-8">
+            <Link href="#walkthrough" onClick={handleHowItWorksClick} className="text-sm font-medium text-gray-300 hover:text-white transition-colors">How it works</Link>
             <Link href="#features" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Why BooTube</Link>
-            <Link href="#walkthrough" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">How it works</Link>
             <Link href="#pricing" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">Pricing</Link>
             <Link href="#faq" className="text-sm font-medium text-gray-300 hover:text-white transition-colors">FAQ</Link>
           </div>
@@ -467,8 +505,8 @@ export default function HowItWorks() {
         {/* Mobile Navigation Dropdown */}
         {mobileMenuOpen && (
           <div className="md:hidden border-b border-white/5 bg-[#050505] px-6 py-6 flex flex-col gap-4 animate-in slide-in-from-top-5 duration-200">
+            <Link href="#walkthrough" onClick={handleHowItWorksMobileClick} className="text-lg font-medium text-gray-300">How it works</Link>
             <Link href="#features" onClick={() => setMobileMenuOpen(false)} className="text-lg font-medium text-gray-300">Why BooTube</Link>
-            <Link href="#walkthrough" onClick={() => setMobileMenuOpen(false)} className="text-lg font-medium text-gray-300">How it works</Link>
             <Link href="#pricing" onClick={() => setMobileMenuOpen(false)} className="text-lg font-medium text-gray-300">Pricing</Link>
             <Link href="#faq" onClick={() => setMobileMenuOpen(false)} className="text-lg font-medium text-gray-300">FAQ</Link>
             <hr className="border-white/5 my-2" />
