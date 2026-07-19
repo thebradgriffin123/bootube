@@ -552,7 +552,7 @@ export default function HowItWorks() {
           {/* Centered Hero Content */}
           <div className="flex-grow flex flex-col items-center justify-center pointer-events-none">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight text-white mb-6 max-w-3xl leading-none">
-              Keep your streams clean.
+              Keep your streams clean
             </h1>
             <p className="text-base sm:text-lg text-gray-300 max-w-2xl leading-relaxed mb-10">
               BooTube automatically ghosts profanity and blasphemy in real-time. Muting the language, never the video.
