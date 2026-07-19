@@ -555,7 +555,7 @@ export default function HowItWorks() {
               Keep your streams clean
             </h1>
             <p className="text-base sm:text-lg text-gray-300 max-w-2xl leading-relaxed mb-10">
-              BooTube automatically ghosts profanity and blasphemy in real-time on your favorite streaming services, keeping your audio clean and family-friendly.
+              BooTube ghosts profanity and blasphemy in real-time, delivering clean, family-friendly audio across your favorite streaming services.
             </p>
             <a 
               href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa"
