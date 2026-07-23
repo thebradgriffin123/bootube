@@ -46,8 +46,12 @@ export async function POST(req: Request) {
         if (userId) {
           const { error } = await supabaseAdmin
             .from('profiles')
-            .update(updateData)
-            .eq('id', userId);
+            .upsert({
+              id: userId,
+              subscription_status: updateData.subscription_status,
+              updated_at: updateData.updated_at,
+              stripe_customer_id: updateData.stripe_customer_id,
+            });
           if (error) throw error;
         } else {
           const { error } = await supabaseAdmin
@@ -71,8 +75,11 @@ export async function POST(req: Request) {
         if (userId) {
           const { error } = await supabaseAdmin
             .from('profiles')
-            .update(updateData)
-            .eq('id', userId);
+            .upsert({
+              id: userId,
+              subscription_status: 'canceled',
+              updated_at: updateData.updated_at,
+            });
           if (error) throw error;
         } else {
           const { error } = await supabaseAdmin
@@ -91,12 +98,12 @@ export async function POST(req: Request) {
         if (userId) {
           const { error } = await supabaseAdmin
             .from('profiles')
-            .update({
+            .upsert({
+              id: userId,
               stripe_customer_id: customerId,
               subscription_status: 'active',
               updated_at: new Date().toISOString(),
-            })
-            .eq('id', userId);
+            });
           if (error) throw error;
         }
         break;

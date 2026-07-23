@@ -50,6 +50,9 @@ export default function DashboardPage() {
       if (res.ok) {
         const data = await res.json();
         setSubDetails(data);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('bootube_force_sync', 'true');
+        }
       } else {
         setSubDetails({ plan: 'free' });
       }

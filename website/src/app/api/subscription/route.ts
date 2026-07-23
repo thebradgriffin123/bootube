@@ -8,6 +8,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_mock', {
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mock.supabase.co';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'mock_key';
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'mock_key';
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey);
 
 export async function GET(req: Request) {
   try {
@@ -35,26 +37,89 @@ export async function GET(req: Request) {
     }
 
     // Retrieve user settings from profiles
-    const { data: profile, error: dbError } = await supabaseClient
+    let { data: profile, error: dbError } = await supabaseClient
       .from('profiles')
       .select('stripe_customer_id, subscription_status')
       .eq('id', user.id)
       .single();
 
-    if (dbError) {
+    if (dbError && dbError.code === 'PGRST116') {
+      // Profile row is missing. Create it using supabaseAdmin!
+      const { data: newProfile, error: insertError } = await supabaseAdmin
+        .from('profiles')
+        .insert({
+          id: user.id,
+          subscription_status: 'free',
+          custom_filter_words: [],
+          blur_screen_enabled: false,
+          buffer_timer_seconds: 0
+        })
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('❌ Error creating missing profile in subscription check:', insertError.message);
+        return new NextResponse('Internal Server Error', { status: 500 });
+      }
+      profile = newProfile;
+      dbError = null;
+    } else if (dbError) {
       console.error('❌ Error fetching profile:', dbError.message);
       return new NextResponse('Internal Server Error', { status: 500 });
     }
 
-    const isPremium = profile?.subscription_status === 'active';
+    let isPremium = profile?.subscription_status === 'active';
+    let customerId = profile?.stripe_customer_id;
 
-    if (!isPremium || !profile?.stripe_customer_id) {
+    // SELF-HEALING: If database profile says they are not premium, or missing Stripe ID,
+    // check Stripe directly by their email to see if they have an active subscription!
+    if ((!isPremium || !customerId) && user.email) {
+      try {
+        const stripeCustomers = await stripe.customers.list({
+          email: user.email,
+          limit: 1,
+        });
+
+        if (stripeCustomers.data.length > 0) {
+          const stripeCustomer = stripeCustomers.data[0];
+          const activeSubscriptions = await stripe.subscriptions.list({
+            customer: stripeCustomer.id,
+            status: 'active',
+            limit: 1,
+          });
+
+          if (activeSubscriptions.data.length > 0) {
+            // Customer has an active subscription in Stripe! Sync database immediately.
+            const { error: updateError } = await supabaseAdmin
+              .from('profiles')
+              .upsert({
+                id: user.id,
+                subscription_status: 'active',
+                stripe_customer_id: stripeCustomer.id,
+                updated_at: new Date().toISOString(),
+              });
+
+            if (!updateError) {
+              console.log(`✅ Self-healed subscription for user ${user.email} (ID: ${user.id})`);
+              isPremium = true;
+              customerId = stripeCustomer.id;
+            } else {
+              console.error('❌ Failed to self-heal subscription database update:', updateError.message);
+            }
+          }
+        }
+      } catch (stripeErr: any) {
+        console.error('⚠️ Stripe self-healing lookup failed:', stripeErr.message);
+      }
+    }
+
+    if (!isPremium || !customerId) {
       return NextResponse.json({ plan: 'free' });
     }
 
     // Query active subscriptions from Stripe
     const subscriptions = await stripe.subscriptions.list({
-      customer: profile.stripe_customer_id,
+      customer: customerId,
       status: 'active',
       limit: 1,
     });
