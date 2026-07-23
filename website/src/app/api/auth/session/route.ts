@@ -1,10 +1,5 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import Stripe from 'stripe';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_mock', {
-  apiVersion: '2023-10-16' as any,
-});
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mock.supabase.co';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'mock_key';
@@ -71,51 +66,6 @@ export async function GET(req: Request) {
   } else if (dbError) {
     console.error('❌ Error fetching profile:', dbError.message);
     return new NextResponse('Internal Server Error', { status: 500 });
-  }
-
-  let isPremium = profile?.subscription_status === 'active';
-
-  // SELF-HEALING: If database profile says they are not premium, check Stripe directly!
-  if (!isPremium && user.email) {
-    try {
-      const stripeCustomers = await stripe.customers.list({
-        email: user.email,
-        limit: 1,
-      });
-
-      if (stripeCustomers.data.length > 0) {
-        const stripeCustomer = stripeCustomers.data[0];
-        const activeSubscriptions = await stripe.subscriptions.list({
-          customer: stripeCustomer.id,
-          status: 'active',
-          limit: 1,
-        });
-
-        if (activeSubscriptions.data.length > 0) {
-          // Self-heal profile in database immediately
-          const { error: updateError } = await supabaseAdmin
-            .from('profiles')
-            .upsert({
-              id: user.id,
-              subscription_status: 'active',
-              stripe_customer_id: stripeCustomer.id,
-              updated_at: new Date().toISOString(),
-            });
-
-          if (!updateError) {
-            console.log(`✅ Self-healed subscription in auth session for user ${user.email}`);
-            isPremium = true;
-            if (profile) {
-              profile.subscription_status = 'active';
-            }
-          } else {
-            console.error('❌ Failed to self-heal subscription database update in session:', updateError.message);
-          }
-        }
-      }
-    } catch (stripeErr: any) {
-      console.error('⚠️ Stripe self-healing lookup in auth session failed:', stripeErr.message);
-    }
   }
 
   return NextResponse.json({
