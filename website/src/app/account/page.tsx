@@ -51,6 +51,9 @@ export default function DashboardPage() {
       if (res.ok) {
         const data = await res.json();
         setSubDetails(data);
+        if (data.plan === 'premium') {
+          setProfile(prev => prev ? { ...prev, subscription_status: 'active' } : prev);
+        }
         if (typeof window !== 'undefined') {
           localStorage.setItem('bootube_force_sync', 'true');
         }
@@ -328,7 +331,7 @@ export default function DashboardPage() {
     );
   }
 
-  const isPremium = profile?.subscription_status === 'active';
+  const isPremium = profile?.subscription_status === 'active' || profile?.subscription_status === 'premium' || subDetails?.plan === 'premium';
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#08080a] via-[#050505] to-[#030304] text-gray-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black relative overflow-hidden">
