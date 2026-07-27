@@ -2860,13 +2860,18 @@ function setupAvatarUploadListeners() {
         saveState();
         updateUI();
 
-        // Optional Supabase user metadata update if session active
-        if (state.supabaseSession && window.supabaseClient) {
-          try {
-            window.supabaseClient.auth.updateUser({
-              data: { avatar_url: dataUrl }
-            }).catch(err => console.log("Supabase avatar sync error:", err));
-          } catch(e) {}
+        // Supabase user metadata cloud sync if session active
+        if (state.supabaseSession && state.supabaseSession.access_token) {
+          const origin = state.lastSyncOrigin || 'https://bootube.app';
+          const baseOrigin = origin.replace(/\/$/, '');
+          fetch(`${baseOrigin}/api/auth/session`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${state.supabaseSession.access_token}`
+            },
+            body: JSON.stringify({ avatar_url: dataUrl })
+          }).catch(err => console.log("Supabase avatar sync error:", err));
         }
       };
       img.src = e.target.result;
@@ -2905,12 +2910,17 @@ function setupAvatarUploadListeners() {
       state.customAvatarDataUrl = null;
       saveState();
       updateUI();
-      if (state.supabaseSession && window.supabaseClient) {
-        try {
-          window.supabaseClient.auth.updateUser({
-            data: { avatar_url: null }
-          }).catch(err => console.log("Supabase avatar reset error:", err));
-        } catch(e) {}
+      if (state.supabaseSession && state.supabaseSession.access_token) {
+        const origin = state.lastSyncOrigin || 'https://bootube.app';
+        const baseOrigin = origin.replace(/\/$/, '');
+        fetch(`${baseOrigin}/api/auth/session`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${state.supabaseSession.access_token}`
+          },
+          body: JSON.stringify({ avatar_url: null })
+        }).catch(err => console.log("Supabase avatar reset error:", err));
       }
     };
   }

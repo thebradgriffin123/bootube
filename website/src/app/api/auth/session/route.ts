@@ -118,19 +118,32 @@ export async function POST(req: Request) {
     return new NextResponse('Invalid JSON body', { status: 400 });
   }
 
-  // Update user settings in profiles
-  const { error: dbError } = await supabaseClient
-    .from('profiles')
-    .update({
-      custom_filter_words: body.custom_blocked_words,
-      blur_screen_enabled: body.blur_screens,
-      buffer_timer_seconds: body.buffer_timer,
-    })
-    .eq('id', user.id);
+  // Update avatar_url in Supabase Auth user_metadata if provided
+  if (body.avatar_url !== undefined) {
+    try {
+      await supabaseAdmin.auth.admin.updateUserById(user.id, {
+        user_metadata: { ...user.user_metadata, avatar_url: body.avatar_url }
+      });
+    } catch (avatarErr: any) {
+      console.error('❌ Error updating avatar_url metadata:', avatarErr.message);
+    }
+  }
 
-  if (dbError) {
-    console.error('❌ Error updating profile:', dbError.message);
-    return new NextResponse(`Internal Server Error: ${dbError.message}`, { status: 500 });
+  // Update user settings in profiles if settings fields are provided
+  if (body.custom_blocked_words !== undefined || body.blur_screens !== undefined || body.buffer_timer !== undefined) {
+    const { error: dbError } = await supabaseClient
+      .from('profiles')
+      .update({
+        custom_filter_words: body.custom_blocked_words,
+        blur_screen_enabled: body.blur_screens,
+        buffer_timer_seconds: body.buffer_timer,
+      })
+      .eq('id', user.id);
+
+    if (dbError) {
+      console.error('❌ Error updating profile:', dbError.message);
+      return new NextResponse(`Internal Server Error: ${dbError.message}`, { status: 500 });
+    }
   }
 
   return NextResponse.json({ success: true });
