@@ -1,35 +1,183 @@
 {
   "manifest_version": 3,
-  "name": "BooTube: The Ultimate Profanity Filter",
-  "version": "1.2",
-  "description": "Ghost the inappropriate words on YouTube. Automatically mutes audio and blurs the screen during profanity.",
+  "name": "BooTube LOCAL TEST - BOOTUBE-EXTENSION",
+  "version": "1.31",
+  "description": "Censor profanity on YouTube.",
   "permissions": [
-    "storage"
+    "storage",
+    "activeTab",
+    "tabs",
+    "sidePanel"
   ],
-  "icons": {
-    "16": "icons/icon-16.png",
-    "48": "icons/icon-48.png",
-    "128": "icons/icon-128.png"
-  },
-  "action": {
-    "default_popup": "popup.html",
-    "default_icon": {
-      "16": "icons/icon-16.png",
-      "48": "icons/icon-48.png",
-      "128": "icons/icon-128.png"
-    }
+  "host_permissions": [
+    "<all_urls>",
+    "*://*.youtube.com/*",
+    "*://*.disneyplus.com/*",
+    "*://*.hulu.com/*",
+    "*://*.plex.tv/*",
+    "*://app.plex.tv/*",
+    "*://*.plex.direct/*",
+    "*://*.fandango.com/*",
+    "*://*.vudu.com/*",
+    "*://*.netflix.com/*",
+    "*://*.amazon.com/*",
+    "*://*.primevideo.com/*",
+    "*://*.amazon.co.uk/*",
+    "*://*.amazon.ca/*",
+    "*://localhost/*",
+    "*://127.0.0.1/*",
+    "*://bootube.app/*",
+    "*://*.bootube.app/*",
+    "*://*.twitter.com/*",
+    "*://*.x.com/*",
+    "*://*.spotify.com/*",
+    "*://*.facebook.com/*",
+    "*://*.fb.watch/*",
+    "*://*.fbcdn.net/*",
+    "*://*.messenger.com/*",
+    "*://*.max.com/*",
+    "*://*.hbomax.com/*",
+    "*://*.paramountplus.com/*",
+    "*://*.cbs.com/*",
+    "*://*.cbsaavideo.com/*",
+    "*://*.cbsinteractive.com/*",
+    "*://*.theplatform.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["*://www.youtube.com/*"],
-      "js": ["inject.js"],
-      "world": "MAIN",
-      "run_at": "document_start"
+      "matches": [
+        "*://*.youtube.com/*",
+        "*://*.disneyplus.com/*",
+        "*://*.hulu.com/*",
+        "*://*.plex.tv/*",
+        "*://app.plex.tv/*",
+        "*://*.plex.direct/*",
+        "*://*.fandango.com/*",
+        "*://*.vudu.com/*",
+        "*://*.netflix.com/*",
+        "*://*.amazon.com/*",
+        "*://*.primevideo.com/*",
+        "*://*.amazon.co.uk/*",
+        "*://*.amazon.ca/*",
+        "*://localhost/*",
+        "*://127.0.0.1/*",
+        "*://bootube.app/*",
+        "*://*.bootube.app/*",
+        "*://*.twitter.com/*",
+        "*://*.x.com/*",
+        "*://*.spotify.com/*",
+        "*://*.facebook.com/*",
+        "*://*.fb.watch/*",
+        "*://*.fbcdn.net/*",
+        "*://*.messenger.com/*",
+        "*://*.max.com/*",
+        "*://*.hbomax.com/*",
+        "*://*.paramountplus.com/*",
+        "*://*.cbs.com/*",
+        "*://*.cbsaavideo.com/*",
+        "*://*.cbsinteractive.com/*",
+        "*://*.theplatform.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
     },
     {
-      "matches": ["*://www.youtube.com/*"],
-      "js": ["content.js"],
-      "run_at": "document_idle"
+      "matches": [
+        "*://*.youtube.com/*",
+        "*://*.disneyplus.com/*",
+        "*://*.hulu.com/*",
+        "*://*.plex.tv/*",
+        "*://app.plex.tv/*",
+        "*://*.plex.direct/*",
+        "*://*.fandango.com/*",
+        "*://*.vudu.com/*",
+        "*://*.netflix.com/*",
+        "*://*.amazon.com/*",
+        "*://*.primevideo.com/*",
+        "*://*.amazon.co.uk/*",
+        "*://*.amazon.ca/*",
+        "*://localhost/*",
+        "*://127.0.0.1/*",
+        "*://*.twitter.com/*",
+        "*://*.x.com/*",
+        "*://*.spotify.com/*",
+        "*://*.facebook.com/*",
+        "*://*.fb.watch/*",
+        "*://*.fbcdn.net/*",
+        "*://*.messenger.com/*",
+        "*://*.max.com/*",
+        "*://*.hbomax.com/*",
+        "*://*.paramountplus.com/*",
+        "*://*.cbs.com/*",
+        "*://*.cbsaavideo.com/*",
+        "*://*.cbsinteractive.com/*",
+        "*://*.theplatform.com/*"
+      ],
+      "js": [
+        "inject.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": true
     }
-  ]
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "inject.js"
+      ],
+      "matches": [
+        "*://*.youtube.com/*",
+        "*://*.disneyplus.com/*",
+        "*://*.hulu.com/*",
+        "*://*.plex.tv/*",
+        "*://app.plex.tv/*",
+        "*://*.plex.direct/*",
+        "*://*.fandango.com/*",
+        "*://*.vudu.com/*",
+        "*://*.netflix.com/*",
+        "*://*.amazon.com/*",
+        "*://*.primevideo.com/*",
+        "*://*.amazon.co.uk/*",
+        "*://*.amazon.ca/*",
+        "*://localhost/*",
+        "*://127.0.0.1/*",
+        "*://*.twitter.com/*",
+        "*://*.x.com/*",
+        "*://*.spotify.com/*",
+        "*://*.facebook.com/*",
+        "*://*.fb.watch/*",
+        "*://*.fbcdn.net/*",
+        "*://*.messenger.com/*",
+        "*://*.max.com/*",
+        "*://*.hbomax.com/*",
+        "*://*.paramountplus.com/*",
+        "*://*.cbs.com/*",
+        "*://*.cbsaavideo.com/*",
+        "*://*.cbsinteractive.com/*",
+        "*://*.theplatform.com/*"
+      ]
+    }
+  ],
+  "action": {
+    "default_icon": {
+      "16": "images/icon.png",
+      "48": "images/icon.png",
+      "128": "images/icon.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "popup.html"
+  },
+  "icons": {
+    "16": "images/icon.png",
+    "48": "images/icon.png",
+    "128": "images/icon.png"
+  }
 }

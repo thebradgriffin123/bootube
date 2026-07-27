@@ -1,81 +1,324 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <title>BooTube Settings</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
   <div class="container">
-    <h2 class="nav-title"><img src="boo-tube-icon.svg" style="width:20px; vertical-align:middle; margin-right:5px; filter: drop-shadow(0 0 2px rgba(0,243,255,0.8));">Boo<span class="text-neon-red">Tube</span></h2>
-    <p style="text-align: center; font-size: 11px; color: var(--text-secondary); margin-top: -12px; margin-bottom: 16px; opacity: 0.9; letter-spacing: 0.2px;">Automatically mute and blur profanity on YouTube.</p>
-    <div class="support-container" style="margin-top: -10px;">
-      <a id="supportLink" href="https://ko-fi.com/bootube" target="_blank">
-        ❤️ Support the Developer
-      </a>
+    
+    <!-- Top App Bar -->
+    <div class="app-bar">
+      <div class="app-brand">
+        <img id="booLogo" src="images/ic_boo_on.svg" alt="BooTube Ghost">
+        <img src="images/logo-bootube-haunted.svg" alt="BooTube Wordmark" class="brand-logo">
+      </div>
+      <div class="app-actions">
+        <button id="topUpgradeBtn" class="top-upgrade-btn">Upgrade</button>
+        <div class="profile-menu-container">
+          <button id="topProfileBtn" class="top-profile-btn">
+            <span id="topProfileText">Sign in</span>
+            <div id="topProfileAvatar" class="profile-avatar-circle" style="display: none;">T</div>
+            <img id="topProfileIcon" src="images/ic_profile.svg" alt="Profile Icon" class="profile-icon">
+          </button>
+          <div id="profileDropdown" class="profile-dropdown">
+            <div class="dropdown-profile-header">
+              <div class="avatar-upload-wrapper">
+                <div id="dropAvatarCircle" class="avatar-circle" title="Click to upload custom picture">T</div>
+                <button id="avatarUploadBtn" class="avatar-upload-badge" title="Upload custom photo" type="button">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                  </svg>
+                </button>
+                <input type="file" id="customAvatarInput" accept="image/png, image/jpeg, image/webp, image/gif, image/svg+xml" style="display: none;">
+              </div>
+              <div id="dropUsername" class="dropdown-username">Account</div>
+              <div id="dropEmail" class="dropdown-email">thebradgriffin@gmail.com</div>
+              <button id="resetAvatarBtn" class="reset-avatar-btn" style="display: none;" type="button">Remove picture</button>
+            </div>
+            
+            <hr class="dropdown-divider">
+            
+            <button id="dropManageBtn" class="dropdown-btn-badge">
+              <span id="dropManageText">Manage subscription</span>
+            </button>
+            
+            <div class="dropdown-stats-card">
+              <div class="stats-row">
+                <span class="label">Account tier:</span>
+                <span id="dropTierVal" class="value">Free</span>
+              </div>
+              <div class="stats-row">
+                <span class="label">App version:</span>
+                <span id="dropVersionVal" class="value">v1.26</span>
+              </div>
+            </div>
+            
+            <button id="dropSignOutBtn" class="dropdown-item signout-btn">
+              Sign out
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="input-group">
-      <input type="text" id="newWord" placeholder="Add a word..." autocomplete="off">
-      <button id="addBtn">Add</button>
+
+    <!-- Platform Shortcut Chips -->
+    <div class="platform-pills-wrapper">
+      <button class="arrow-btn left-arrow" id="platformLeftArrow" title="Scroll Left">
+        <img src="images/ic_chevron_right.svg" style="transform: rotate(180deg);" alt="Scroll Left">
+      </button>
+      <div class="platform-pills" id="platformPills"></div>
+      <button class="arrow-btn right-arrow" id="platformRightArrow" title="Scroll Right">
+        <img src="images/ic_chevron_right.svg" alt="Scroll Right">
+      </button>
     </div>
-    <div class="list-actions-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding: 0 4px;">
-      <span class="settings-label" style="font-size: 11px; font-weight: bold; opacity: 0.8; text-transform: uppercase; letter-spacing: 0.5px; transform: translateY(1px); display: inline-block;">Blocklist</span>
-      <div style="display: flex; gap: 8px; align-items: center;">
-        <button id="bulkRevealBtn" class="bulk-action-btn" title="Reveal all words">
-          <svg id="eyeIconOpen" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-          <svg id="eyeIconClosed" viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+
+    <!-- Video Banner Area -->
+    <div class="video-banner" id="videoBanner">
+      <video id="promoVideo" src="bootube-chrome-video.mp4" muted playsinline></video>
+      <div class="video-gradient"></div>
+    </div>
+
+    <!-- Main Domain Toggle -->
+    <div class="domain-row">
+      <div class="domain-icon" id="domainIconContainer">
+        <img id="domainIcon" src="images/ic_youtube.svg">
+      </div>
+      <div class="domain-info">
+        <h2>Censoring</h2>
+        <p id="domainSubtitle">Profanity on &bull; YouTube</p>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="bootubeEnabled">
+        <span class="slider round"></span>
+      </label>
+    </div>
+    
+    <!-- Censor Impact HUD -->
+    <div class="impact-hud" id="impactHud" style="display: none;">
+      <div class="hud-title-row">
+        <span class="hud-title-text">Censor Stream</span>
+        <div class="hud-tally">
+          <span class="tally-item"><span class="dot green"></span> Muted: <strong id="hudMutedCount">0</strong></span>
+          <span class="tally-item" id="hudLockedTally"><span class="dot orange"></span> Locked: <strong id="hudLockedCount">0</strong> 🔒</span>
+          <button class="hud-toggle-btn" id="hudToggleBtn" title="Toggle history">▼</button>
+        </div>
+      </div>
+      <div class="hud-log-feed" id="hudLogFeed">
+        <div class="hud-log-empty">Waiting for audio cues...</div>
+      </div>
+      <button class="upgrade-btn-hud" id="hudUpgradeBtn">Unlock all categories</button>
+    </div>
+    
+    <div class="divider"></div>
+
+    <!-- Censored Words Header -->
+    <!-- Censored Words Header -->
+    <div class="section-header" id="controlsHeader">
+      <div class="section-title">
+        <span id="sectionTitleText">Censored words</span> <span class="count" id="wordCount">0</span>
+      </div>
+      <div class="section-actions">
+        <button class="icon-btn active-btn" id="listTabBtn" title="Censored words">
+          <img src="images/ic_list.svg" alt="List">
         </button>
-        <span id="deleteCounter" style="display: none; font-size: 11px; color: #ff4757; font-weight: bold; margin-right: 4px;">0 selected</span>
-        <button id="bulkDeleteBtn" class="bulk-action-btn" title="Delete words">
-          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        <button class="icon-btn" id="scriptTabBtn" title="Script">
+          <img src="images/ic_script.svg" alt="Script">
         </button>
-        <button id="confirmDeleteBtn" class="bulk-action-btn" title="Confirm Deletion" style="display: none; color: #ff4757;">
-          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        </button>
-        <button id="cancelDeleteBtn" class="bulk-action-btn" title="Cancel" style="display: none; color: var(--text-secondary);">
-          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <button class="icon-btn" id="advancedBtn" title="Advanced settings">
+          <img src="images/ic_settings_sliders.svg" alt="Settings">
         </button>
       </div>
     </div>
-    <ul id="wordList"></ul>
-    
-    <div class="settings-group">
-      <span class="settings-label" style="font-weight: bold; color: #ff3333;">Enable Censor Filter</span>
-      <label class="toggle-switch">
-        <input type="checkbox" id="masterToggle">
-        <span class="slider"></span>
-      </label>
-    </div>
-    
-    <div class="help-text">
-      ⚠️ <strong>Important:</strong> BooTube requires YouTube's Closed Captions (CC) to be turned <strong>ON</strong> in the video player to detect words. If you turn CC off on YouTube, the filter will stop working!
+
+    <!-- Advanced Settings Content (Hidden by default) -->
+    <div class="advanced-content" id="advancedContent" style="display: none;">
+      <div class="toggle-row">
+        <img src="images/ic_cc.svg" class="icon">
+        <div class="toggle-info">
+          <div class="toggle-title">Hide captions on screen</div>
+          <div class="toggle-sub">Forces subtitles to stay hidden</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="hideCCEnabled">
+          <span class="slider round"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <img src="images/ic_blur_on.svg" class="icon">
+        <div class="toggle-info">
+          <div class="toggle-title">Blur</div>
+          <div class="toggle-sub">Blurs video during profanity</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="blurEnabled">
+          <span class="slider round"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row" id="respectfulRow">
+        <img src="images/ic_hands.svg" class="icon">
+        <div class="toggle-info">
+          <div class="toggle-title">Respectful mode</div>
+          <div class="toggle-sub">Allows context-sensitive words on religious channels</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="respectfulModeEnabled">
+          <span class="slider round"></span>
+        </label>
+      </div>
+      
+      <div class="toggle-row">
+        <img src="images/ic_visibility_outline.svg" class="icon">
+        <div class="toggle-info">
+          <div class="toggle-title">Reveal words</div>
+          <div class="toggle-sub">Reveals the raw text of the words in the censored words list</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="revealAllToggle">
+          <span class="slider round"></span>
+        </label>
+      </div>
+      
+      <div class="toggle-row slider-row">
+        <div class="slider-header">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon clock-icon">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <div class="toggle-info">
+            <div class="toggle-title">Mute buffer</div>
+            <div class="toggle-sub">Adjust how early/late the audio cuts out</div>
+          </div>
+        </div>
+        <div class="range-container">
+          <input type="range" id="muteAggressiveness" min="1" max="3" value="2" class="custom-range">
+          <div class="range-labels">
+            <span>0.3s</span>
+            <span class="highlight-label" id="aggressivenessNormalLabel">0.5s</span>
+            <span>1.0s</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="toggle-row">
+        <img src="images/ic_restore.svg" class="icon">
+        <div class="toggle-info">
+          <div class="toggle-title">Restore original words</div>
+          <div class="toggle-sub">Erases custom words and restores defaults</div>
+        </div>
+        <button id="restoreDefaultBtn" class="pill-btn">Restore</button>
+      </div>
     </div>
 
-    <div class="settings-group" style="margin-top: 8px; padding-top: 0; border-top: none;">
-      <span class="settings-label">Hide Captions on Screen</span>
-      <label class="toggle-switch">
-        <input type="checkbox" id="hideCcToggle">
-        <span class="slider"></span>
-      </label>
+    <!-- Script Panel -->
+    <div class="script-panel" id="scriptPanel" style="display: none;">
+      <div class="script-container">
+        <div class="script-search-bar">
+          <input type="text" id="scriptSearchInput" placeholder="Search script...">
+          <span class="search-counter" id="searchCounter" style="display:none;">0/0</span>
+          <button id="scriptSearchUpBtn" class="search-btn" title="Search Up"><img src="images/ic_chevron_up.svg"></button>
+          <button id="scriptSearchDownBtn" class="search-btn" title="Search Down"><img src="images/ic_chevron_down.svg"></button>
+          <button id="scriptSearchClearBtn" class="search-btn clear-btn" title="Clear Search"><img src="images/ic_delete_outline.svg" style="width: 18px; height: 18px;"></button>
+        </div>
+        <div class="script-content" id="scriptContent">
+          <!-- Script text injected here -->
+        </div>
+      </div>
     </div>
-    <div class="help-text">
-      Use this to hide the captions visually while keeping the filter running in the background.
-    </div>
-    
-    <div class="settings-group" style="margin-top: 8px; padding-top: 0; border-top: none;">
-      <span class="settings-label">Blur Video on Censor</span>
-      <label class="toggle-switch">
-        <input type="checkbox" id="blurToggle">
-        <span class="slider"></span>
-      </label>
-    </div>
-    <div class="help-text">
-      When turned on, the entire video will heavily blur while an inappropriate word is spoken to prevent lip-reading and hide inappropriate visual context.
+
+    <!-- Word List -->
+    <div class="word-list-container" id="wordListContainer">
+      <div class="word-list" id="wordList">
+        <!-- Word items will be injected here -->
+      </div>
+      
+      <!-- Disclaimer Accordion -->
+      <div class="disclaimer-accordion" id="disclaimerAccordion">
+        <div class="disclaimer-header" id="disclaimerHeader">
+          <span>Disclaimers & Limitations</span>
+          <img src="images/ic_chevron_down.svg" id="disclaimerChevron" class="chevron-icon">
+        </div>
+        <div class="disclaimer-content" id="disclaimerContent" style="display: none;">
+          <ul>
+            <li><strong>Best Effort:</strong> Bootube is highly effective but cannot guarantee 100% accuracy. Some profanity may occasionally slip through.</li>
+            <li><strong>Caption Dependent:</strong> Filtering relies entirely on Closed Captions (CC). If a video lacks captions (e.g. music videos, Shorts), the filter cannot operate.</li>
+            <li><strong>Caption Quirks:</strong> We are at the mercy of the caption provider. Odd spellings, weird formatting, or overlapping dialogue can cause missed words.</li>
+            <li><strong>Visual Content:</strong> Bootube only filters audio and subtitles. It does not censor inappropriate visual scenes or text burned into the video itself.</li>
+            <li><strong>Live Streams:</strong> Auto-generated captions on live broadcasts are often delayed or inaccurate, reducing reliability.</li>
+            <li><strong>Platform Differences:</strong> The extension's interface may render slightly differently depending on your operating system (Mac vs. Windows).</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Integrated Add Word Box -->
+      <div class="add-word-sticky-wrapper">
+        <div class="add-word-row">
+          <input type="text" id="addWordInput" placeholder="Add to censor list...">
+          <button class="icon-btn" id="addWordBtn" title="Add Custom Word">
+            <img src="images/ic_add.svg" alt="Add Word">
+          </button>
+        </div>
+        <a href="https://ko-fi.com/bootube" target="_blank" class="donate-banner" title="Support Bootube Development">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+            <defs>
+              <linearGradient id="kofi-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#4789F0" />
+                <stop offset="100%" stop-color="#3AA5C2" />
+              </linearGradient>
+            </defs>
+            <path fill="url(#kofi-gradient)" d="M23.881 8.948c-.773-4.085-4.859-4.593-4.859-4.593H.723c-.604 0-.679.798-.679.798s-.082 7.324-.022 11.822c.164 2.424 2.586 2.672 2.586 2.672s8.267-.023 11.966-.049c2.438-.426 2.683-2.566 2.658-3.734 4.352.24 7.422-2.831 6.649-6.916zm-11.062 3.511c-1.246 1.453-4.011 3.976-4.011 3.976s-.121.119-.31.023c-.076-.057-.108-.09-.108-.09-.443-.441-3.368-3.049-4.034-3.954-.709-.965-1.041-2.7-.091-3.71.951-1.01 3.005-1.086 4.363.407 0 0 1.565-1.782 3.468-.963 1.904.82 1.832 3.011.723 4.311zm6.173.478c-.928.116-1.682.028-1.682.028V7.284h1.77s1.971.551 1.971 2.638c0 1.913-.985 2.667-2.059 3.015z"/>
+          </svg>
+          <span class="donate-text">Donate to the developer</span>
+        </a>
+      </div>
     </div>
     
   </div>
-  <script src="popup.js"></script>
-</body>
+  <div id="toast" class="toast"></div>
+    <div id="contextMenu" class="context-menu" style="display: none;">
+      <div class="context-item" id="ctxReveal">
+        <img src="images/ic_visibility_outline.svg" class="ctx-icon">
+        <div class="ctx-content">
+          <div class="ctx-title" id="ctxRevealTitle">Reveal word</div>
+          <div class="ctx-subtitle">Reveals the raw text of the word</div>
+        </div>
+      </div>
+      <div class="context-item" id="ctxDisable">
+        <img src="images/ic_close.svg" class="ctx-icon" id="ctxDisableIcon">
+        <div class="ctx-content">
+          <div class="ctx-title" id="ctxDisableTitle">Disable word</div>
+          <div class="ctx-subtitle" id="ctxDisableSub">Word will not be filtered</div>
+        </div>
+      </div>
+      <div class="context-item context-danger" id="ctxDelete">
+        <img src="images/ic_delete_outline.svg" class="ctx-icon">
+        <div class="ctx-content">
+          <div class="ctx-title">Delete word</div>
+          <div class="ctx-subtitle">Permanently removes word from list</div>
+        </div>
+      </div>
+    <!-- Account Slide-in Panel -->
+    <div class="account-panel" id="accountPanel">
+      <div class="account-panel-header">
+        <button id="accountPanelCloseBtn" class="icon-btn back-btn" title="Back">
+          <img src="images/ic_chevron_right.svg" style="transform: rotate(180deg);" alt="Back">
+        </button>
+        <h2>Account Hub</h2>
+      </div>
+      <div class="account-panel-content">
+        <div id="accountPanelDetails"></div>
+      </div>
+    </div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
 </html>

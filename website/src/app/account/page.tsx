@@ -27,6 +27,7 @@ export default function DashboardPage() {
   const [subLoading, setSubLoading] = useState(true);
   
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [customAvatar, setCustomAvatar] = useState<string | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [subDetails, setSubDetails] = useState<SubscriptionDetails | null>(null);
 
@@ -76,6 +77,7 @@ export default function DashboardPage() {
         }
 
         setUserEmail(session.user.email ?? null);
+        setCustomAvatar(session.user.user_metadata?.avatar_url ?? null);
 
         // Fetch profile
         const { data, error } = await supabase
@@ -338,9 +340,10 @@ export default function DashboardPage() {
             <div className="relative">
               <button 
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="w-8 h-8 rounded-full border border-white bg-[#191b22] hover:bg-[#252833] text-white text-xs font-black flex items-center justify-center uppercase transition-all shadow-[0_0_8px_rgba(255,255,255,0.1)] hover:scale-105 active:scale-95 cursor-pointer outline-none"
+                className="w-8 h-8 rounded-full border border-white/60 hover:border-white bg-[#191b22] hover:bg-[#252833] text-white text-xs font-black flex items-center justify-center uppercase transition-all shadow-[0_0_8px_rgba(255,255,255,0.1)] hover:scale-105 active:scale-95 cursor-pointer outline-none bg-cover bg-center overflow-hidden"
+                style={customAvatar ? { backgroundImage: `url("${customAvatar}")`, border: 'none' } : {}}
               >
-                {userEmail ? userEmail.charAt(0).toUpperCase() : 'U'}
+                {!customAvatar && (userEmail ? userEmail.charAt(0).toUpperCase() : 'U')}
               </button>
               
               {dropdownOpen && (
@@ -353,8 +356,11 @@ export default function DashboardPage() {
                   
                   <div className="absolute right-0 mt-2.5 w-56 bg-[#0d0e12] border border-[#1f222d] rounded-2xl shadow-[0_12px_32px_rgba(0,0,0,0.6)] p-4 z-50 flex flex-col text-left">
                     <div className="flex flex-col items-center text-center mb-1">
-                      <div className="w-12 h-12 rounded-full border-2 border-white bg-[#191b22] text-white text-lg font-black flex items-center justify-center uppercase mb-2">
-                        {userEmail ? userEmail.charAt(0).toUpperCase() : 'U'}
+                      <div 
+                        className="w-12 h-12 rounded-full border-2 border-white/60 bg-[#191b22] text-white text-lg font-black flex items-center justify-center uppercase mb-2 bg-cover bg-center overflow-hidden"
+                        style={customAvatar ? { backgroundImage: `url("${customAvatar}")`, border: 'none' } : {}}
+                      >
+                        {!customAvatar && (userEmail ? userEmail.charAt(0).toUpperCase() : 'U')}
                       </div>
                       <div className="text-sm font-black text-white leading-none">Account</div>
                       <div className="text-[11px] text-gray-400 mt-1.5 word-break-all select-all">{userEmail}</div>
