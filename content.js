@@ -3098,5 +3098,106 @@ function startFallbackObserver() {
   }
 }
 
+// Tab Focus, Visibility & Stale Tab Re-hydration Suite
+let lastRehydrationTime = 0;
+
+function rehydrateFilterEngine() {
+  const now = Date.now();
+  if (now - lastRehydrationTime < 1000) return; // Cooldown throttle (1 sec)
+  lastRehydrationTime = now;
+
+  console.log("⚡ [BooTube] Re-hydrating filter engine (tab wake-up / focus / play event detected)...");
+
+  // 1. Verify and reload storage safely if context is valid
+  if (isContextValid() && typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+    try {
+      chrome.storage.local.get(['subscriptionStatus', 'blocklist', 'disabledWords', 'hideCCEnabled', 'blurEnabled', 'bootubeEnabled', 'whitelistedChannels', 'enabledCategories', 'respectfulModeEnabled', 'muteAggressiveness', 'lastFetchedCaptions'], (result) => {
+        if (result) {
+          handleSettingsLoaded(result);
+        }
+      });
+    } catch (e) {
+      console.warn("⚡ [BooTube] Context invalidated during tab wake-up, using active in-memory blocklist.");
+    }
+  }
+
+  // 2. Re-bind active video DOM element and media play listeners
+  const video = document.querySelector('video');
+  if (video) {
+    attachVideoPlayListeners(video);
+  }
+
+  // 3. Re-evaluate subtitle tracks and trigger player state update
+  if (typeof updatePlayerState === 'function') {
+    try {
+      updatePlayerState();
+    } catch(e) {}
+  }
+
+  // 4. Force caption payload re-processing for active cues
+  if (allCaptionPayloads && allCaptionPayloads.length > 0) {
+    allCaptionPayloads.forEach(data => processCaptionData(data.payload, data.isTranslated));
+  }
+
+  // 5. Ensure hideCC stylesheet is active
+  if (typeof applyHideCCStyle === 'function') {
+    try {
+      applyHideCCStyle();
+    } catch(e) {}
+  }
+}
+
+function attachVideoPlayListeners(videoEl) {
+  if (!videoEl || videoEl.dataset.bootubeListenersAttached === 'true') return;
+  videoEl.dataset.bootubeListenersAttached = 'true';
+
+  const onMediaEvent = () => {
+    rehydrateFilterEngine();
+  };
+
+  videoEl.addEventListener('play', onMediaEvent);
+  videoEl.addEventListener('playing', onMediaEvent);
+  videoEl.addEventListener('seeked', onMediaEvent);
+}
+
+function setupTabRehydrationListeners() {
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      rehydrateFilterEngine();
+    }
+  });
+
+  window.addEventListener('focus', () => {
+    rehydrateFilterEngine();
+  });
+
+  // Watch for newly added video elements in SPA page transitions
+  try {
+    const videoObserver = new MutationObserver(() => {
+      const video = document.querySelector('video');
+      if (video && !video.dataset.bootubeListenersAttached) {
+        attachVideoPlayListeners(video);
+      }
+    });
+    const target = document.body || document.documentElement;
+    if (target) {
+      videoObserver.observe(target, { childList: true, subtree: true });
+    }
+  } catch(e) {}
+
+  // Initial attach for existing video
+  const currentVideo = document.querySelector('video');
+  if (currentVideo) {
+    attachVideoPlayListeners(currentVideo);
+  }
+}
+
+// Initialize rehydration listeners
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupTabRehydrationListeners);
+} else {
+  setupTabRehydrationListeners();
+}
+
 }
 runBootube();
