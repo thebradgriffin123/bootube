@@ -1917,16 +1917,21 @@ function captureTabAndRender(tab, url) {
     return;
   }
   lastCaptureTime = now;
-  chrome.tabs.captureVisibleTab(tab.windowId, {format: 'jpeg', quality: 20}, (dataUrl) => {
-    if (chrome.runtime.lastError) {
-      console.error("captureVisibleTab failed for", url, ":", chrome.runtime.lastError.message);
-      fallbackContentScriptThumbnail(tab.id, url);
-    } else if (dataUrl) {
-      renderThumbnail(dataUrl);
-    } else {
-      fallbackContentScriptThumbnail(tab.id, url);
-    }
-  });
+  try {
+    chrome.tabs.captureVisibleTab(tab.windowId, {format: 'jpeg', quality: 20}, (dataUrl) => {
+      const err = chrome.runtime.lastError;
+      if (err) {
+        // Silently consume runtime.lastError for DRM protected domains (e.g. Disney+, Netflix) and fallback
+        fallbackContentScriptThumbnail(tab.id, url);
+      } else if (dataUrl) {
+        renderThumbnail(dataUrl);
+      } else {
+        fallbackContentScriptThumbnail(tab.id, url);
+      }
+    });
+  } catch (e) {
+    fallbackContentScriptThumbnail(tab.id, url);
+  }
 }
 
 
