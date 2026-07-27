@@ -888,12 +888,13 @@ input:checked + .slider:before {
   display: inline-block;
 }
 .category-header-match-count.disabled::before {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.15)) !important;
+  background: rgba(255, 255, 255, 0.25) !important;
 }
 .category-header-match-count.disabled .match-count-text {
-  background: linear-gradient(135deg, #777, #777) !important;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.4) !important;
+  color: rgba(255, 255, 255, 0.4) !important;
 }
 .category-words-container {
   display: flex;
