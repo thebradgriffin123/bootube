@@ -77,7 +77,19 @@ export default function DashboardPage() {
         }
 
         setUserEmail(session.user.email ?? null);
-        setCustomAvatar(session.user.user_metadata?.avatar_url ?? null);
+        
+        // Fetch fresh user data to ensure latest user_metadata avatar_url is loaded
+        const { data: { user: freshUser } } = await supabase.auth.getUser();
+        const activeUser = freshUser || session.user;
+        const avatarUrl = activeUser.user_metadata?.avatar_url ?? null;
+        
+        if (avatarUrl) {
+          setCustomAvatar(avatarUrl);
+          if (typeof window !== 'undefined') localStorage.setItem('bootube_custom_avatar', avatarUrl);
+        } else if (typeof window !== 'undefined') {
+          const cached = localStorage.getItem('bootube_custom_avatar');
+          if (cached) setCustomAvatar(cached);
+        }
 
         // Fetch profile
         const { data, error } = await supabase
@@ -356,14 +368,72 @@ export default function DashboardPage() {
                   
                   <div className="absolute right-0 mt-2.5 w-56 bg-[#0d0e12] border border-[#1f222d] rounded-2xl shadow-[0_12px_32px_rgba(0,0,0,0.6)] p-4 z-50 flex flex-col text-left">
                     <div className="flex flex-col items-center text-center mb-1">
-                      <div 
-                        className="w-12 h-12 rounded-full border-2 border-white/60 bg-[#191b22] text-white text-lg font-black flex items-center justify-center uppercase mb-2 bg-cover bg-center overflow-hidden"
-                        style={customAvatar ? { backgroundImage: `url("${customAvatar}")`, border: 'none' } : {}}
-                      >
-                        {!customAvatar && (userEmail ? userEmail.charAt(0).toUpperCase() : 'U')}
+                      <div className="relative group cursor-pointer mb-2" onClick={() => {
+                        const fileInput = document.getElementById('webAvatarInput') as HTMLInputElement;
+                        if (fileInput) fileInput.click();
+                      }}>
+                        <div 
+                          className="w-12 h-12 rounded-full border-2 border-white/60 bg-[#191b22] text-white text-lg font-black flex items-center justify-center uppercase bg-cover bg-center overflow-hidden transition-all group-hover:opacity-85"
+                          style={customAvatar ? { backgroundImage: `url("${customAvatar}")`, border: 'none' } : {}}
+                        >
+                          {!customAvatar && (userEmail ? userEmail.charAt(0).toUpperCase() : 'U')}
+                        </div>
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 border border-white text-white flex items-center justify-center shadow-md">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                            <circle cx="12" cy="13" r="3" />
+                          </svg>
+                        </div>
                       </div>
+
+                      <input 
+                        type="file" 
+                        id="webAvatarInput" 
+                        accept="image/*" 
+                        className="hidden" 
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const reader = new FileReader();
+                          reader.onload = (ev) => {
+                            const img = new Image();
+                            img.onload = async () => {
+                              const canvas = document.createElement('canvas');
+                              const ctx = canvas.getContext('2d');
+                              canvas.width = 128;
+                              canvas.height = 128;
+                              const minDim = Math.min(img.width, img.height);
+                              const sx = (img.width - minDim) / 2;
+                              const sy = (img.height - minDim) / 2;
+                              if (ctx) ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, 128, 128);
+                              const dataUrl = canvas.toDataURL('image/webp', 0.88);
+                              setCustomAvatar(dataUrl);
+                              if (typeof window !== 'undefined') localStorage.setItem('bootube_custom_avatar', dataUrl);
+                              await supabase.auth.updateUser({ data: { avatar_url: dataUrl } });
+                            };
+                            img.src = ev.target?.result as string;
+                          };
+                          reader.readAsDataURL(file);
+                          e.target.value = '';
+                        }}
+                      />
+
                       <div className="text-sm font-black text-white leading-none">Account</div>
                       <div className="text-[11px] text-gray-400 mt-1.5 word-break-all select-all">{userEmail}</div>
+
+                      {customAvatar && (
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            setCustomAvatar(null);
+                            if (typeof window !== 'undefined') localStorage.removeItem('bootube_custom_avatar');
+                            await supabase.auth.updateUser({ data: { avatar_url: null } });
+                          }}
+                          className="mt-1.5 text-[10px] text-gray-400 hover:text-red-400 underline cursor-pointer"
+                        >
+                          Remove picture
+                        </button>
+                      )}
                     </div>
                     
                     <hr className="border-[#1f222d] my-3 w-full" />
