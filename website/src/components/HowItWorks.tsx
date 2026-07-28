@@ -19,7 +19,7 @@ export default function HowItWorks() {
   const faqs = [
     {
       q: "Does BooTube work on Netflix or Hulu?",
-      a: "Yes! BooTube currently supports YouTube, Netflix, Disney+, Hulu, Plex, Prime Video, and Fandango at Home (Vudu)."
+      a: "Yes! BooTube currently supports YouTube, Netflix, Disney+, Hulu, HBO Max / Max, Paramount+, Plex, Prime Video, and Fandango at Home (Vudu)."
     },
     {
       q: "Will streaming services ban my account for using this?",
@@ -596,6 +596,22 @@ export default function HowItWorks() {
                 className="text-gray-400 hover:text-[#1CE783] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer italic"
               >
                 hulu
+              </a>
+              <a 
+                href="https://www.max.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-[#3AA5C2] font-black tracking-tighter text-lg md:text-xl transition-colors cursor-pointer"
+              >
+                MAX
+              </a>
+              <a 
+                href="https://www.paramountplus.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-[#0064FF] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer"
+              >
+                Paramount+
               </a>
               <a 
                 href="https://www.plex.tv"

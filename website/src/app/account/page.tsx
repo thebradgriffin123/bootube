@@ -599,7 +599,7 @@ export default function DashboardPage() {
                   <div className="p-6 rounded-xl bg-gradient-to-r from-blue-950/20 to-cyan-950/20 border border-cyan-500/15 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                     <div>
                       <h4 className="text-sm font-bold text-white">Unlock cross-platform censoring controls</h4>
-                      <p className="text-xs text-gray-400 mt-1">Filter profanity on YouTube, Disney+, Hulu, Plex, and Fandango. Access custom blocked words, timings, and blur features.</p>
+                      <p className="text-xs text-gray-400 mt-1">Filter profanity on YouTube, Disney+, Hulu, HBO Max, Paramount+, Plex, and Fandango. Access custom blocked words, timings, and blur features.</p>
                     </div>
                     <button
                       onClick={handleUpgrade}
