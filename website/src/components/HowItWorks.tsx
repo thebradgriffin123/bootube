@@ -591,6 +591,8 @@ export default function HowItWorks() {
                 <a href="https://www.netflix.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#E50914] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Netflix</a>
                 <a href="https://www.primevideo.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#00A8E1] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Prime Video</a>
                 <a href="https://www.spotify.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#1DB954] font-extrabold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Spotify</a>
+                <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#1877F2] font-extrabold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Facebook</a>
+                <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white font-black tracking-tight text-lg md:text-xl transition-colors cursor-pointer">X</a>
 
                 {/* Duplicated Second Set for Continuous Infinite Loop */}
                 <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">YouTube</a>
@@ -603,6 +605,8 @@ export default function HowItWorks() {
                 <a href="https://www.netflix.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#E50914] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Netflix</a>
                 <a href="https://www.primevideo.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#00A8E1] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Prime Video</a>
                 <a href="https://www.spotify.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#1DB954] font-extrabold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Spotify</a>
+                <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#1877F2] font-extrabold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Facebook</a>
+                <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white font-black tracking-tight text-lg md:text-xl transition-colors cursor-pointer">X</a>
               </div>
             </div>
             
