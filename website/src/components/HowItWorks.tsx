@@ -244,90 +244,16 @@ export default function HowItWorks() {
     }
   }, [videoTime, currentStep, userUnmuted, isMobile]);
 
-  // Mobile layout fallback
-  if (isMobile) {
-    return (
-      <section className="bg-gradient-to-b from-[#08080a] via-[#050505] to-[#030304] py-20 px-6 text-gray-100 relative border-t border-white/5 overflow-hidden">
-        {/* Ambient background glows */}
-        <div className="absolute top-[-100px] right-[-100px] w-[300px] h-[300px] rounded-full bg-cyan-950/10 blur-[80px] pointer-events-none" />
-        <div className="max-w-xl mx-auto space-y-12 relative z-10">
-          <div className="text-center mb-10">
-            <span className="text-[10px] font-bold tracking-widest text-cyan-400 uppercase bg-cyan-950/40 border border-cyan-800/30 px-3 py-1 rounded-full">
-              Setup Walkthrough
-            </span>
-            <h2 className="text-3xl font-black text-white mt-4">Simple Setup</h2>
-            <p className="text-sm text-gray-400 mt-2">Filter your streams in three quick steps.</p>
-          </div>
-
-          <div className="bg-[#0d0e12] border border-white/10 rounded-2xl p-6 space-y-4">
-            <div className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-full bg-cyan-950/50 border border-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-sm">1</span>
-              <h3 className="font-extrabold text-white">Click the BooTube Icon</h3>
-            </div>
-            <p className="text-xs text-gray-400 leading-relaxed">
-              Locate and click the BooTube ghost icon directly in your Chrome browser toolbar to open the active settings console.
-            </p>
-            <div className="border border-white/5 rounded-xl overflow-hidden bg-black/40 p-4 flex items-center justify-between text-xs text-gray-500">
-              <span>Extensions</span>
-              <img src="/boo-icon-glyph.svg" alt="BooTube Icon" className="h-5 w-auto" />
-            </div>
-          </div>
-
-          <div className="bg-[#0d0e12] border border-white/10 rounded-2xl p-6 space-y-4">
-            <div className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-full bg-cyan-950/50 border border-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-sm">2</span>
-              <h3 className="font-extrabold text-white">Turn On Censoring & Hide Captions</h3>
-            </div>
-            <p className="text-xs text-gray-400 leading-relaxed">
-              Toggle **Censoring** to ON (Spaghetti Western) and toggle **Hide Captions** to ON. These settings apply immediately to clean the stream.
-            </p>
-            <div className="border border-white/5 rounded-xl overflow-hidden bg-[#0d0e12] p-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-bold text-white">Censoring</p>
-                  <p className="text-[10px] text-gray-500">Spaghetti Western</p>
-                </div>
-                <span className="w-8 h-4.5 bg-cyan-500 rounded-full flex items-center px-0.5 justify-end">
-                  <span className="w-3.5 h-3.5 bg-white rounded-full" />
-                </span>
-              </div>
-              <div className="flex items-center justify-between pt-2 border-t border-white/5">
-                <p className="text-xs font-bold text-white">Hide Captions</p>
-                <span className="w-8 h-4.5 bg-cyan-500 rounded-full flex items-center px-0.5 justify-end">
-                  <span className="w-3.5 h-3.5 bg-white rounded-full" />
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-[#0d0e12] border border-white/10 rounded-2xl p-6 space-y-4">
-            <div className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-full bg-cyan-950/50 border border-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-sm">3</span>
-              <h3 className="font-extrabold text-white">Censored Playback</h3>
-            </div>
-            <p className="text-xs text-gray-400 leading-relaxed">
-              The video automatically plays with audio seamlessly muted at the exact moments of profanity, and the captions are completely hidden.
-            </p>
-            <div className="border border-cyan-500/20 bg-cyan-950/10 rounded-xl p-4 flex items-center justify-between">
-              <span className="text-xs font-bold text-cyan-400">Stream Cleaned</span>
-              <span className="text-xs font-bold text-gray-400">🔇 Muted Real-Time</span>
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   // Calculate scrolling ranges to drive mock states
-  const zoomProgress = Math.min(1, scrollProgress / 0.40);
-  const scale = 1 + zoomProgress * 3.8;
-  const bgOpacity = Math.max(0, 1 - Math.max(0, (scrollProgress - 0.25) / 0.08));
-  const bgOverlayOpacity = Math.max(0.1, 0.65 - zoomProgress * 0.55);
+  const zoomProgress = isMobile ? 0 : Math.min(1, scrollProgress / 0.40);
+  const scale = isMobile ? 1 : 1 + zoomProgress * 3.8;
+  const bgOpacity = isMobile ? 0.25 : Math.max(0, 1 - Math.max(0, (scrollProgress - 0.25) / 0.08));
+  const bgOverlayOpacity = isMobile ? 0.7 : Math.max(0.1, 0.65 - zoomProgress * 0.55);
 
-  const heroOpacity = Math.max(0, 1 - Math.min(1, scrollProgress / 0.20));
+  const heroOpacity = isMobile ? 1 : Math.max(0, 1 - Math.min(1, scrollProgress / 0.20));
 
-  const browserOpacity = scrollProgress < 0.25 ? 0 : Math.min(1, Math.max(0, (scrollProgress - 0.25) / 0.08));
-  const browserScale = scrollProgress < 0.25 ? 0.9 : 0.9 + Math.min(1, (scrollProgress - 0.25) / 0.08) * 0.1;
+  const browserOpacity = isMobile ? 1 : (scrollProgress < 0.25 ? 0 : Math.min(1, Math.max(0, (scrollProgress - 0.25) / 0.08)));
+  const browserScale = isMobile ? 1 : (scrollProgress < 0.25 ? 0.9 : 0.9 + Math.min(1, (scrollProgress - 0.25) / 0.08) * 0.1);
 
   // 3. Right-side Copy Transitions (instant transition, no overlap)
   const step1Active = currentStep === 1;
