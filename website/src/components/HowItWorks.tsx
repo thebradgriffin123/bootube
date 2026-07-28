@@ -567,84 +567,43 @@ export default function HowItWorks() {
             </a>
           </div>
 
-          {/* Platform compatibility bar (acting like a footer) */}
-          <div className="w-full max-w-4xl mx-auto mb-4 pointer-events-auto flex flex-col items-center gap-4">
-            <p className="text-center text-[10px] sm:text-[11px] font-extrabold tracking-wider text-cyan-400/80">
+          {/* Platform compatibility bar (Mercury-style scrolling marquee with gradient opacity masks) */}
+          <div className="w-full max-w-5xl mx-auto mb-4 pointer-events-auto flex flex-col items-center gap-3">
+            <p className="text-center text-[10px] sm:text-[11px] font-extrabold tracking-wider text-cyan-400/80 uppercase">
               Works seamlessly with
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 md:gap-x-12 select-none">
-              <a 
-                href="https://www.youtube.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer"
-              >
-                YouTube
-              </a>
-              <a 
-                href="https://www.disneyplus.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#00d4ff] font-black tracking-tighter text-lg md:text-xl transition-colors cursor-pointer"
-              >
-                DISNEY+
-              </a>
-              <a 
-                href="https://www.hulu.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#1CE783] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer italic"
-              >
-                hulu
-              </a>
-              <a 
-                href="https://www.max.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#3AA5C2] font-black tracking-tighter text-lg md:text-xl transition-colors cursor-pointer"
-              >
-                MAX
-              </a>
-              <a 
-                href="https://www.paramountplus.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#0064FF] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer"
-              >
-                Paramount+
-              </a>
-              <a 
-                href="https://www.plex.tv"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#E5A93B] font-black tracking-normal text-lg md:text-xl transition-colors cursor-pointer"
-              >
-                PLEX
-              </a>
-              <a 
-                href="https://www.vudu.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#F15A24] font-extrabold tracking-wide text-lg md:text-xl transition-colors cursor-pointer"
-              >
-                Fandango
-              </a>
-              <a 
-                href="https://www.netflix.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#E50914] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer"
-              >
-                Netflix
-              </a>
-              <a 
-                href="https://www.primevideo.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#00A8E1] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer"
-              >
-                Prime Video
-              </a>
+            <div 
+              className="w-full overflow-hidden relative select-none py-2"
+              style={{
+                maskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)'
+              }}
+            >
+              <div className="animate-marquee flex items-center gap-10 md:gap-14 shrink-0 whitespace-nowrap">
+                {/* First Set of Brands */}
+                <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">YouTube</a>
+                <a href="https://www.disneyplus.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#00d4ff] font-black tracking-tighter text-lg md:text-xl transition-colors cursor-pointer">DISNEY+</a>
+                <a href="https://www.hulu.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#1CE783] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer italic">hulu</a>
+                <a href="https://www.max.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#3AA5C2] font-black tracking-tighter text-lg md:text-xl transition-colors cursor-pointer">MAX</a>
+                <a href="https://www.paramountplus.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#0064FF] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Paramount+</a>
+                <a href="https://www.plex.tv" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#E5A93B] font-black tracking-normal text-lg md:text-xl transition-colors cursor-pointer">PLEX</a>
+                <a href="https://www.vudu.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#F15A24] font-extrabold tracking-wide text-lg md:text-xl transition-colors cursor-pointer">Fandango</a>
+                <a href="https://www.netflix.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#E50914] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Netflix</a>
+                <a href="https://www.primevideo.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#00A8E1] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Prime Video</a>
+                <a href="https://www.spotify.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#1DB954] font-extrabold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Spotify</a>
+
+                {/* Duplicated Second Set for Continuous Infinite Loop */}
+                <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">YouTube</a>
+                <a href="https://www.disneyplus.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#00d4ff] font-black tracking-tighter text-lg md:text-xl transition-colors cursor-pointer">DISNEY+</a>
+                <a href="https://www.hulu.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#1CE783] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer italic">hulu</a>
+                <a href="https://www.max.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#3AA5C2] font-black tracking-tighter text-lg md:text-xl transition-colors cursor-pointer">MAX</a>
+                <a href="https://www.paramountplus.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#0064FF] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Paramount+</a>
+                <a href="https://www.plex.tv" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#E5A93B] font-black tracking-normal text-lg md:text-xl transition-colors cursor-pointer">PLEX</a>
+                <a href="https://www.vudu.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#F15A24] font-extrabold tracking-wide text-lg md:text-xl transition-colors cursor-pointer">Fandango</a>
+                <a href="https://www.netflix.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#E50914] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Netflix</a>
+                <a href="https://www.primevideo.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#00A8E1] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Prime Video</a>
+                <a href="https://www.spotify.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#1DB954] font-extrabold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Spotify</a>
+              </div>
             </div>
             
             <div className="text-xs text-gray-400 mt-6 animate-pulse select-none pointer-events-none">
