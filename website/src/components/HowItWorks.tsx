@@ -247,8 +247,8 @@ export default function HowItWorks() {
   // Calculate scrolling ranges to drive mock states
   const zoomProgress = isMobile ? 0 : Math.min(1, scrollProgress / 0.40);
   const scale = isMobile ? 1 : 1 + zoomProgress * 3.8;
-  const bgOpacity = isMobile ? 0.25 : Math.max(0, 1 - Math.max(0, (scrollProgress - 0.25) / 0.08));
-  const bgOverlayOpacity = isMobile ? 0.7 : Math.max(0.1, 0.65 - zoomProgress * 0.55);
+  const bgOpacity = isMobile ? 0.65 : Math.max(0, 1 - Math.max(0, (scrollProgress - 0.25) / 0.08));
+  const bgOverlayOpacity = isMobile ? 0.40 : Math.max(0.1, 0.65 - zoomProgress * 0.55);
 
   const heroOpacity = isMobile ? 1 : Math.max(0, 1 - Math.min(1, scrollProgress / 0.20));
 
