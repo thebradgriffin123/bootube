@@ -16,6 +16,103 @@ export default function HowItWorks() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
+  // Dedicated Mobile Demo State (< 1024px, completely isolated from desktop)
+  const mobileVideoRef = useRef<HTMLVideoElement>(null);
+  const [mobileStep, setMobileStep] = useState<1 | 2 | 3>(1);
+  const [mobileDemoPlaying, setMobileDemoPlaying] = useState(false);
+  const [mobileUserUnmuted, setMobileUserUnmuted] = useState(false);
+  const [mobileVideoTime, setMobileVideoTime] = useState(0);
+  const [mobilePopupOpen, setMobilePopupOpen] = useState(false);
+  const [mobileCensoringOn, setMobileCensoringOn] = useState(false);
+  const [mobileHideCaptionsOn, setMobileHideCaptionsOn] = useState(false);
+
+  const handleSelectMobileStep = (step: 1 | 2 | 3) => {
+    setMobileStep(step);
+    const video = mobileVideoRef.current;
+    if (!video) return;
+
+    if (step === 1) {
+      setMobilePopupOpen(false);
+      setMobileCensoringOn(false);
+      setMobileHideCaptionsOn(false);
+      video.currentTime = 0;
+      video.play().catch(() => {});
+      setMobileDemoPlaying(true);
+    } else if (step === 2) {
+      video.pause();
+      setMobilePopupOpen(true);
+      setMobileCensoringOn(true);
+      setMobileHideCaptionsOn(true);
+      setMobileDemoPlaying(false);
+    } else if (step === 3) {
+      setMobilePopupOpen(false);
+      setMobileCensoringOn(true);
+      setMobileHideCaptionsOn(true);
+      video.currentTime = 0;
+      video.play().catch(() => {});
+      setMobileDemoPlaying(true);
+    }
+  };
+
+  // Mobile Audio Muting Sync for Step 3
+  useEffect(() => {
+    const video = mobileVideoRef.current;
+    if (!video) return;
+
+    if (!mobileUserUnmuted) {
+      video.muted = true;
+    } else {
+      if (mobileStep === 3) {
+        const shouldMute = 
+          (mobileVideoTime >= 1.0 && mobileVideoTime <= 2.0) || 
+          (mobileVideoTime >= 3.3 && mobileVideoTime <= 4.3) || 
+          (mobileVideoTime >= 4.8 && mobileVideoTime <= 5.6);
+        video.muted = shouldMute;
+      } else {
+        video.muted = false;
+      }
+    }
+  }, [mobileVideoTime, mobileStep, mobileUserUnmuted]);
+
+  const getMobileCaptionText = () => {
+    if (mobileStep === 3 && mobileHideCaptionsOn) return null;
+
+    if (mobileVideoTime >= 0 && mobileVideoTime < 3.0) {
+      if (mobileStep === 3 && mobileCensoringOn) {
+        return (
+          <>
+            You are a <span className="bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-1.5 py-0.5 rounded font-extrabold uppercase text-[10px] animate-pulse font-sans">🚫 MUTED</span> liar,
+          </>
+        );
+      }
+      return <>You are a dang liar,</>;
+    }
+    
+    if (mobileVideoTime >= 3.0 && mobileVideoTime < 4.8) {
+      if (mobileStep === 3 && mobileCensoringOn) {
+        return (
+          <>
+            and I will see you in <span className="bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-1.5 py-0.5 rounded font-extrabold uppercase text-[10px] animate-pulse font-sans">🚫 MUTED</span>!
+          </>
+        );
+      }
+      return <>and I will see you in heck!</>;
+    }
+
+    if (mobileVideoTime >= 4.8 && mobileVideoTime < 7.0) {
+      if (mobileStep === 3 && mobileCensoringOn) {
+        return (
+          <>
+            <span className="bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 px-1.5 py-0.5 rounded font-extrabold uppercase text-[10px] animate-pulse font-sans">🚫 MUTED</span> you!
+          </>
+        );
+      }
+      return <>Forget you!</>;
+    }
+
+    return null;
+  };
+
   const faqs = [
     {
       q: "Does BooTube work on Netflix or Hulu?",
@@ -65,20 +162,11 @@ export default function HowItWorks() {
     e.preventDefault();
     setMobileMenuOpen(false);
     
-    const container = containerRef.current;
-    if (!container) return;
-
-    const viewportHeight = window.innerHeight;
-    const totalHeight = container.clientHeight - viewportHeight;
-    const targetScrollY = container.offsetTop + 0.35 * totalHeight;
-
-    window.scrollTo({
-      top: targetScrollY,
-      behavior: 'smooth'
-    });
-
-    setIsDemoPlaying(true);
-    setUserUnmuted(true);
+    const elem = document.getElementById('mobile-demo');
+    if (elem) {
+      elem.scrollIntoView({ behavior: 'smooth' });
+      handleSelectMobileStep(1);
+    }
   };
   
   const isWalkthroughActive = scrollProgress >= 0.33;
@@ -448,8 +536,8 @@ export default function HowItWorks() {
         )}
       </nav>
 
-      {/* Walkthrough Scrollytelling Container */}
-      <div id="walkthrough" ref={containerRef} className="relative h-[400vh] w-full">
+      {/* Walkthrough Scrollytelling Container (Desktop >= 1024px) */}
+      <div id="walkthrough" ref={containerRef} className="hidden lg:block relative h-[400vh] w-full">
         <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center bg-gradient-to-b from-[#08080a] via-[#050505] to-[#030304]">
         
         {/* Ambient background glows */}
@@ -840,6 +928,379 @@ export default function HowItWorks() {
         )}
 
       </div>
+      </div>
+
+      {/* Dedicated Mobile Experience (< 1024px) */}
+      <div className="block lg:hidden w-full relative">
+        {/* Mobile Hero Section */}
+        <div className="relative min-h-[85dvh] w-full flex flex-col justify-between items-center text-center px-4 pt-28 pb-8 overflow-hidden bg-gradient-to-b from-[#08080a] via-[#050505] to-[#030304]">
+          {/* Ambient Glows */}
+          <div className="absolute top-[-50px] right-[-50px] w-[300px] h-[300px] rounded-full bg-cyan-950/20 blur-[90px] pointer-events-none z-0" />
+          <div className="absolute bottom-[-50px] left-[-50px] w-[300px] h-[300px] rounded-full bg-blue-950/15 blur-[90px] pointer-events-none z-0" />
+          
+          {/* Hero Background with dark overlay */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center pointer-events-none opacity-40 z-0"
+            style={{ backgroundImage: "url('/gemini-hero.jpeg')" }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black pointer-events-none z-10" />
+
+          {/* Centered Hero Content */}
+          <div className="relative z-20 flex-grow flex flex-col items-center justify-center max-w-md mx-auto my-auto py-8">
+            <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white mb-4 leading-[1.1]">
+              Keep your streams clean
+            </h1>
+            <p className="text-sm sm:text-base text-gray-300 max-w-sm leading-relaxed mb-8">
+              BooTube ghosts profanity and blasphemy in real-time, delivering clean, family-friendly audio across your favorite streaming services.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs">
+              <a 
+                href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-3.5 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-extrabold rounded-full shadow-[0_0_20px_rgba(6,182,212,0.3)] text-sm transition-all text-center"
+              >
+                Get BooTube — It&apos;s Free
+              </a>
+              <button
+                onClick={() => {
+                  const el = document.getElementById('mobile-demo');
+                  if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  handleSelectMobileStep(1);
+                }}
+                className="w-full py-3.5 bg-white/10 hover:bg-white/15 text-white font-bold rounded-full border border-white/15 text-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>▶️</span> Watch Demo
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Platform Marquee */}
+          <div className="relative z-20 w-full max-w-lg mx-auto mt-4">
+            <p className="text-center text-[10px] font-extrabold tracking-wider text-cyan-400/80 uppercase mb-2">
+              Works seamlessly with
+            </p>
+            <div 
+              className="w-full overflow-hidden relative select-none py-1.5"
+              style={{
+                maskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%)'
+              }}
+            >
+              <div className="animate-marquee flex items-center gap-8 shrink-0 whitespace-nowrap">
+                <span className="text-gray-400 font-bold text-base">YouTube</span>
+                <span className="text-gray-400 font-black text-base text-[#00d4ff]">DISNEY+</span>
+                <span className="text-gray-400 font-bold text-base text-[#1CE783] italic">hulu</span>
+                <span className="text-gray-400 font-black text-base text-[#3AA5C2]">MAX</span>
+                <span className="text-gray-400 font-bold text-base text-[#0064FF]">Paramount+</span>
+                <span className="text-gray-400 font-bold text-base text-[#00A8E1]">Peacock</span>
+                <span className="text-gray-400 font-black text-base text-[#E5A93B]">PLEX</span>
+                <span className="text-gray-400 font-extrabold text-base text-[#F15A24]">Fandango</span>
+                <span className="text-gray-400 font-bold text-base text-[#E50914]">Netflix</span>
+                <span className="text-gray-400 font-bold text-base text-[#00A8E1]">Prime Video</span>
+                <span className="text-gray-400 font-extrabold text-base text-[#1DB954]">Spotify</span>
+                <span className="text-gray-400 font-extrabold text-base text-[#1877F2]">Facebook</span>
+                <span className="text-gray-400 font-black text-base text-white">X</span>
+                {/* Loop */}
+                <span className="text-gray-400 font-bold text-base">YouTube</span>
+                <span className="text-gray-400 font-black text-base text-[#00d4ff]">DISNEY+</span>
+                <span className="text-gray-400 font-bold text-base text-[#1CE783] italic">hulu</span>
+                <span className="text-gray-400 font-black text-base text-[#3AA5C2]">MAX</span>
+                <span className="text-gray-400 font-bold text-base text-[#0064FF]">Paramount+</span>
+                <span className="text-gray-400 font-bold text-base text-[#00A8E1]">Peacock</span>
+                <span className="text-gray-400 font-black text-base text-[#E5A93B]">PLEX</span>
+                <span className="text-gray-400 font-extrabold text-base text-[#F15A24]">Fandango</span>
+                <span className="text-gray-400 font-bold text-base text-[#E50914]">Netflix</span>
+                <span className="text-gray-400 font-bold text-base text-[#00A8E1]">Prime Video</span>
+                <span className="text-gray-400 font-extrabold text-base text-[#1DB954]">Spotify</span>
+                <span className="text-gray-400 font-extrabold text-base text-[#1877F2]">Facebook</span>
+                <span className="text-gray-400 font-black text-base text-white">X</span>
+              </div>
+            </div>
+            <div className="text-[11px] text-gray-400 mt-4 animate-bounce select-none pointer-events-none">
+              ↓ See demo in action
+            </div>
+          </div>
+        </div>
+
+        {/* Dedicated Mobile Interactive Demo */}
+        <div id="mobile-demo" className="w-full bg-[#050505] border-t border-white/5 py-12 px-4 sm:px-6 relative overflow-hidden">
+          {/* Header */}
+          <div className="text-center max-w-md mx-auto mb-6">
+            <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400 bg-cyan-950/40 border border-cyan-800/30 px-3 py-1 rounded-full inline-block mb-3">
+              Interactive Demo
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2">
+              See BooTube in action
+            </h2>
+            <p className="text-xs sm:text-sm text-gray-400">
+              Tap the steps below to experience how BooTube detects profanity, mutes syllables instantly, and hides captions.
+            </p>
+          </div>
+
+          {/* Step Selector Pills */}
+          <div className="max-w-md mx-auto grid grid-cols-3 gap-2 mb-6 select-none">
+            <button
+              onClick={() => handleSelectMobileStep(1)}
+              className={`py-2 px-1 rounded-xl text-center transition-all border cursor-pointer ${
+                mobileStep === 1
+                  ? 'bg-cyan-500/15 border-cyan-500/50 text-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.2)]'
+                  : 'bg-white/[0.02] border-white/5 text-gray-400 hover:text-white'
+              }`}
+            >
+              <span className="text-[10px] font-black block uppercase tracking-wider">Step 1</span>
+              <span className="text-[11px] font-bold block truncate">1. Unfiltered</span>
+            </button>
+
+            <button
+              onClick={() => handleSelectMobileStep(2)}
+              className={`py-2 px-1 rounded-xl text-center transition-all border cursor-pointer ${
+                mobileStep === 2
+                  ? 'bg-cyan-500/15 border-cyan-500/50 text-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.2)]'
+                  : 'bg-white/[0.02] border-white/5 text-gray-400 hover:text-white'
+              }`}
+            >
+              <span className="text-[10px] font-black block uppercase tracking-wider">Step 2</span>
+              <span className="text-[11px] font-bold block truncate">2. Turn On</span>
+            </button>
+
+            <button
+              onClick={() => handleSelectMobileStep(3)}
+              className={`py-2 px-1 rounded-xl text-center transition-all border cursor-pointer ${
+                mobileStep === 3
+                  ? 'bg-cyan-500/15 border-cyan-500/50 text-cyan-400 shadow-[0_0_12px_rgba(6,182,212,0.2)]'
+                  : 'bg-white/[0.02] border-white/5 text-gray-400 hover:text-white'
+              }`}
+            >
+              <span className="text-[10px] font-black block uppercase tracking-wider">Step 3</span>
+              <span className="text-[11px] font-bold block truncate">3. Censored</span>
+            </button>
+          </div>
+
+          {/* Mobile Player Mockup Frame */}
+          <div className="max-w-md mx-auto aspect-[16/9] w-full bg-black rounded-xl border border-white/10 overflow-hidden shadow-2xl relative flex flex-col">
+            {/* Top Browser Bar */}
+            <div className="h-8 bg-[#181920] border-b border-white/5 flex items-center px-3 justify-between select-none flex-shrink-0 z-30">
+              <div className="flex gap-1 items-center">
+                <div className="w-2 h-2 rounded-full bg-red-500/60" />
+                <div className="w-2 h-2 rounded-full bg-yellow-500/60" />
+                <div className="w-2 h-2 rounded-full bg-green-500/60" />
+              </div>
+              
+              <div className="bg-[#0f1016] border border-white/5 rounded px-2 py-0.5 text-[9px] text-gray-400 truncate max-w-[170px] text-center flex items-center justify-center">
+                youtube.com/watch?v=demo
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <img 
+                  src="/boo-icon-glyph.svg" 
+                  alt="BooTube" 
+                  className={`h-4 w-auto cursor-pointer transition-all duration-200 ${
+                    mobilePopupOpen 
+                      ? 'filter drop-shadow-[0_0_5px_rgba(6,182,212,0.8)] scale-110' 
+                      : 'opacity-70'
+                  }`}
+                />
+              </div>
+            </div>
+
+            {/* Video Canvas Area */}
+            <div className="flex-grow w-full h-0 relative bg-black/80 flex items-center justify-center">
+              <video
+                ref={mobileVideoRef}
+                src="/cowboys.mp4"
+                playsInline
+                muted={!mobileUserUnmuted || (mobileStep === 3 && ((mobileVideoTime >= 1.0 && mobileVideoTime <= 2.0) || (mobileVideoTime >= 3.3 && mobileVideoTime <= 4.3) || (mobileVideoTime >= 4.8 && mobileVideoTime <= 5.6)))}
+                onTimeUpdate={(e) => setMobileVideoTime(e.currentTarget.currentTime)}
+                onEnded={() => {
+                  if (mobileStep === 1) {
+                    handleSelectMobileStep(2);
+                  } else if (mobileStep === 3) {
+                    handleSelectMobileStep(1);
+                  }
+                }}
+                onClick={() => {
+                  const video = mobileVideoRef.current;
+                  if (!video) return;
+                  if (video.paused) {
+                    video.play().catch(() => {});
+                    setMobileDemoPlaying(true);
+                  } else {
+                    video.pause();
+                    setMobileDemoPlaying(false);
+                  }
+                }}
+                className="w-full h-full object-cover cursor-pointer"
+              />
+
+              {/* Tap to Unmute Overlay */}
+              {!mobileUserUnmuted && (
+                <button
+                  onClick={() => {
+                    setMobileUserUnmuted(true);
+                    const video = mobileVideoRef.current;
+                    if (video) {
+                      video.muted = false;
+                      video.play().catch(() => {});
+                      setMobileDemoPlaying(true);
+                    }
+                  }}
+                  className="absolute top-3 left-3 z-30 flex items-center gap-1.5 bg-[#0c0d12]/95 text-white border border-cyan-500/40 px-3 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wider shadow-lg animate-pulse cursor-pointer"
+                >
+                  <span>🔊</span> Tap for sound
+                </button>
+              )}
+
+              {/* Dynamic Live Subtitles */}
+              {getMobileCaptionText() && (
+                <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 w-full px-4 text-center pointer-events-none select-none">
+                  <div className="bg-black/85 px-3 py-1.5 rounded border border-white/10 max-w-[90%] mx-auto inline-block">
+                    <p className="text-[11px] sm:text-[12px] text-white leading-relaxed font-semibold">
+                      {getMobileCaptionText()}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Bottom Playback Bar */}
+              <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 to-transparent p-2.5 flex items-center justify-between text-white text-[10px] select-none z-20">
+                <div className="flex gap-2.5 items-center">
+                  <button
+                    onClick={() => {
+                      const video = mobileVideoRef.current;
+                      if (!video) return;
+                      if (video.paused) {
+                        video.play().catch(() => {});
+                        setMobileDemoPlaying(true);
+                      } else {
+                        video.pause();
+                        setMobileDemoPlaying(false);
+                      }
+                    }}
+                    className="hover:text-cyan-400 transition-colors cursor-pointer"
+                  >
+                    {mobileDemoPlaying ? '⏸' : '▶️'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMobileUserUnmuted(prev => !prev);
+                    }}
+                    className="hover:text-cyan-400 transition-colors cursor-pointer"
+                  >
+                    {!mobileUserUnmuted || (mobileStep === 3 && ((mobileVideoTime >= 1.0 && mobileVideoTime <= 2.0) || (mobileVideoTime >= 3.3 && mobileVideoTime <= 4.3) || (mobileVideoTime >= 4.8 && mobileVideoTime <= 5.6))) ? '🔇' : '🔊'}
+                  </button>
+                  <span className="text-[9px] text-gray-300 font-mono">
+                    {formatTime(mobileVideoTime)} / 0:07
+                  </span>
+                </div>
+
+                <div className="flex gap-2 items-center text-[10px]">
+                  <span className={mobileStep === 3 ? 'line-through text-gray-500' : 'text-cyan-400 font-bold'}>
+                    CC
+                  </span>
+                  <span className={mobileStep === 3 && ((mobileVideoTime >= 1.0 && mobileVideoTime <= 2.0) || (mobileVideoTime >= 3.3 && mobileVideoTime <= 4.3) || (mobileVideoTime >= 4.8 && mobileVideoTime <= 5.6)) ? 'text-red-400 font-bold' : 'text-gray-400'}>
+                    {mobileStep === 3 && ((mobileVideoTime >= 1.0 && mobileVideoTime <= 2.0) || (mobileVideoTime >= 3.3 && mobileVideoTime <= 4.3) || (mobileVideoTime >= 4.8 && mobileVideoTime <= 5.6)) ? 'MUTED' : 'CLEAN'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Step 2 BooTube Popup Sheet Overlay */}
+              {mobilePopupOpen && (
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-40 flex items-center justify-center p-3 animate-in fade-in duration-200">
+                  <div className="w-full max-w-[240px] bg-[#0d0e12] border border-cyan-500/30 rounded-xl p-3 shadow-2xl">
+                    <div className="flex items-center justify-between border-b border-white/10 pb-2 mb-2.5">
+                      <div className="flex items-center gap-1.5">
+                        <img src="/boo-icon-glyph.svg" alt="BooTube" className="h-4 w-auto" />
+                        <span className="text-[11px] font-extrabold text-white">BooTube Console</span>
+                      </div>
+                      <span className="text-[8px] text-cyan-400 font-bold bg-cyan-950/50 px-1.5 py-0.5 rounded border border-cyan-800/30">ACTIVE</span>
+                    </div>
+
+                    {/* Censoring toggle */}
+                    <div className="flex items-center justify-between py-1.5 border-b border-white/5">
+                      <span className="text-[11px] font-bold text-white">Censoring</span>
+                      <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-gradient-to-r from-[#4789F0] to-[#3AA5C2] text-white">
+                        ON
+                      </span>
+                    </div>
+
+                    {/* Hide captions toggle */}
+                    <div className="flex items-center justify-between py-1.5 mb-2.5">
+                      <span className="text-[11px] font-bold text-white">Hide Captions</span>
+                      <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-gradient-to-r from-[#4789F0] to-[#3AA5C2] text-white">
+                        ON
+                      </span>
+                    </div>
+
+                    <button
+                      onClick={() => handleSelectMobileStep(3)}
+                      className="w-full py-1.5 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-extrabold rounded-lg text-[10px] tracking-wide uppercase transition-all shadow-[0_0_10px_rgba(6,182,212,0.3)] cursor-pointer"
+                    >
+                      Apply &amp; See Results →
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Active Step Description Card */}
+          <div className="max-w-md mx-auto mt-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
+            {mobileStep === 1 && (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase text-cyan-400">Step 1: Original Stream</span>
+                  <button 
+                    onClick={() => handleSelectMobileStep(2)}
+                    className="text-[10px] font-bold text-cyan-400 hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    Next Step →
+                  </button>
+                </div>
+                <h3 className="text-sm font-bold text-white">Unfiltered Video &amp; Captions</h3>
+                <p className="text-xs text-gray-400 leading-relaxed">
+                  The raw video plays with spoken bad words and explicit on-screen captions visible.
+                </p>
+              </div>
+            )}
+
+            {mobileStep === 2 && (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase text-cyan-400">Step 2: Configuration</span>
+                  <button 
+                    onClick={() => handleSelectMobileStep(3)}
+                    className="text-[10px] font-bold text-cyan-400 hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    Next Step →
+                  </button>
+                </div>
+                <h3 className="text-sm font-bold text-white">Turn On Censoring &amp; Hide Captions</h3>
+                <p className="text-xs text-gray-400 leading-relaxed">
+                  With one tap in the BooTube toolbar, toggle Censoring to ON and Hide Captions to ON.
+                </p>
+              </div>
+            )}
+
+            {mobileStep === 3 && (
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-black uppercase text-cyan-400">Step 3: Clean Playback</span>
+                  <button 
+                    onClick={() => handleSelectMobileStep(1)}
+                    className="text-[10px] font-bold text-cyan-400 hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    Restart Demo ↺
+                  </button>
+                </div>
+                <h3 className="text-sm font-bold text-white">Syllable-Level Audio Muting &amp; Hidden CC</h3>
+                <p className="text-xs text-gray-400 leading-relaxed">
+                  BooTube automatically mutes the exact bad syllables in real-time while keeping surrounding dialogue crystal clear.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Standalone Landing Page Sections */}
