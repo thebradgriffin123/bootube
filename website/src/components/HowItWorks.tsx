@@ -54,6 +54,37 @@ export default function HowItWorks() {
     }
   };
 
+  // Mobile autoplay when scrolled into view
+  useEffect(() => {
+    const el = document.getElementById('mobile-demo');
+    if (!el) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const video = mobileVideoRef.current;
+          if (video && video.paused) {
+            video.play().catch(() => {});
+            setMobileDemoPlaying(true);
+          }
+        }
+      });
+    }, { threshold: 0.25 });
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Step 2 auto-advance timer: after 3.2s, auto-proceed to Step 3 for seamless hands-free tour
+  useEffect(() => {
+    if (mobileStep === 2 && mobilePopupOpen) {
+      const timer = setTimeout(() => {
+        handleSelectMobileStep(3);
+      }, 3200);
+      return () => clearTimeout(timer);
+    }
+  }, [mobileStep, mobilePopupOpen]);
+
   // Mobile Audio Muting Sync for Step 3
   useEffect(() => {
     const video = mobileVideoRef.current;
@@ -1105,11 +1136,12 @@ export default function HowItWorks() {
             </div>
 
             {/* Video Canvas Area */}
-            <div className="flex-grow w-full h-0 relative bg-black/80 flex items-center justify-center">
+            <div className="flex-1 min-h-0 w-full relative bg-black/80 flex items-center justify-center">
               <video
                 ref={mobileVideoRef}
                 src="/cowboys.mp4"
                 playsInline
+                preload="auto"
                 muted={!mobileUserUnmuted || (mobileStep === 3 && ((mobileVideoTime >= 1.0 && mobileVideoTime <= 2.0) || (mobileVideoTime >= 3.3 && mobileVideoTime <= 4.3) || (mobileVideoTime >= 4.8 && mobileVideoTime <= 5.6)))}
                 onTimeUpdate={(e) => setMobileVideoTime(e.currentTarget.currentTime)}
                 onEnded={() => {
