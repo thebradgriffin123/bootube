@@ -977,14 +977,14 @@ export default function HowItWorks() {
           <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/60 to-black pointer-events-none z-10" />
 
           {/* Centered Hero Content */}
-          <div className="relative z-20 flex-grow flex flex-col items-center justify-center max-w-md mx-auto my-auto py-8">
+          <div className="relative z-20 flex-grow flex flex-col items-center justify-center max-w-xl md:max-w-2xl mx-auto my-auto py-8">
             <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-white mb-4 leading-[1.1]">
               Keep your streams clean
             </h1>
-            <p className="text-sm sm:text-base text-gray-300 max-w-sm leading-relaxed mb-8">
+            <p className="text-sm sm:text-base text-gray-300 max-w-xl leading-relaxed mb-8">
               BooTube ghosts profanity and blasphemy in real-time, delivering clean, family-friendly audio across your favorite streaming services.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs">
+            <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs sm:max-w-md">
               <a 
                 href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa"
                 target="_blank"
@@ -1007,7 +1007,7 @@ export default function HowItWorks() {
           </div>
 
           {/* Mobile Platform Marquee */}
-          <div className="relative z-20 w-full max-w-lg mx-auto mt-4">
+          <div className="relative z-20 w-full max-w-3xl mx-auto mt-4">
             <p className="text-center text-[10px] font-extrabold tracking-wider text-cyan-400/80 uppercase mb-2">
               Works seamlessly with
             </p>
@@ -1057,7 +1057,7 @@ export default function HowItWorks() {
         {/* Dedicated Mobile Interactive Demo */}
         <div id="mobile-demo" className="w-full bg-[#050505] border-t border-white/5 py-12 px-4 sm:px-6 relative overflow-hidden">
           {/* Header */}
-          <div className="text-center max-w-md mx-auto mb-6">
+          <div className="text-center max-w-xl md:max-w-3xl mx-auto mb-6">
             <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400 bg-cyan-950/40 border border-cyan-800/30 px-3 py-1 rounded-full inline-block mb-3">
               Interactive Demo
             </span>
@@ -1070,7 +1070,7 @@ export default function HowItWorks() {
           </div>
 
           {/* Step Selector Pills */}
-          <div className="max-w-md mx-auto grid grid-cols-3 gap-2 mb-6 select-none">
+          <div className="max-w-xl md:max-w-3xl mx-auto grid grid-cols-3 gap-2 sm:gap-3 mb-6 select-none">
             <button
               onClick={() => handleSelectMobileStep(1)}
               className={`py-2 px-1 rounded-xl text-center transition-all border cursor-pointer ${
@@ -1109,7 +1109,7 @@ export default function HowItWorks() {
           </div>
 
           {/* Mobile Player Mockup Frame */}
-          <div className="max-w-md mx-auto aspect-[16/9] w-full bg-black rounded-xl border border-white/10 overflow-hidden shadow-2xl relative flex flex-col">
+          <div className="max-w-xl md:max-w-3xl mx-auto aspect-[16/9] w-full bg-black rounded-xl border border-white/10 overflow-hidden shadow-2xl relative flex flex-col">
             {/* Top Browser Bar */}
             <div className="h-8 bg-[#181920] border-b border-white/5 flex items-center px-3 justify-between select-none flex-shrink-0 z-30">
               <div className="flex gap-1 items-center">
@@ -1118,7 +1118,7 @@ export default function HowItWorks() {
                 <div className="w-2 h-2 rounded-full bg-green-500/60" />
               </div>
               
-              <div className="bg-[#0f1016] border border-white/5 rounded px-2 py-0.5 text-[9px] text-gray-400 truncate max-w-[170px] text-center flex items-center justify-center">
+              <div className="bg-[#0f1016] border border-white/5 rounded px-2 py-0.5 text-[9px] text-gray-400 truncate max-w-[170px] sm:max-w-[280px] text-center flex items-center justify-center">
                 youtube.com/watch?v=demo
               </div>
 
@@ -1277,7 +1277,7 @@ export default function HowItWorks() {
           </div>
 
           {/* Active Step Description Card */}
-          <div className="max-w-md mx-auto mt-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
+          <div className="max-w-xl md:max-w-3xl mx-auto mt-4 p-4 sm:p-5 rounded-xl bg-white/[0.02] border border-white/5">
             {mobileStep === 1 && (
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
