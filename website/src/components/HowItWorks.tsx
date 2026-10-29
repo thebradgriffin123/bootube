@@ -1441,7 +1441,7 @@ export default function HowItWorks() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
               
               {/* Free Plan */}
-              <div className="flex flex-col p-8 rounded-2xl border border-white/35 bg-gradient-to-b from-zinc-800/85 to-zinc-900/95 backdrop-blur-md relative shadow-[0_0_30px_rgba(255,255,255,0.06),inset_0_1px_0_0_rgba(255,255,255,0.2)] hover:border-white/55 hover:from-zinc-800/95 hover:to-zinc-900 transition-all">
+              <div className="flex flex-col p-8 rounded-2xl border border-white/20 bg-gradient-to-b from-zinc-800/85 to-zinc-900/95 bg-clip-padding backdrop-blur-md relative overflow-hidden shadow-[0_0_30px_rgba(255,255,255,0.05)] hover:border-white/40 hover:from-zinc-800/95 hover:to-zinc-900 transition-all">
                 <h3 className="text-xl font-bold text-white mb-2">Free plan</h3>
                 <p className="text-sm text-gray-300 mb-6">Essential blasphemy censoring for everyone.</p>
                 
@@ -1471,7 +1471,7 @@ export default function HowItWorks() {
                   href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full text-center py-3 bg-white/15 hover:bg-white/25 border border-white/35 hover:border-white/55 text-white font-bold rounded-xl shadow-md transition-all pointer-events-auto"
+                  className="w-full text-center py-3 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 text-white font-bold rounded-xl transition-all pointer-events-auto"
                 >
                   Add to browser
                 </a>
