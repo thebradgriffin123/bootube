@@ -94,18 +94,26 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <form onSubmit={handleLogin} noValidate className="space-y-5">
+          <form onSubmit={handleLogin} method="POST" noValidate className="space-y-5">
             
             {error && (
-              <div className="p-3 rounded-lg bg-red-950/20 border border-red-500/20 text-xs text-red-400">
-                ⚠️ {error}
+              <div role="alert" aria-live="polite" className="p-3 rounded-lg bg-red-950/20 border border-red-500/20 text-xs text-red-400">
+                <span aria-hidden="true">⚠️</span> {error}
               </div>
             )}
 
             <div>
-              <label className="block text-xs font-bold text-gray-400 mb-2">Email address</label>
+              <label htmlFor="loginEmail" className="block text-xs font-bold text-gray-400 mb-2">Email address</label>
               <input 
-                type="email" 
+                id="loginEmail"
+                name="email"
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                aria-describedby="loginEmailError"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onBlur={() => setEmailTouched(true)}
@@ -117,16 +125,19 @@ export default function LoginPage() {
                 }`}
               />
               {(emailTouched || showValidation) && !isEmailValid && (
-                <p className="text-red-400 text-xs mt-1.5">
+                <p id="loginEmailError" aria-live="polite" className="text-red-400 text-xs mt-1.5">
                   Please enter a valid email address.
                 </p>
               )}
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-gray-400 mb-2">Password</label>
+              <label htmlFor="loginPassword" className="block text-xs font-bold text-gray-400 mb-2">Password</label>
               <input 
-                type="password" 
+                id="loginPassword"
+                name="password"
+                type="password"
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"

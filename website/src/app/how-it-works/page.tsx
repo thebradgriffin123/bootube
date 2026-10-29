@@ -1,8 +1,5 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import React from 'react';
-import HowItWorks from '@/components/HowItWorks';
-
-export default function HowItWorksPreviewPage() {
-  return <HowItWorks />;
+export default function HowItWorksRedirectPage() {
+  redirect('/');
 }

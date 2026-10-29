@@ -506,9 +506,20 @@ export default function DashboardPage() {
 
         {/* Global Notifications */}
         {notification && (
-          <div className={`p-4 rounded-xl border mb-8 flex items-center justify-between text-sm bg-red-950/20 border-red-500/20 text-red-400`}>
-            <span className="font-semibold">{notification.message}</span>
-            <button onClick={() => setNotification(null)} className="text-gray-500 hover:text-white font-bold px-2">×</button>
+          <div
+            role={notification.type === 'error' ? 'alert' : 'status'}
+            aria-live="polite"
+            className={`p-4 rounded-xl border mb-8 flex items-center justify-between text-sm ${
+              notification.type === 'success'
+                ? 'bg-cyan-950/30 border-cyan-500/30 text-cyan-300'
+                : 'bg-red-950/20 border-red-500/20 text-red-400'
+            }`}
+          >
+            <span className="font-semibold flex items-center gap-2">
+              <span aria-hidden="true">{notification.type === 'success' ? '✓' : '⚠️'}</span>
+              <span>{notification.message}</span>
+            </span>
+            <button onClick={() => setNotification(null)} aria-label="Dismiss notification" className="text-gray-400 hover:text-white font-bold px-2 cursor-pointer">×</button>
           </div>
         )}
 
@@ -598,8 +609,8 @@ export default function DashboardPage() {
                 {subDetails?.plan === 'free' && (
                   <div className="p-6 rounded-xl bg-gradient-to-r from-blue-950/20 to-cyan-950/20 border border-cyan-500/15 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                     <div>
-                      <h4 className="text-sm font-bold text-white">Unlock cross-platform censoring controls</h4>
-                      <p className="text-xs text-gray-400 mt-1">Filter profanity on YouTube, Disney+, Hulu, HBO Max, Paramount+, Plex, and Fandango. Access custom blocked words, timings, and blur features.</p>
+                      <h4 className="text-sm font-bold text-white">Unlock full profanity categories &amp; cloud sync</h4>
+                      <p className="text-xs text-gray-400 mt-1">Filter all 6 profanity, sexual, and derogatory categories across all 13 streaming platforms, add unlimited custom blocked words, and sync across devices.</p>
                     </div>
                     <button
                       onClick={handleUpgrade}
@@ -624,29 +635,29 @@ export default function DashboardPage() {
               {/* Free Tier Details */}
               <div className="p-6 rounded-2xl bg-gradient-to-b from-zinc-800/80 to-zinc-900/90 bg-clip-padding border border-white/20 overflow-hidden flex flex-col justify-between">
                 <div>
-                  <h3 className="text-md font-extrabold text-gray-300 uppercase tracking-wide">Free Plan</h3>
-                  <div className="text-2xl font-black text-white mt-2 mb-4">$0.00 <span className="text-xs text-gray-500 font-medium">/ forever</span></div>
-                  <ul className="space-y-3 text-xs text-gray-400">
-                    <li className="flex items-center gap-2">🟢 YouTube censoring support</li>
-                    <li className="flex items-center gap-2">🟢 Standard blasphemy muting</li>
-                    <li className="flex items-center gap-2">🟢 Up to 10 custom words</li>
-                    <li className="flex items-center gap-2">🔴 Locked multi-channel support</li>
-                    <li className="flex items-center gap-2">🔴 Locked video blurring overlays</li>
-                    <li className="flex items-center gap-2">🔴 Locked adjustable timing buffer</li>
+                  <h3 className="text-md font-extrabold text-gray-200 uppercase tracking-wide">Free Plan</h3>
+                  <div className="text-2xl font-black text-white mt-2 mb-4">$0.00 <span className="text-xs text-gray-400 font-medium">/ forever</span></div>
+                  <ul className="space-y-3 text-xs text-gray-300">
+                    <li className="flex items-center gap-2">🟢 100% free blasphemy muting</li>
+                    <li className="flex items-center gap-2">🟢 Works across all 13 streaming platforms</li>
+                    <li className="flex items-center gap-2">🟢 Hide captions &amp; smart video blurring</li>
+                    <li className="flex items-center gap-2">🟢 Adjustable mute buffer (0.3s - 1.0s)</li>
+                    <li className="flex items-center gap-2 text-gray-400">🔴 Locked full profanity &amp; vulgarity categories</li>
+                    <li className="flex items-center gap-2 text-gray-400">🔴 Locked custom word lists &amp; cloud sync</li>
                   </ul>
                 </div>
               </div>
 
               {/* Premium Tier Details */}
-              <div className="p-6 rounded-2xl bg-cyan-950/5 border border-cyan-500/20 flex flex-col justify-between relative shadow-[0_0_30px_rgba(6,182,212,0.05)]">
+              <div className="p-6 rounded-2xl bg-cyan-950/20 border border-cyan-500/30 bg-clip-padding overflow-hidden flex flex-col justify-between relative shadow-[0_0_30px_rgba(6,182,212,0.08)]">
                 <div>
                   <h3 className="text-md font-extrabold text-cyan-400 uppercase tracking-wide">Premium Plan</h3>
-                  <div className="text-2xl font-black text-white mt-2 mb-4">$3.99 <span className="text-xs text-cyan-500/50 font-medium">/ month</span></div>
-                  <ul className="space-y-3 text-xs text-gray-300">
-                    <li className="flex items-center gap-2 text-cyan-300">✨ Sync across YouTube, Hulu, Disney+, Plex & Vudu</li>
-                    <li className="flex items-center gap-2 text-cyan-300">✨ Unlimited custom blocked words</li>
-                    <li className="flex items-center gap-2 text-cyan-300">✨ Enable visual screen blurring filters</li>
-                    <li className="flex items-center gap-2 text-cyan-300">✨ Fine-tune timing sliders (0.5s - 1.5s)</li>
+                  <div className="text-2xl font-black text-white mt-2 mb-4">$3.99 <span className="text-xs text-cyan-400 font-medium">/ month</span></div>
+                  <ul className="space-y-3 text-xs text-gray-200">
+                    <li className="flex items-center gap-2 text-cyan-300">✨ Everything in Free Plan included</li>
+                    <li className="flex items-center gap-2 text-cyan-300">✨ All 6 profanity, sexual &amp; derogatory categories</li>
+                    <li className="flex items-center gap-2 text-cyan-300">✨ Unlimited custom blocked words &amp; phrases</li>
+                    <li className="flex items-center gap-2 text-cyan-300">✨ Bleeps &amp; censored symbol ([__], ***) muting</li>
                     <li className="flex items-center gap-2 text-cyan-300">✨ Sync settings automatically across all active devices</li>
                     <li className="flex items-center gap-2 text-cyan-300">✨ Secure commercial-free billing portal</li>
                   </ul>

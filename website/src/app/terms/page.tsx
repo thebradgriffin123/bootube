@@ -32,7 +32,7 @@ export default function TermsPage() {
         <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-6 md:p-10 shadow-xl space-y-8">
           <div>
             <h1 className="text-3xl font-black text-white">Terms of Use</h1>
-            <p className="text-xs text-cyan-400 font-semibold mt-1">Last updated: July 16, 2026</p>
+            <p className="text-xs text-cyan-400 font-semibold mt-1">Last updated: October 28, 2026</p>
           </div>
 
           <div className="space-y-6 text-sm text-gray-300 leading-relaxed">
@@ -106,16 +106,18 @@ export default function TermsPage() {
             <Link href="/privacy" className="hover:text-gray-300">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-gray-300">Terms of Use</Link>
             <Link href="/support" className="hover:text-gray-300">Support Desk</Link>
-            <a href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa" target="_blank" className="hover:text-gray-300">Chrome Store</a>
+            <a href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300">Chrome Store</a>
+            <a href="https://addons.mozilla.org/firefox/addon/addon@bootube.app/" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300">Firefox Add-ons</a>
+            <a href="https://play.google.com/store/apps/details?id=com.bootube.app" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300">Google Play</a>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto mt-8 pt-8 border-t border-white/5 text-center text-[10px] text-gray-600 leading-relaxed">
+        <div className="max-w-7xl mx-auto mt-8 pt-8 border-t border-white/5 text-center text-[10px] text-gray-500 leading-relaxed">
           <p className="mb-4">
             &copy; 2026 BooTube. Built for a cleaner internet.
           </p>
           <p className="max-w-4xl mx-auto italic">
-            Disclaimer: BooTube is an independent browser extension and mobile application. It is not affiliated with, sponsored by, or endorsed by Google LLC (YouTube), Disney Enterprises, Inc. (Disney+), Hulu LLC, Plex, Inc., Fandango Media, LLC, Netflix, Inc., Amazon.com, Inc., or any other third-party streaming service mentioned. All trademarks and registered trademarks are the property of their respective owners.
+            Disclaimer: BooTube is an independent browser extension and mobile application. It is not affiliated with, sponsored by, or endorsed by Google LLC (YouTube), Netflix, Inc., Disney Enterprises, Inc. (Disney+), Hulu LLC, Warner Bros. Discovery (Max / HBO Max), Amazon.com, Inc. (Prime Video), Paramount Global (Paramount+), NBCUniversal (Peacock), Plex, Inc., Fandango Media, LLC (Fandango at Home), Spotify AB, Meta Platforms, Inc. (Facebook), X Corp., or any other third-party streaming service mentioned. All trademarks and registered trademarks are the property of their respective owners.
           </p>
         </div>
       </footer>

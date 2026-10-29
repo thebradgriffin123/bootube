@@ -133,18 +133,26 @@ export default function SignupPage() {
                 </p>
               </div>
 
-              <form onSubmit={handleSignup} noValidate className="space-y-5">
+              <form onSubmit={handleSignup} method="POST" noValidate className="space-y-5">
               
               {error && (
-                <div className="p-3 rounded-lg bg-red-950/20 border border-red-500/20 text-xs text-red-400">
-                  ⚠️ {error}
+                <div role="alert" aria-live="polite" className="p-3 rounded-lg bg-red-950/20 border border-red-500/20 text-xs text-red-400">
+                  <span aria-hidden="true">⚠️</span> {error}
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-bold text-gray-400 mb-2">Email address</label>
+                <label htmlFor="signupEmail" className="block text-xs font-bold text-gray-400 mb-2">Email address</label>
                 <input 
-                  type="email" 
+                  id="signupEmail"
+                  name="email"
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck={false}
+                  aria-describedby="signupEmailError"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   onBlur={() => setEmailTouched(true)}
@@ -156,16 +164,20 @@ export default function SignupPage() {
                   }`}
                 />
                 {(emailTouched || showValidation) && !isEmailValid && (
-                  <p className="text-red-400 text-xs mt-1.5">
+                  <p id="signupEmailError" aria-live="polite" className="text-red-400 text-xs mt-1.5">
                     Please enter a valid email address.
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-400 mb-2">Password</label>
+                <label htmlFor="signupPassword" className="block text-xs font-bold text-gray-400 mb-2">Password</label>
                 <input 
-                  type="password" 
+                  id="signupPassword"
+                  name="password"
+                  type="password"
+                  autoComplete="new-password"
+                  aria-describedby="signupPasswordHelp"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onBlur={() => setPasswordTouched(true)}
@@ -183,7 +195,7 @@ export default function SignupPage() {
                 )}
 
                 {/* Password strength checklist */}
-                <div className="mt-2.5 p-3 rounded-lg bg-white/[0.01] border border-white/5 space-y-1.5 text-[11px]">
+                <div id="signupPasswordHelp" className="mt-2.5 p-3 rounded-lg bg-white/[0.01] border border-white/5 space-y-1.5 text-[11px]">
                   <div className="text-gray-400 font-semibold mb-1">Password requirements:</div>
                   <div className="flex items-center gap-2">
                     <span className={passwordReqs.length ? "text-cyan-400 font-bold" : "text-gray-600"}>
@@ -213,9 +225,12 @@ export default function SignupPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-400 mb-2">Confirm password</label>
+                <label htmlFor="signupConfirmPassword" className="block text-xs font-bold text-gray-400 mb-2">Confirm password</label>
                 <input 
-                  type="password" 
+                  id="signupConfirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  autoComplete="new-password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   onBlur={() => setConfirmTouched(true)}

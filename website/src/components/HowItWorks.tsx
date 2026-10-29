@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 
 export default function HowItWorks() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -15,6 +16,13 @@ export default function HowItWorks() {
   const [isDemoPlaying, setIsDemoPlaying] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session);
+    }).catch(() => {});
+  }, []);
 
   // Dedicated Mobile Demo State (< 1024px, completely isolated from desktop)
   const mobileVideoRef = useRef<HTMLVideoElement>(null);
@@ -147,7 +155,7 @@ export default function HowItWorks() {
   const faqs = [
     {
       q: "Does BooTube work on Netflix or Hulu?",
-      a: "Yes! BooTube currently supports YouTube, Netflix, Disney+, Hulu, HBO Max / Max, Paramount+, Plex, Prime Video, and Fandango at Home (Vudu)."
+      a: "Yes! BooTube works seamlessly across all 13 major streaming services: YouTube, Netflix, Disney+, Hulu, Max (HBO Max), Amazon Prime Video, Paramount+, Peacock, Plex, Fandango at Home, Spotify, Facebook, and X."
     },
     {
       q: "Will streaming services ban my account for using this?",
@@ -155,11 +163,11 @@ export default function HowItWorks() {
     },
     {
       q: "Is my personal data sold to third parties?",
-      a: "Never. BooTube is built with privacy-first architecture. All parsing, scanning, and muting run 100% locally on your own device. Your custom settings and blocklists stay secure in your own account."
+      a: "Never. BooTube is built with privacy-first architecture. All subtitle parsing, scanning, and muting run 100% locally on your own device. Your custom settings and blocklists stay secure in your own account."
     },
     {
-      q: "What is the difference between Blasphemy and Profanity filters?",
-      a: "Our free tier includes 100% free filtering for blasphemous and religious exclamations. The Premium Plan unlocks advanced profanity (vulgarity, slurs), custom word blocklists, video player blurring, and cross-device sync."
+      q: "What is the difference between the Free and Premium plans?",
+      a: "Our Free Plan includes 100% free blasphemy filtering across all 13 streaming platforms, plus on-screen caption hiding, smart video blurring, and adjustable mute buffer controls (0.3s–1.0s). The Premium Plan unlocks all 6 advanced profanity & vulgarity categories (Profanity, Sexual, Scatological, Anatomical, Derogatory, and Bleeps & Symbols), unlimited custom word & phrase blocklists, and cross-device cloud sync."
     }
   ];
 
@@ -522,13 +530,24 @@ export default function HowItWorks() {
           </div>
 
           <div className="hidden md:flex items-center gap-4">
-            <Link href="/login" className="text-sm font-semibold hover:text-white transition-colors px-4 py-2 text-gray-300">Log in</Link>
-            <Link 
-              href="/signup" 
-              className="text-sm font-bold bg-white text-black hover:bg-gray-200 transition-all px-5 py-2.5 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.15)] hover:shadow-[0_0_20px_rgba(255,255,255,0.25)]"
-            >
-              Sign up
-            </Link>
+            {isLoggedIn ? (
+              <Link 
+                href="/account" 
+                className="text-sm font-bold bg-white text-black hover:bg-gray-200 transition-all px-5 py-2.5 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.15)] hover:shadow-[0_0_20px_rgba(255,255,255,0.25)]"
+              >
+                Account
+              </Link>
+            ) : (
+              <>
+                <Link href="/login" className="text-sm font-semibold hover:text-white transition-colors px-4 py-2 text-gray-300">Log in</Link>
+                <Link 
+                  href="/signup" 
+                  className="text-sm font-bold bg-white text-black hover:bg-gray-200 transition-all px-5 py-2.5 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.15)] hover:shadow-[0_0_20px_rgba(255,255,255,0.25)]"
+                >
+                  Sign up
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu trigger */}
@@ -555,14 +574,26 @@ export default function HowItWorks() {
             <Link href="#pricing" onClick={() => setMobileMenuOpen(false)} className="text-lg font-medium text-gray-300">Pricing</Link>
             <Link href="#faq" onClick={() => setMobileMenuOpen(false)} className="text-lg font-medium text-gray-300">FAQ</Link>
             <hr className="border-white/5 my-2" />
-            <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="text-lg font-medium text-gray-300">Log in</Link>
-            <Link 
-              href="/signup"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center py-3 bg-white text-black font-bold rounded-full"
-            >
-              Sign up
-            </Link>
+            {isLoggedIn ? (
+              <Link 
+                href="/account"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full text-center py-3 bg-white text-black font-bold rounded-full"
+              >
+                Account
+              </Link>
+            ) : (
+              <>
+                <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="text-lg font-medium text-gray-300">Log in</Link>
+                <Link 
+                  href="/signup"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-3 bg-white text-black font-bold rounded-full"
+                >
+                  Sign up
+                </Link>
+              </>
+            )}
           </div>
         )}
       </nav>
@@ -633,7 +664,7 @@ export default function HowItWorks() {
                 <a href="https://www.paramountplus.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#0064FF] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Paramount+</a>
                 <a href="https://www.peacocktv.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#00A8E1] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Peacock</a>
                 <a href="https://www.plex.tv" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#E5A93B] font-black tracking-normal text-lg md:text-xl transition-colors cursor-pointer">PLEX</a>
-                <a href="https://www.vudu.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#F15A24] font-extrabold tracking-wide text-lg md:text-xl transition-colors cursor-pointer">Fandango</a>
+                <a href="https://athome.fandango.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#F15A24] font-extrabold tracking-wide text-lg md:text-xl transition-colors cursor-pointer">Fandango</a>
                 <a href="https://www.netflix.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#E50914] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Netflix</a>
                 <a href="https://www.primevideo.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#00A8E1] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Prime Video</a>
                 <a href="https://www.spotify.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#1DB954] font-extrabold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Spotify</a>
@@ -648,7 +679,7 @@ export default function HowItWorks() {
                 <a href="https://www.paramountplus.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#0064FF] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Paramount+</a>
                 <a href="https://www.peacocktv.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#00A8E1] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Peacock</a>
                 <a href="https://www.plex.tv" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#E5A93B] font-black tracking-normal text-lg md:text-xl transition-colors cursor-pointer">PLEX</a>
-                <a href="https://www.vudu.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#F15A24] font-extrabold tracking-wide text-lg md:text-xl transition-colors cursor-pointer">Fandango</a>
+                <a href="https://athome.fandango.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#F15A24] font-extrabold tracking-wide text-lg md:text-xl transition-colors cursor-pointer">Fandango</a>
                 <a href="https://www.netflix.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#E50914] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Netflix</a>
                 <a href="https://www.primevideo.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#00A8E1] font-bold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Prime Video</a>
                 <a href="https://www.spotify.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#1DB954] font-extrabold tracking-tight text-lg md:text-xl transition-colors cursor-pointer">Spotify</a>
@@ -716,6 +747,8 @@ export default function HowItWorks() {
                       <video
                         ref={setVideoRef}
                         src="/cowboys.mp4"
+                        width={1280}
+                        height={720}
                         autoPlay
                         preload="auto"
                         muted
@@ -789,7 +822,7 @@ export default function HowItWorks() {
                             <img src="/boo-icon-glyph.svg" alt="Logo" className="h-4.5 w-auto" />
                             <span className="text-[11px] font-extrabold text-white">BooTube</span>
                           </div>
-                          <span className="text-[9px] text-gray-500 uppercase font-black bg-white/5 px-1.5 py-0.5 rounded border border-white/5">v1.26</span>
+                          <span className="text-[9px] text-gray-500 uppercase font-black bg-white/5 px-1.5 py-0.5 rounded border border-white/5">v2.43</span>
                         </div>
 
                         <div className="flex items-center justify-between py-2 border-b border-white/5">
@@ -939,7 +972,7 @@ export default function HowItWorks() {
               <div className="z-30 mt-4 pointer-events-auto">
                 <button
                   onClick={toggleDemo}
-                  className="flex items-center gap-2 bg-[#0c0d12]/60 hover:bg-[#181920]/80 border border-cyan-500/30 hover:border-cyan-400/60 text-cyan-400 font-extrabold px-6 py-2.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 hover:scale-105 cursor-pointer outline-none select-none border-none"
+                  className="flex items-center gap-2 bg-[#0c0d12]/60 hover:bg-[#181920]/80 border border-cyan-500/30 hover:border-cyan-400/60 text-cyan-400 font-extrabold px-6 py-2.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 hover:scale-105 cursor-pointer outline-none select-none"
                 >
                   {isDemoPlaying ? (
                     <>
@@ -1020,32 +1053,32 @@ export default function HowItWorks() {
             >
               <div className="animate-marquee flex items-center gap-8 shrink-0 whitespace-nowrap">
                 <span className="text-gray-400 font-bold text-base">YouTube</span>
-                <span className="text-gray-400 font-black text-base text-[#00d4ff]">DISNEY+</span>
-                <span className="text-gray-400 font-bold text-base text-[#1CE783] italic">hulu</span>
-                <span className="text-gray-400 font-black text-base text-[#3AA5C2]">MAX</span>
-                <span className="text-gray-400 font-bold text-base text-[#0064FF]">Paramount+</span>
-                <span className="text-gray-400 font-bold text-base text-[#00A8E1]">Peacock</span>
-                <span className="text-gray-400 font-black text-base text-[#E5A93B]">PLEX</span>
-                <span className="text-gray-400 font-extrabold text-base text-[#F15A24]">Fandango</span>
-                <span className="text-gray-400 font-bold text-base text-[#E50914]">Netflix</span>
-                <span className="text-gray-400 font-bold text-base text-[#00A8E1]">Prime Video</span>
-                <span className="text-gray-400 font-extrabold text-base text-[#1DB954]">Spotify</span>
-                <span className="text-gray-400 font-extrabold text-base text-[#1877F2]">Facebook</span>
-                <span className="text-gray-400 font-black text-base text-white">X</span>
+                <span className="text-gray-400 font-black text-base tracking-tighter">DISNEY+</span>
+                <span className="text-gray-400 font-bold text-base italic">hulu</span>
+                <span className="text-gray-400 font-black text-base tracking-tighter">MAX</span>
+                <span className="text-gray-400 font-bold text-base">Paramount+</span>
+                <span className="text-gray-400 font-bold text-base">Peacock</span>
+                <span className="text-gray-400 font-black text-base">PLEX</span>
+                <span className="text-gray-400 font-extrabold text-base tracking-wide">Fandango</span>
+                <span className="text-gray-400 font-bold text-base">Netflix</span>
+                <span className="text-gray-400 font-bold text-base">Prime Video</span>
+                <span className="text-gray-400 font-extrabold text-base">Spotify</span>
+                <span className="text-gray-400 font-extrabold text-base">Facebook</span>
+                <span className="text-gray-400 font-black text-base">X</span>
                 {/* Loop */}
                 <span className="text-gray-400 font-bold text-base">YouTube</span>
-                <span className="text-gray-400 font-black text-base text-[#00d4ff]">DISNEY+</span>
-                <span className="text-gray-400 font-bold text-base text-[#1CE783] italic">hulu</span>
-                <span className="text-gray-400 font-black text-base text-[#3AA5C2]">MAX</span>
-                <span className="text-gray-400 font-bold text-base text-[#0064FF]">Paramount+</span>
-                <span className="text-gray-400 font-bold text-base text-[#00A8E1]">Peacock</span>
-                <span className="text-gray-400 font-black text-base text-[#E5A93B]">PLEX</span>
-                <span className="text-gray-400 font-extrabold text-base text-[#F15A24]">Fandango</span>
-                <span className="text-gray-400 font-bold text-base text-[#E50914]">Netflix</span>
-                <span className="text-gray-400 font-bold text-base text-[#00A8E1]">Prime Video</span>
-                <span className="text-gray-400 font-extrabold text-base text-[#1DB954]">Spotify</span>
-                <span className="text-gray-400 font-extrabold text-base text-[#1877F2]">Facebook</span>
-                <span className="text-gray-400 font-black text-base text-white">X</span>
+                <span className="text-gray-400 font-black text-base tracking-tighter">DISNEY+</span>
+                <span className="text-gray-400 font-bold text-base italic">hulu</span>
+                <span className="text-gray-400 font-black text-base tracking-tighter">MAX</span>
+                <span className="text-gray-400 font-bold text-base">Paramount+</span>
+                <span className="text-gray-400 font-bold text-base">Peacock</span>
+                <span className="text-gray-400 font-black text-base">PLEX</span>
+                <span className="text-gray-400 font-extrabold text-base tracking-wide">Fandango</span>
+                <span className="text-gray-400 font-bold text-base">Netflix</span>
+                <span className="text-gray-400 font-bold text-base">Prime Video</span>
+                <span className="text-gray-400 font-extrabold text-base">Spotify</span>
+                <span className="text-gray-400 font-extrabold text-base">Facebook</span>
+                <span className="text-gray-400 font-black text-base">X</span>
               </div>
             </div>
             <div className="text-[11px] text-gray-400 mt-4 animate-bounce select-none pointer-events-none">
@@ -1140,6 +1173,8 @@ export default function HowItWorks() {
               <video
                 ref={mobileVideoRef}
                 src="/cowboys.mp4"
+                width={1280}
+                height={720}
                 playsInline
                 preload="auto"
                 muted={!mobileUserUnmuted || (mobileStep === 3 && ((mobileVideoTime >= 1.0 && mobileVideoTime <= 2.0) || (mobileVideoTime >= 3.3 && mobileVideoTime <= 4.3) || (mobileVideoTime >= 4.8 && mobileVideoTime <= 5.6)))}
@@ -1386,7 +1421,7 @@ export default function HowItWorks() {
                 Unmatched platform access
               </h3>
               <p className="text-sm text-gray-400 leading-relaxed">
-                Because we operate via client-side scripts, we can filter services other platforms are legally blocked from—including Disney+, Hulu, and your personal Plex server files.
+                Because we operate via client-side scripts, we can filter services other platforms are legally blocked from—including Netflix, Disney+, Hulu, Prime Video, Max, Peacock, Paramount+, Fandango at Home, and your personal Plex server.
               </p>
             </div>
 
@@ -1400,10 +1435,10 @@ export default function HowItWorks() {
               What devices are compatible?
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto mb-12 text-sm sm:text-base leading-relaxed">
-              Filter your content wherever you watch. BooTube is available as a Chrome extension for desktop browsers, and an Android app for mobile streaming.
+              Filter your content wherever you watch. BooTube is available for Chrome and Firefox browsers, Firefox for Android, and as a native Android app.
             </p>
             
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-6">
+            <div className="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-5">
               <a 
                 href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa" 
                 target="_blank"
@@ -1414,7 +1449,16 @@ export default function HowItWorks() {
                 <span>Chrome extension</span>
               </a>
               <a 
-                href="https://play.google.com/apps/testing/com.bootube.app" 
+                href="https://addons.mozilla.org/firefox/addon/addon@bootube.app/" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-extrabold rounded-full transition-all hover:scale-105 shadow-[0_0_15px_rgba(255,255,255,0.05)] pointer-events-auto"
+              >
+                <span>🦊</span>
+                <span>Firefox add-on</span>
+              </a>
+              <a 
+                href="https://play.google.com/store/apps/details?id=com.bootube.app" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto flex items-center justify-center gap-3 px-8 py-4 bg-cyan-950/20 hover:bg-cyan-950/40 border border-cyan-500/30 hover:border-cyan-400/60 text-cyan-400 font-extrabold rounded-full transition-all hover:scale-105 shadow-[0_0_15px_rgba(6,182,212,0.1)] pointer-events-auto"
@@ -1457,13 +1501,13 @@ export default function HowItWorks() {
                     <span className="text-cyan-400">✓</span> 100% free blasphemy filtering
                   </li>
                   <li className="flex items-center gap-3 text-sm text-gray-200">
-                    <span className="text-cyan-400">✓</span> Mutes YouTube & Podcasts
+                    <span className="text-cyan-400">✓</span> Works across all 13 streaming platforms
                   </li>
                   <li className="flex items-center gap-3 text-sm text-gray-200">
-                    <span className="text-cyan-400">✓</span> Mutes Disney+, Hulu, Plex & Vudu
+                    <span className="text-cyan-400">✓</span> Hide captions, video blur &amp; buffer controls
                   </li>
                   <li className="flex items-center gap-3 text-sm text-gray-200">
-                    <span className="text-cyan-400">✓</span> Offline real-time processing
+                    <span className="text-cyan-400">✓</span> 100% local real-time processing
                   </li>
                 </ul>
 
@@ -1498,16 +1542,16 @@ export default function HowItWorks() {
                     <span className="text-cyan-400">✓</span> <strong>Everything in Free</strong>
                   </li>
                   <li className="flex items-center gap-3 text-sm text-gray-300">
-                    <span className="text-cyan-400">✓</span> Full profanity & vulgarity filtering
+                    <span className="text-cyan-400">✓</span> All 6 profanity &amp; vulgarity categories
                   </li>
                   <li className="flex items-center gap-3 text-sm text-gray-300">
-                    <span className="text-cyan-400">✓</span> Custom word & phrase blocklists
+                    <span className="text-cyan-400">✓</span> Custom word &amp; phrase blocklists
                   </li>
                   <li className="flex items-center gap-3 text-sm text-gray-300">
-                    <span className="text-cyan-400">✓</span> Smart screen blurring during alerts
+                    <span className="text-cyan-400">✓</span> Bleeps &amp; censored symbol muting
                   </li>
                   <li className="flex items-center gap-3 text-sm text-gray-300">
-                    <span className="text-cyan-400">✓</span> Video buffer timer controls
+                    <span className="text-cyan-400">✓</span> Respectful context &amp; channel whitelisting
                   </li>
                   <li className="flex items-center gap-3 text-sm text-gray-300">
                     <span className="text-cyan-400">✓</span> <strong>Unified account cloud sync</strong>
@@ -1566,6 +1610,8 @@ export default function HowItWorks() {
               <Link href="/terms" className="hover:text-gray-300">Terms of Use</Link>
               <Link href="/support" className="hover:text-gray-300">Support Desk</Link>
               <a href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300">Chrome Store</a>
+              <a href="https://addons.mozilla.org/firefox/addon/addon@bootube.app/" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300">Firefox Add-ons</a>
+              <a href="https://play.google.com/store/apps/details?id=com.bootube.app" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300">Google Play</a>
             </div>
           </div>
 
@@ -1574,7 +1620,7 @@ export default function HowItWorks() {
               &copy; 2026 BooTube. Built for a cleaner internet.
             </p>
             <p className="max-w-4xl mx-auto italic">
-              Disclaimer: BooTube is an independent browser extension and mobile application. It is not affiliated with, sponsored by, or endorsed by Google LLC (YouTube), Disney Enterprises, Inc. (Disney+), Hulu LLC, Plex, Inc., Fandango Media, LLC, Netflix, Inc., Amazon.com, Inc., or any other third-party streaming service mentioned. All trademarks and registered trademarks are the property of their respective owners.
+              Disclaimer: BooTube is an independent browser extension and mobile application. It is not affiliated with, sponsored by, or endorsed by Google LLC (YouTube), Netflix, Inc., Disney Enterprises, Inc. (Disney+), Hulu LLC, Warner Bros. Discovery (Max / HBO Max), Amazon.com, Inc. (Prime Video), Paramount Global (Paramount+), NBCUniversal (Peacock), Plex, Inc., Fandango Media, LLC (Fandango at Home), Spotify AB, Meta Platforms, Inc. (Facebook), X Corp., or any other third-party streaming service mentioned. All trademarks and registered trademarks are the property of their respective owners.
             </p>
           </div>
         </footer>

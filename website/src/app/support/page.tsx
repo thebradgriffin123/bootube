@@ -2,11 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mock.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'mock_key';
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+import { supabase } from '@/lib/supabase';
 
 interface FaqItem {
   q: string;
@@ -25,24 +21,24 @@ export default function SupportPage() {
 
   const faqs: FaqItem[] = [
     {
-      q: "Why isn't muting/censoring working on Plex, Disney+, or Hulu?",
-      a: "Our filter engine relies on reading subtitle data to determine timing. Subtitles must be turned on in the streaming media player interface (e.g. English [CC]) for censoring to function correctly."
+      q: "Why isn't muting/censoring working on Netflix, Disney+, Hulu, or Plex?",
+      a: "Our filter engine relies on reading subtitle tracks to determine exact word timing. Closed Captions / Subtitles (e.g. English [CC]) must be enabled in the video player for censoring to function."
     },
     {
       q: "Can I adjust the length of the audio mute?",
-      a: "Yes! Clicking on the BooTube toolbar icon opens your settings menu. Under 'Advanced settings', you can use the Mute buffer slider to adjust the safety cushioning (from tight 0.3s up to a wide 1.0s cushion)."
+      a: "Yes! Clicking on the BooTube toolbar icon opens your settings menu. Under 'Advanced settings', you can use the Mute buffer slider to adjust the safety cushioning (from a tight 0.3s up to a wide 1.0s cushion) on both Free and Premium plans."
     },
     {
-      q: "Is my search history or data collected?",
-      a: "No. BooTube is built with a privacy-first mindset. All subtitle interception, parsing, and muting calculation runs 100% locally on your browser. Your data is never sent to external servers."
+      q: "Is my viewing history or personal data collected?",
+      a: "No. BooTube is built with a privacy-first mindset. All subtitle interception, parsing, and muting calculation runs 100% locally on your device. Your viewing history is never transmitted to external servers."
     },
     {
-      q: "How do I copy a specific swear word into my list?",
-      a: "For the best results, copy the word exactly as it appears in the video's Closed Captions, including any special punctuation (like trailing periods or dashes) that might be attached to the word."
+      q: "How do I add a custom word or phrase to my blocklist?",
+      a: "With a Premium plan, open the BooTube console, expand 'Custom Blocked Words', and type any word or phrase you want muted. It will automatically sync across your signed-in devices."
     },
     {
-      q: "Can I whitelist specific channels?",
-      a: "Yes! If Respectful Mode's auto-detect fails to whitelist a term on a podcast, click the BooTube icon in your toolbar while watching the video and toggle the 'Trust Channel' switch to whitelist it."
+      q: "Can I whitelist specific channels or faith-based content?",
+      a: "Yes! Turn on 'Respectful Mode' in the BooTube console to allow reverent religious context while still muting profanity, or toggle 'Trust Channel' to whitelist a specific creator."
     }
   ];
 
@@ -51,21 +47,10 @@ export default function SupportPage() {
     const checkUser = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        if (session && session.user) {
-          setEmail(session.user.email || '');
-          
-          // Query profile to fetch display name
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('email')
-            .eq('id', session.user.id)
-            .single();
-
-          if (session.user.email) {
-            // Get name from email prefix as a fallback
-            const prefix = session.user.email.split('@')[0];
-            setName(prefix.charAt(0).toUpperCase() + prefix.slice(1));
-          }
+        if (session && session.user && session.user.email) {
+          setEmail(session.user.email);
+          const prefix = session.user.email.split('@')[0];
+          setName(prefix.charAt(0).toUpperCase() + prefix.slice(1));
         }
       } catch (e) {
         console.error('Failed to pre-fill user info:', e);
@@ -74,26 +59,45 @@ export default function SupportPage() {
     checkUser();
   }, []);
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    // Generate random Ticket ID
     const randomId = "BT-" + Math.floor(10000 + Math.random() * 90000);
     setTicketId(randomId);
 
-    // Construct mailto link
-    const subject = encodeURIComponent(`BooTube Support Request [${randomId}] - ${platform.toUpperCase()}`);
-    const body = encodeURIComponent(
-      `Ticket ID: #${randomId}\n` +
-      `Name: ${name}\n` +
-      `Email: ${email}\n` +
-      `Platform: ${platform.toUpperCase()}\n\n` +
-      `Description of the Issue:\n${description}`
-    );
+    let sentViaEmail = false;
+    try {
+      const res = await fetch('/api/support', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ticketId: randomId,
+          name,
+          email,
+          platform,
+          description,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        sentViaEmail = !!data.sentViaEmail;
+      }
+    } catch (err) {
+      console.warn('Fallback to mailto:', err);
+    }
 
-    // Open mail client
-    window.location.href = `mailto:support@mythic-makers.com?subject=${subject}&body=${body}`;
+    if (!sentViaEmail) {
+      const subject = encodeURIComponent(`BooTube Support Request [${randomId}] - ${platform.toUpperCase()}`);
+      const body = encodeURIComponent(
+        `Ticket ID: #${randomId}\n` +
+        `Name: ${name}\n` +
+        `Email: ${email}\n` +
+        `Platform: ${platform.toUpperCase()}\n\n` +
+        `Description of the Issue:\n${description}`
+      );
+      window.location.href = `mailto:support@mythic-makers.com?subject=${subject}&body=${body}`;
+    }
 
     setModalOpen(true);
     setLoading(false);
@@ -101,7 +105,7 @@ export default function SupportPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-b from-[#08080a] via-[#050505] to-[#030304] text-gray-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black relative overflow-hidden">
+    <div className="relative min-h-screen bg-gradient-to-b from-[#08080a] via-[#050505] to-[#030304] text-gray-100 flex flex-col font-sans selection:bg-cyan-500 selection:text-black overflow-hidden">
       
       {/* Subtle Background Glows */}
       <div className="absolute top-[-100px] right-[-100px] w-[500px] h-[500px] rounded-full bg-cyan-950/15 blur-[120px] pointer-events-none" />
@@ -127,13 +131,13 @@ export default function SupportPage() {
       <main className="max-w-5xl mx-auto w-full px-6 pt-32 pb-24 flex-grow relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
         
         {/* Left Side: Support Ticket Form */}
-        <section className="bg-white/[0.02] border border-white/5 rounded-2xl p-6 md:p-8 shadow-xl space-y-6">
+        <section className="bg-white/[0.02] border border-white/10 rounded-2xl p-6 md:p-8 shadow-xl space-y-6">
           <div>
             <h1 className="text-2xl font-black text-white">Support Ticket</h1>
             <p className="text-xs text-gray-400 mt-1">Have a question or running into an issue? Drop us a line below.</p>
           </div>
 
-          <form onSubmit={handleFormSubmit} className="space-y-4">
+          <form onSubmit={handleFormSubmit} method="POST" action="/api/support" className="space-y-4">
             <div>
               <label htmlFor="supportName" className="block text-[10px] uppercase font-bold tracking-wider text-gray-400 mb-1.5">
                 Your Name
@@ -141,6 +145,8 @@ export default function SupportPage() {
               <input
                 type="text"
                 id="supportName"
+                name="name"
+                autoComplete="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="John Doe"
@@ -156,6 +162,12 @@ export default function SupportPage() {
               <input
                 type="email"
                 id="supportEmail"
+                name="email"
+                inputMode="email"
+                autoComplete="email"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="john@example.com"
@@ -171,6 +183,7 @@ export default function SupportPage() {
               <div className="relative">
                 <select
                   id="supportPlatform"
+                  name="platform"
                   value={platform}
                   onChange={(e) => setPlatform(e.target.value)}
                   required
@@ -178,10 +191,19 @@ export default function SupportPage() {
                 >
                   <option value="" disabled>Select active platform</option>
                   <option value="youtube">YouTube</option>
+                  <option value="netflix">Netflix</option>
                   <option value="disney">Disney+</option>
                   <option value="hulu">Hulu</option>
+                  <option value="max">Max (HBO Max)</option>
+                  <option value="primevideo">Amazon Prime Video</option>
+                  <option value="paramount">Paramount+</option>
+                  <option value="peacock">Peacock</option>
                   <option value="plex">Plex</option>
-                  <option value="other">Other / Setup Issue</option>
+                  <option value="fandango">Fandango at Home</option>
+                  <option value="spotify">Spotify</option>
+                  <option value="facebook">Facebook</option>
+                  <option value="x">X (Twitter)</option>
+                  <option value="other">Other / Account &amp; Billing</option>
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                   <svg className="h-3 w-3 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -197,6 +219,7 @@ export default function SupportPage() {
               </label>
               <textarea
                 id="supportDesc"
+                name="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Let us know what's happening. If a specific word didn't mute, let us know the platform and show/video name."
@@ -211,13 +234,13 @@ export default function SupportPage() {
               disabled={loading}
               className="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white font-extrabold text-xs rounded-xl shadow-lg transition-all disabled:opacity-50 cursor-pointer"
             >
-              {loading ? 'Compiling Ticket...' : 'Submit Ticket'}
+              {loading ? 'Submitting Ticket...' : 'Submit Ticket'}
             </button>
           </form>
         </section>
 
         {/* Right Side: Troubleshooting FAQs */}
-        <section className="bg-white/[0.02] border border-white/5 rounded-2xl p-6 md:p-8 shadow-xl space-y-6">
+        <section className="bg-white/[0.02] border border-white/10 rounded-2xl p-6 md:p-8 shadow-xl space-y-6">
           <h2 className="text-xl font-black text-white">Troubleshooting FAQ</h2>
           <div className="space-y-4">
             {faqs.map((faq, index) => {
@@ -225,8 +248,9 @@ export default function SupportPage() {
               return (
                 <div key={index} className="border border-white/5 rounded-xl bg-white/[0.01] overflow-hidden transition-all">
                   <button
+                    type="button"
                     onClick={() => setActiveFaq(isOpen ? null : index)}
-                    className="w-full text-left px-5 py-4 flex items-center justify-between text-xs font-bold text-white hover:bg-white/[0.02]"
+                    className="w-full text-left px-5 py-4 flex items-center justify-between text-xs font-bold text-white hover:bg-white/[0.02] cursor-pointer"
                   >
                     <span>{faq.q}</span>
                     <span className="text-gray-500 font-normal">{isOpen ? '−' : '+'}</span>
@@ -255,16 +279,18 @@ export default function SupportPage() {
             <Link href="/privacy" className="hover:text-gray-300">Privacy Policy</Link>
             <Link href="/terms" className="hover:text-gray-300">Terms of Use</Link>
             <Link href="/support" className="hover:text-gray-300">Support Desk</Link>
-            <a href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa" target="_blank" className="hover:text-gray-300">Chrome Store</a>
+            <a href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300">Chrome Store</a>
+            <a href="https://addons.mozilla.org/firefox/addon/addon@bootube.app/" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300">Firefox Add-ons</a>
+            <a href="https://play.google.com/store/apps/details?id=com.bootube.app" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300">Google Play</a>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto mt-8 pt-8 border-t border-white/5 text-center text-[10px] text-gray-600 leading-relaxed">
+        <div className="max-w-7xl mx-auto mt-8 pt-8 border-t border-white/5 text-center text-[10px] text-gray-500 leading-relaxed">
           <p className="mb-4">
             &copy; 2026 BooTube. Built for a cleaner internet.
           </p>
           <p className="max-w-4xl mx-auto italic">
-            Disclaimer: BooTube is an independent browser extension and mobile application. It is not affiliated with, sponsored by, or endorsed by Google LLC (YouTube), Disney Enterprises, Inc. (Disney+), Hulu LLC, Plex, Inc., Fandango Media, LLC, Netflix, Inc., Amazon.com, Inc., or any other third-party streaming service mentioned. All trademarks and registered trademarks are the property of their respective owners.
+            Disclaimer: BooTube is an independent browser extension and mobile application. It is not affiliated with, sponsored by, or endorsed by Google LLC (YouTube), Netflix, Inc., Disney Enterprises, Inc. (Disney+), Hulu LLC, Warner Bros. Discovery (Max / HBO Max), Amazon.com, Inc. (Prime Video), Paramount Global (Paramount+), NBCUniversal (Peacock), Plex, Inc., Fandango Media, LLC (Fandango at Home), Spotify AB, Meta Platforms, Inc. (Facebook), X Corp., or any other third-party streaming service mentioned. All trademarks and registered trademarks are the property of their respective owners.
           </p>
         </div>
       </footer>
@@ -282,6 +308,7 @@ export default function SupportPage() {
               #{ticketId}
             </div>
             <button
+              type="button"
               onClick={() => setModalOpen(false)}
               className="w-full py-2 bg-white/[0.05] border border-white/10 hover:bg-white/[0.1] text-white font-bold text-xs rounded-lg transition-colors cursor-pointer"
             >

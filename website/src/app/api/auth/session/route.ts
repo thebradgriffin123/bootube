@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import Stripe from 'stripe';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_mock', {
+  apiVersion: '2023-10-16' as any,
+});
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://mock.supabase.co';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'mock_key';
@@ -33,7 +38,7 @@ export async function GET(req: Request) {
   // Retrieve user settings from profiles
   let { data: profile, error: dbError } = await supabaseClient
     .from('profiles')
-    .select('subscription_status, custom_filter_words, blur_screen_enabled, buffer_timer_seconds')
+    .select('subscription_status, custom_filter_words, blur_screen_enabled, buffer_timer_seconds, stripe_customer_id')
     .eq('id', user.id)
     .single();
 
@@ -60,12 +65,55 @@ export async function GET(req: Request) {
       subscription_status: newProfile.subscription_status,
       custom_filter_words: newProfile.custom_filter_words,
       blur_screen_enabled: newProfile.blur_screen_enabled,
-      buffer_timer_seconds: newProfile.buffer_timer_seconds
+      buffer_timer_seconds: newProfile.buffer_timer_seconds,
+      stripe_customer_id: newProfile.stripe_customer_id
     } as any;
     dbError = null;
   } else if (dbError) {
     console.error('❌ Error fetching profile:', dbError.message);
     return new NextResponse('Internal Server Error', { status: 500 });
+  }
+
+  // SELF-HEALING: If database profile says user is not active, check Stripe directly by email
+  const currentStatus = String(profile?.subscription_status || '').toLowerCase();
+  const isCurrentlyPremium = ['active', 'premium', 'pro', 'trialing', 'trialling'].includes(currentStatus);
+  
+  if (!isCurrentlyPremium && user.email && process.env.STRIPE_SECRET_KEY) {
+    try {
+      const stripeCustomers = await stripe.customers.list({
+        email: user.email,
+        limit: 1,
+      });
+
+      if (stripeCustomers.data.length > 0) {
+        const stripeCustomer = stripeCustomers.data[0];
+        const activeSubscriptions = await stripe.subscriptions.list({
+          customer: stripeCustomer.id,
+          status: 'active',
+          limit: 1,
+        });
+
+        if (activeSubscriptions.data.length > 0) {
+          const { error: updateError } = await supabaseAdmin
+            .from('profiles')
+            .upsert({
+              id: user.id,
+              subscription_status: 'active',
+              stripe_customer_id: stripeCustomer.id,
+              updated_at: new Date().toISOString(),
+            });
+
+          if (!updateError) {
+            console.log(`✅ [Session API] Self-healed subscription status to 'active' for user ${user.email}`);
+            if (profile) profile.subscription_status = 'active';
+          } else {
+            console.error('❌ [Session API] Failed to self-heal subscription database update:', updateError.message);
+          }
+        }
+      }
+    } catch (stripeErr: any) {
+      console.warn('⚠️ [Session API] Stripe lookup failed during self-healing:', stripeErr && stripeErr.message ? stripeErr.message : stripeErr);
+    }
   }
 
   return NextResponse.json({
