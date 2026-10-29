@@ -64,6 +64,8 @@ export async function POST(req: Request) {
       .eq('id', refundRequest.user_id)
       .single();
 
+    const fromEmail = process.env.RESEND_FROM_EMAIL || 'BooTube <support@bootube.app>';
+
     if (decision === 'approved') {
       let stripeRefundSuccess = false;
 
@@ -105,7 +107,7 @@ export async function POST(req: Request) {
       // Send approved confirmation email
       try {
         await resend.emails.send({
-          from: 'BooTube <onboarding@resend.dev>',
+          from: fromEmail,
           to: refundRequest.email,
           subject: 'Refund Approved: BooTube Premium',
           html: `
@@ -142,7 +144,7 @@ export async function POST(req: Request) {
       // Send rejection confirmation email
       try {
         await resend.emails.send({
-          from: 'BooTube <onboarding@resend.dev>',
+          from: fromEmail,
           to: refundRequest.email,
           subject: 'Refund Request Update: BooTube Premium',
           html: `

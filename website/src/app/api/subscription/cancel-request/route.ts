@@ -95,9 +95,10 @@ export async function POST(req: Request) {
       }
 
       // Fire cancellation email
+      const fromEmail = process.env.RESEND_FROM_EMAIL || 'BooTube <support@bootube.app>';
       try {
         await resend.emails.send({
-          from: 'BooTube <onboarding@resend.dev>',
+          from: fromEmail,
           to: user.email || '',
           subject: 'BooTube Membership Cancellation Confirmation',
           html: `
@@ -141,7 +142,7 @@ export async function POST(req: Request) {
         const geminiApiKey = process.env.GEMINI_API_KEY;
         if (geminiApiKey) {
           const genAI = new GoogleGenerativeAI(geminiApiKey);
-          const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+          const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
           const wordCount = Array.isArray(profile.custom_filter_words) 
             ? profile.custom_filter_words.length 
@@ -236,9 +237,10 @@ Respond ONLY with a valid JSON object matching the following structure:
             .eq('id', requestRecord.id);
 
           // Fire Refund Approved email
+          const fromEmail = process.env.RESEND_FROM_EMAIL || 'BooTube <support@bootube.app>';
           try {
             await resend.emails.send({
-              from: 'BooTube <onboarding@resend.dev>',
+              from: fromEmail,
               to: user.email || '',
               subject: 'Refund Approved: BooTube Premium',
               html: `
@@ -262,9 +264,10 @@ Respond ONLY with a valid JSON object matching the following structure:
       }
 
       // Normal Review Path: Queue claim & fire "Under Review" email
+      const fromEmailReview = process.env.RESEND_FROM_EMAIL || 'BooTube <support@bootube.app>';
       try {
         await resend.emails.send({
-          from: 'BooTube <onboarding@resend.dev>',
+          from: fromEmailReview,
           to: user.email || '',
           subject: 'Refund Request Received: BooTube Premium',
           html: `

@@ -42,10 +42,17 @@ export async function POST(req: Request) {
       return new NextResponse('Internal Server Error: Price ID configuration missing.', { status: 500 });
     }
 
+    // Check if user already has a stripe_customer_id in profiles
+    const { data: profile } = await supabaseClient
+      .from('profiles')
+      .select('stripe_customer_id')
+      .eq('id', user.id)
+      .single();
+
     // Create a Stripe Checkout Session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      billing_address_collection: 'required',
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
+      billing_address_collection: 'auto',
+      allow_promotion_codes: true,
       line_items: [
         {
           price: priceId,
@@ -61,7 +68,15 @@ export async function POST(req: Request) {
       client_reference_id: user.id,
       success_url: `${origin}/account?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/account`,
-    });
+    };
+
+    if (profile?.stripe_customer_id) {
+      sessionParams.customer = profile.stripe_customer_id;
+    } else if (user.email) {
+      sessionParams.customer_email = user.email;
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     return NextResponse.json({ url: session.url });
   } catch (err: any) {
