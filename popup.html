@@ -3,10 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>BooTube Settings</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
@@ -250,6 +246,9 @@
           <ul>
             <li><strong>Best Effort:</strong> Bootube is highly effective but cannot guarantee 100% accuracy. Some profanity may occasionally slip through.</li>
             <li><strong>Caption Dependent:</strong> Filtering relies entirely on Closed Captions (CC). If a video lacks captions (e.g. music videos, Shorts), the filter cannot operate.</li>
+            <li><strong>Hide Captions Toggle:</strong> Toggling "Hide captions on screen" works best when selecting your preference and refreshing the video page. Because streaming platforms bind subtitle tracks at playback initialization, a quick refresh ensures captions and background boxes are cleanly hidden or restored.</li>
+            <li><strong>Bleeps & Symbols:</strong> Many platforms and broadcasters pre-censor closed captions using asterisks, underscores, or brackets (e.g., <code>****</code>, <code>***</code>, <code>[ __ ]</code>, <code>f***</code>). The "Bleeps & Symbols" category detects these auto-filtered masks so the spoken profanity is still muted. If you prefer not to mute bleeped words or symbols, you can toggle this category off.</li>
+            <li><strong>Paramount+:</strong> Closed Captions must be enabled in Paramount's video player for audio muting to work. Hiding CC on Paramount+ is currently not supported.</li>
             <li><strong>Caption Quirks:</strong> We are at the mercy of the caption provider. Odd spellings, weird formatting, or overlapping dialogue can cause missed words.</li>
             <li><strong>Visual Content:</strong> Bootube only filters audio and subtitles. It does not censor inappropriate visual scenes or text burned into the video itself.</li>
             <li><strong>Live Streams:</strong> Auto-generated captions on live broadcasts are often delayed or inaccurate, reducing reliability.</li>

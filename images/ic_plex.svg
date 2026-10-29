@@ -1,0 +1,6 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(-20, -295)">
+        <rect x="20" y="295" width="40" height="40" rx="10" fill="white" fill-opacity="0.1"></rect>
+        <path d="M 30 301 L 40 301 L 50 315 L 40 329 L 30 329 L 40 315 Z" fill="#E5A93B"></path>
+    </g>
+</svg>

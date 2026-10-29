@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <!-- Mountain path -->
+  <path d="M50 20 L80 75 L65 75 L50 48 L42 62 L35 52 L20 75 Z" fill="#0064ff"/>
+  <path d="M50 20 L58 40 L50 48 L42 62 L35 52 Z" fill="#ffffff" opacity="0.3"/>
+  <!-- Circle of stars -->
+  <g fill="#0064ff">
+    <circle cx="50" cy="10" r="2.5"/>
+    <circle cx="68" cy="15" r="2.5"/>
+    <circle cx="82" cy="29" r="2.5"/>
+    <circle cx="88" cy="47" r="2.5"/>
+    <circle cx="85" cy="66" r="2.5"/>
+    <circle cx="32" cy="15" r="2.5"/>
+    <circle cx="18" cy="29" r="2.5"/>
+    <circle cx="12" cy="47" r="2.5"/>
+    <circle cx="15" cy="66" r="2.5"/>
+  </g>
+</svg>

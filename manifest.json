@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "BooTube LOCAL TEST - BOOTUBE-EXTENSION",
-  "version": "1.31",
-  "description": "Censor profanity on YouTube.",
+  "name": "BooTube — Streaming Profanity Filter",
+  "version": "1.46",
+  "description": "Real-time profanity and blasphemy mute filter for YouTube, Disney+, Hulu, HBO Max, Paramount+, Peacock, Netflix, Prime Video, Plex & Spotify.",
   "permissions": [
     "storage",
     "activeTab",
@@ -42,7 +42,9 @@
     "*://*.cbs.com/*",
     "*://*.cbsaavideo.com/*",
     "*://*.cbsinteractive.com/*",
-    "*://*.theplatform.com/*"
+    "*://*.theplatform.com/*",
+    "*://*.peacocktv.com/*",
+    "*://*.peacock.com/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -80,7 +82,9 @@
         "*://*.cbs.com/*",
         "*://*.cbsaavideo.com/*",
         "*://*.cbsinteractive.com/*",
-        "*://*.theplatform.com/*"
+        "*://*.theplatform.com/*",
+        "*://*.peacocktv.com/*",
+        "*://*.peacock.com/*"
       ],
       "js": [
         "content.js"
@@ -118,7 +122,9 @@
         "*://*.cbs.com/*",
         "*://*.cbsaavideo.com/*",
         "*://*.cbsinteractive.com/*",
-        "*://*.theplatform.com/*"
+        "*://*.theplatform.com/*",
+        "*://*.peacocktv.com/*",
+        "*://*.peacock.com/*"
       ],
       "js": [
         "inject.js"
@@ -131,38 +137,12 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "inject.js"
+        "inject.js",
+        "images/*",
+        "images/ic_boo_premium.png"
       ],
       "matches": [
-        "*://*.youtube.com/*",
-        "*://*.disneyplus.com/*",
-        "*://*.hulu.com/*",
-        "*://*.plex.tv/*",
-        "*://app.plex.tv/*",
-        "*://*.plex.direct/*",
-        "*://*.fandango.com/*",
-        "*://*.vudu.com/*",
-        "*://*.netflix.com/*",
-        "*://*.amazon.com/*",
-        "*://*.primevideo.com/*",
-        "*://*.amazon.co.uk/*",
-        "*://*.amazon.ca/*",
-        "*://localhost/*",
-        "*://127.0.0.1/*",
-        "*://*.twitter.com/*",
-        "*://*.x.com/*",
-        "*://*.spotify.com/*",
-        "*://*.facebook.com/*",
-        "*://*.fb.watch/*",
-        "*://*.fbcdn.net/*",
-        "*://*.messenger.com/*",
-        "*://*.max.com/*",
-        "*://*.hbomax.com/*",
-        "*://*.paramountplus.com/*",
-        "*://*.cbs.com/*",
-        "*://*.cbsaavideo.com/*",
-        "*://*.cbsinteractive.com/*",
-        "*://*.theplatform.com/*"
+        "<all_urls>"
       ]
     }
   ],

@@ -79,16 +79,17 @@ if (typeof chrome === 'undefined' || !chrome.runtime || !chrome.storage) {
 
 const DEFAULT_BLOCKLIST = [
   // Profanity
-  { word: "shit", category: "Profanity" },
-  { word: "fuck", category: "Profanity" },
   { word: "damn", category: "Profanity" },
   { word: "bitch", category: "Profanity" },
   { word: "hell", category: "Profanity" },
-  { word: "asshole", category: "Profanity" },
-  { word: "motherfucker", category: "Profanity" },
   { word: "bastard", category: "Profanity" },
-  { word: "[ __ ]", category: "Profanity" },
-  { word: "[__]", category: "Profanity" },
+  { word: "badass", category: "Profanity" },
+  
+  // Bleeps & Symbols
+  { word: "****", category: "Bleeps & Symbols" },
+  { word: "***", category: "Bleeps & Symbols" },
+  { word: "[ __ ]", category: "Bleeps & Symbols" },
+  { word: "[__]", category: "Bleeps & Symbols" },
   
   // Blasphemy
   { word: "jesus", category: "Blasphemy" },
@@ -100,16 +101,21 @@ const DEFAULT_BLOCKLIST = [
   { word: "oh my god", category: "Blasphemy" },
   { word: "god damn", category: "Blasphemy" },
   { word: "god damn you", category: "Blasphemy" },
+  { word: "goddamn", category: "Blasphemy" },
   
   // Scatological
   { word: "shit", category: "Scatological" },
+  { word: "bullshit", category: "Scatological" },
   { word: "crap", category: "Scatological" },
   { word: "piss", category: "Scatological" },
   { word: "turd", category: "Scatological" },
   { word: "shitty", category: "Scatological" },
+  { word: "shithole", category: "Scatological" },
+  { word: "shitstorm", category: "Scatological" },
   
   // Anatomical
   { word: "ass", category: "Anatomical" },
+  { word: "asshole", category: "Anatomical" },
   { word: "cunt", category: "Anatomical" },
   { word: "dick", category: "Anatomical" },
   { word: "dick head", category: "Anatomical" },
@@ -120,6 +126,9 @@ const DEFAULT_BLOCKLIST = [
   // Sexual
   { word: "fuck", category: "Sexual" },
   { word: "fucker", category: "Sexual" },
+  { word: "fucking", category: "Sexual" },
+  { word: "fucked", category: "Sexual" },
+  { word: "motherfucker", category: "Sexual" },
   { word: "mother fucker", category: "Sexual" },
   { word: "cunnilingus", category: "Sexual" },
   { word: "oral", category: "Sexual" },
@@ -141,14 +150,14 @@ const ctxDelete = document.getElementById("ctxDelete");
 
 let state = {
   bootubeEnabled: true,
-  hideCCEnabled: false,
+  hideCCEnabled: true,
   blurEnabled: true,
   respectfulModeEnabled: true,
   revealWordsEnabled: false,
   muteAggressiveness: 2,
   blocklist: [...DEFAULT_BLOCKLIST],
   disabledWords: [],
-  enabledCategories: ["Profanity", "Blasphemy", "Custom"],
+  enabledCategories: ["Profanity", "Blasphemy", "Sexual", "Scatological", "Anatomical", "Derogatory", "Bleeps & Symbols", "Custom"],
   supabaseSession: null,
   subscriptionStatus: 'free',
   collapsedCategories: [],
@@ -158,6 +167,38 @@ let state = {
 };
 
 let currentView = 'list'; // 'list', 'filter', 'script'
+
+function isPremiumStatus(status) {
+  if (!status) return false;
+  const s = String(status).toLowerCase();
+  return ['active', 'premium', 'pro', 'trialing', 'trialling', 'true'].includes(s);
+}
+
+function getActiveTab(callback) {
+  if (typeof chrome === 'undefined' || !chrome.tabs || !chrome.tabs.query) {
+    if (callback) callback(null);
+    return;
+  }
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs && tabs.length > 0 && tabs[0] && tabs[0].url) {
+      if (callback) callback(tabs[0]);
+    } else {
+      chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs2) => {
+        if (tabs2 && tabs2.length > 0 && tabs2[0] && tabs2[0].url) {
+          if (callback) callback(tabs2[0]);
+        } else {
+          chrome.tabs.query({ active: true }, (tabs3) => {
+            if (tabs3 && tabs3.length > 0 && tabs3[0]) {
+              if (callback) callback(tabs3[0]);
+            } else {
+              if (callback) callback(null);
+            }
+          });
+        }
+      });
+    }
+  });
+}
 let currentPlatformThumbnail = null;
 
 let categoryCounts = {};
@@ -321,9 +362,11 @@ function renderWordList() {
   let activeCount = 0;
   if (isMasterEnabled) {
     state.blocklist.forEach(item => {
-      let word = typeof item === 'string' ? item : item.word;
-      let cat = typeof item === 'string' ? 'Custom' : item.category;
-      if (state.enabledCategories.includes(cat) && !state.disabledWords.includes(word)) {
+      const word = typeof item === 'string' ? item : item.word;
+      const cat = typeof item === 'string' ? 'Custom' : item.category;
+      const lowerWord = (typeof word === 'string' ? word : '').toLowerCase().trim();
+      const isWordDisabled = state.disabledWords.some(dw => (typeof dw === 'string' ? dw : '').toLowerCase().trim() === lowerWord);
+      if (state.enabledCategories.includes(cat) && !isWordDisabled) {
         activeCount++;
       }
     });
@@ -352,7 +395,7 @@ function renderWordList() {
   const collapsedList = state.collapsedCategories || [];
 
   for (const cat of sortedCategories) {
-    const isPremium = state.subscriptionStatus === 'active' || state.subscriptionStatus === 'premium';
+    const isPremium = isPremiumStatus(state.subscriptionStatus);
     const isCategoryLocked = !isPremium && cat !== "Blasphemy";
     
     // Create Header Row Container
@@ -495,7 +538,8 @@ function renderWordList() {
       const item = document.createElement("div");
       item.className = "word-item";
       
-      const isWordDisabled = state.disabledWords.includes(word) || !state.enabledCategories.includes(cat);
+      const lowerWord = (typeof word === 'string' ? word : '').toLowerCase().trim();
+      const isWordDisabled = state.disabledWords.some(dw => (typeof dw === 'string' ? dw : '').toLowerCase().trim() === lowerWord) || !state.enabledCategories.includes(cat);
       if (!isMasterEnabled || isWordDisabled) {
         item.classList.add("strikethrough");
       }
@@ -567,9 +611,11 @@ function renderWordList() {
           };
         } else {
           ctxDisable.classList.remove("ctx-disabled");
-          if (state.disabledWords.includes(word)) {
+          const lowerWord = (typeof word === 'string' ? word : '').toLowerCase().trim();
+          const isWordDisabled = state.disabledWords.some(dw => (typeof dw === 'string' ? dw : '').toLowerCase().trim() === lowerWord);
+          if (isWordDisabled) {
             ctxDisableTitle.textContent = "Enable word";
-            ctxDisableSub.textContent = "Word is being filtered";
+            ctxDisableSub.textContent = "Word is currently disabled";
           } else {
             ctxDisableTitle.textContent = "Disable word";
             ctxDisableSub.textContent = "Word will not be filtered";
@@ -577,8 +623,8 @@ function renderWordList() {
           
           ctxDisable.onclick = (e) => {
             e.stopPropagation();
-            if (state.disabledWords.includes(word)) {
-              state.disabledWords = state.disabledWords.filter(w => w !== word);
+            if (state.disabledWords.some(dw => (typeof dw === 'string' ? dw : '').toLowerCase().trim() === lowerWord)) {
+              state.disabledWords = state.disabledWords.filter(w => (typeof w === 'string' ? w : '').toLowerCase().trim() !== lowerWord);
             } else {
               state.disabledWords.push(word);
             }
@@ -590,10 +636,12 @@ function renderWordList() {
         
         ctxDelete.onclick = (e) => {
           e.stopPropagation();
+          const lowerWord = (typeof word === 'string' ? word : '').toLowerCase().trim();
           state.blocklist = state.blocklist.filter(item => {
             let itemWord = typeof item === 'string' ? item : item.word;
-            return itemWord !== word;
+            return (typeof itemWord === 'string' ? itemWord : '').toLowerCase().trim() !== lowerWord;
           });
+          state.disabledWords = state.disabledWords.filter(w => (typeof w === 'string' ? w : '').toLowerCase().trim() !== lowerWord);
           saveState();
           renderWordList();
           contextMenu.style.display = "none";
@@ -611,29 +659,29 @@ function renderWordList() {
 
 function calculateCategoryCounts(scriptText = "") {
   let isDisneyPlus = false;
-  chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-    if (tabs && tabs[0] && tabs[0].url && (
-      tabs[0].url.includes("paramountplus.com") || 
-      tabs[0].url.includes("max.com") || 
-      tabs[0].url.includes("hbomax.com") || 
-      tabs[0].url.includes("disneyplus.com") || 
-      tabs[0].url.includes("hulu.com") || 
-      tabs[0].url.includes("plex.tv") || 
-      tabs[0].url.includes("plex.direct") || 
-      tabs[0].url.includes(":32400") || 
-      tabs[0].url.includes("fandango.com") || 
-      tabs[0].url.includes("vudu.com") || 
-      tabs[0].url.includes("netflix.com") ||
-      tabs[0].url.includes("primevideo.com") ||
-      tabs[0].url.includes("amazon.com/gp/video") ||
-      tabs[0].url.includes("amazon.com/v/") ||
-      tabs[0].url.includes("amazon.co.uk/gp/video") ||
-      tabs[0].url.includes("amazon.ca/gp/video")
+  getActiveTab((tab) => {
+    if (tab && tab.url && (
+      tab.url.includes("paramountplus.com") || 
+      tab.url.includes("max.com") || 
+      tab.url.includes("hbomax.com") || 
+      tab.url.includes("disneyplus.com") || 
+      tab.url.includes("hulu.com") || 
+      tab.url.includes("plex.tv") || 
+      tab.url.includes("plex.direct") || 
+      tab.url.includes(":32400") || 
+      tab.url.includes("fandango.com") || 
+      tab.url.includes("vudu.com") || 
+      tab.url.includes("netflix.com") ||
+      tab.url.includes("primevideo.com") ||
+      tab.url.includes("amazon.com/gp/video") ||
+      tab.url.includes("amazon.com/v/") ||
+      tab.url.includes("amazon.co.uk/gp/video") ||
+      tab.url.includes("amazon.ca/gp/video")
     )) {
       isDisneyPlus = true;
     }
     
-    const categories = ["Profanity", "Blasphemy", "Scatological", "Anatomical", "Sexual", "Derogatory", "Custom"];
+    const categories = ["Profanity", "Blasphemy", "Scatological", "Anatomical", "Sexual", "Derogatory", "Bleeps & Symbols", "Custom"];
     
     categories.forEach(catName => {
       let count = 0;
@@ -646,14 +694,18 @@ function calculateCategoryCounts(scriptText = "") {
       
       if (scriptText && !isDisneyPlus) {
           wordsInCat.forEach(word => {
+             if (word.includes('*') || word.includes('[')) return;
              const regex = new RegExp(`\\b${escapeRegExp(word)}\\b`, 'gi');
              const matches = scriptText.match(regex);
              if (matches) count += matches.length;
           });
-          if (catName === "Profanity") {
-             const regex = /\[\s*__\s*\]/g;
-             const matches = scriptText.match(regex);
-             if (matches) count += matches.length;
+          if (catName === "Bleeps & Symbols") {
+             const regexBracket = /\[\s*__\s*\]/g;
+             const regexMask = /\*{2,}/g;
+             const matchesBracket = scriptText.match(regexBracket);
+             const matchesMask = scriptText.match(regexMask);
+             if (matchesBracket) count += matchesBracket.length;
+             if (matchesMask) count += matchesMask.length;
           }
       }
       
@@ -744,6 +796,12 @@ const SUPPORTED_PLATFORMS = [
     patterns: ["paramountplus.com", "cbs.com"]
   },
   {
+    name: "Peacock",
+    icon: "images/ic_peacock.svg",
+    url: "https://www.peacocktv.com",
+    patterns: ["peacocktv.com", "peacock.com"]
+  },
+  {
     name: "Plex",
     icon: "images/ic_plex.svg",
     url: "https://app.plex.tv",
@@ -813,9 +871,9 @@ function renderPlatformPills() {
   });
   
   setTimeout(updatePlatformScrollArrows, 50);
-  chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-    if (tabs && tabs[0]) {
-      updateSelectedPlatformPill(tabs[0].url || "");
+  getActiveTab((tab) => {
+    if (tab) {
+      updateSelectedPlatformPill(tab.url || "");
     }
   });
 }
@@ -940,7 +998,7 @@ function updateUI() {
   respectfulModeEnabledToggle.checked = state.respectfulModeEnabled;
   revealAllToggle.checked = state.revealWordsEnabled;
   
-  const isPremium = state.subscriptionStatus === 'active' || state.subscriptionStatus === 'premium';
+  const isPremium = isPremiumStatus(state.subscriptionStatus);
   
   if (!isPremium && state.bootubeEnabled) {
     state.enabledCategories = ["Blasphemy"];
@@ -1054,45 +1112,25 @@ function updateUI() {
     renderAccountPanelDetails();
   }
   
-  // Enforce premium gating for video blurring
+  // Video blurring toggle (fully functional on all tiers)
   const blurRow = blurEnabledToggle ? blurEnabledToggle.closest('.toggle-row') : null;
   if (blurEnabledToggle) {
-    if (!isPremium) {
-      state.blurEnabled = false;
-      blurEnabledToggle.checked = false;
-      blurEnabledToggle.disabled = true;
-      if (blurRow) {
-        blurRow.classList.add("disabled-premium");
-        blurRow.title = "Upgrade to Premium to enable video blurring";
-      }
-    } else {
-      blurEnabledToggle.checked = state.blurEnabled;
-      blurEnabledToggle.disabled = false;
-      if (blurRow) {
-        blurRow.classList.remove("disabled-premium");
-        blurRow.removeAttribute("title");
-      }
+    blurEnabledToggle.checked = state.blurEnabled;
+    blurEnabledToggle.disabled = false;
+    if (blurRow) {
+      blurRow.classList.remove("disabled-premium");
+      blurRow.removeAttribute("title");
     }
   }
 
-  // Enforce premium gating for mute buffer slider
+  // Mute buffer slider (fully functional on all tiers)
   const sliderRow = muteAggressivenessSlider ? muteAggressivenessSlider.closest('.toggle-row') : null;
   if (muteAggressivenessSlider) {
-    if (!isPremium) {
-      state.muteAggressiveness = 2;
-      muteAggressivenessSlider.value = 2;
-      muteAggressivenessSlider.disabled = true;
-      if (sliderRow) {
-        sliderRow.classList.add("disabled-premium");
-        sliderRow.title = "Upgrade to Premium to adjust the mute buffer";
-      }
-    } else {
-      muteAggressivenessSlider.value = state.muteAggressiveness || 2;
-      muteAggressivenessSlider.disabled = false;
-      if (sliderRow) {
-        sliderRow.classList.remove("disabled-premium");
-        sliderRow.removeAttribute("title");
-      }
+    muteAggressivenessSlider.value = state.muteAggressiveness || 2;
+    muteAggressivenessSlider.disabled = false;
+    if (sliderRow) {
+      sliderRow.classList.remove("disabled-premium");
+      sliderRow.removeAttribute("title");
     }
   }
 
@@ -1218,9 +1256,9 @@ bootubeEnabledToggle.addEventListener("change", (e) => {
   if (!state.bootubeEnabled) {
     state.enabledCategories = [];
   } else {
-    const isPremium = state.subscriptionStatus === 'active' || state.subscriptionStatus === 'premium';
+    const isPremium = isPremiumStatus(state.subscriptionStatus);
     if (isPremium) {
-      state.enabledCategories = ["Blasphemy", "Profanity", "Sexual", "Scatological", "Anatomical", "Derogatory", "Custom"];
+      state.enabledCategories = ["Blasphemy", "Profanity", "Sexual", "Scatological", "Anatomical", "Derogatory", "Bleeps & Symbols", "Custom"];
     } else {
       state.enabledCategories = ["Blasphemy"];
     }
@@ -1243,13 +1281,19 @@ revealAllToggle.addEventListener("change", (e) => {
 restoreDefaultBtn.addEventListener("click", () => {
   state.blocklist = [...DEFAULT_BLOCKLIST];
   state.disabledWords = [];
+  if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+    chrome.storage.local.remove(['hideSubtitleToast', 'hideDisneyToast']);
+  }
+  try {
+    sessionStorage.removeItem('bootubeToastShown');
+  } catch(e) {}
   saveState();
   renderWordList();
   calculateCategoryCounts(""); // Force UI refresh for the pills!
 });
 
 addWordBtn.addEventListener("click", () => {
-  const isPremium = state.subscriptionStatus === 'active' || state.subscriptionStatus === 'premium';
+  const isPremium = isPremiumStatus(state.subscriptionStatus);
   if (!isPremium) {
     showToast("Upgrade to Premium to add custom words", true);
     return;
@@ -1269,7 +1313,7 @@ addWordBtn.addEventListener("click", () => {
 });
 
 addWordInput.addEventListener("click", () => {
-  const isPremium = state.subscriptionStatus === 'active' || state.subscriptionStatus === 'premium';
+  const isPremium = isPremiumStatus(state.subscriptionStatus);
   if (!isPremium) {
     showToast("Upgrade to Premium to add custom words", true);
   }
@@ -1306,7 +1350,7 @@ if (muteAggressivenessSlider) {
   const sliderRow = muteAggressivenessSlider.closest(".slider-row");
   if (sliderRow) {
     sliderRow.addEventListener("click", () => {
-      const isPremium = state.subscriptionStatus === 'active' || state.subscriptionStatus === 'premium';
+      const isPremium = isPremiumStatus(state.subscriptionStatus);
       if (!isPremium) {
         showToast("Upgrade to Premium to adjust the mute buffer", true);
       }
@@ -1323,7 +1367,7 @@ if (muteAggressivenessSlider) {
   if (labels && labels.length === 3) {
     labels.forEach((lbl, idx) => {
       lbl.addEventListener("click", (e) => {
-        const isPremium = state.subscriptionStatus === 'active' || state.subscriptionStatus === 'premium';
+        const isPremium = isPremiumStatus(state.subscriptionStatus);
         if (!isPremium) {
           e.stopPropagation();
           showToast("Upgrade to Premium to adjust the mute buffer", true);
@@ -1339,6 +1383,7 @@ if (muteAggressivenessSlider) {
 }
 
 function signOutUser() {
+  const oldAccessToken = (state.supabaseSession && state.supabaseSession.access_token) ? state.supabaseSession.access_token : null;
   try {
     if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
       chrome.runtime.sendMessage({ action: "CLEAR_SUPABASE_SESSION" }, () => {
@@ -1360,7 +1405,8 @@ function signOutUser() {
           censorHistoryLog: [],
           sessionMutedCount: 0,
           sessionLockedCount: 0,
-          userExplicitlySignedOut: true
+          userExplicitlySignedOut: true,
+          signedOutAccessToken: oldAccessToken
         });
         updateUI();
         
@@ -1390,7 +1436,7 @@ function renderAccountPanelDetails() {
     return;
   }
   
-  const isPremium = state.subscriptionStatus === 'active' || state.subscriptionStatus === 'premium';
+  const isPremium = isPremiumStatus(state.subscriptionStatus);
   const email = state.supabaseSession?.user?.email;
   
   if (!state.supabaseSession) {
@@ -1470,22 +1516,6 @@ function renderAccountPanelDetails() {
 
 // Initialization
 document.addEventListener("DOMContentLoaded", () => {
-  // Seamlessly request <all_urls> permission on first click to enable tab screenshots from side panel
-  document.addEventListener("click", () => {
-    if (typeof chrome !== 'undefined' && chrome.permissions) {
-      chrome.permissions.contains({ origins: ["<all_urls>"] }, (result) => {
-        if (!result) {
-          chrome.permissions.request({ origins: ["<all_urls>"] }, (granted) => {
-            if (granted) {
-              console.log("☁️ [Popup] Permission <all_urls> granted dynamically!");
-              refreshActiveTabDetails();
-            }
-          });
-        }
-      });
-    }
-  }, { once: true });
-
   // Trigger a background settings sync on popup open to fetch latest user state
   console.log("☁️ [Popup] Triggering FORCE_SYNC on startup...");
   try {
@@ -1548,29 +1578,46 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    if (tabs.length > 0 && tabs[0].url && (
-      tabs[0].url.includes('paramountplus.com') || 
-      tabs[0].url.includes('max.com') || 
-      tabs[0].url.includes('hbomax.com') || 
-      tabs[0].url.includes('disneyplus.com') || 
-      tabs[0].url.includes('hulu.com') || 
-      tabs[0].url.includes('plex.tv') || 
-      tabs[0].url.includes('plex.direct') || 
-      tabs[0].url.includes(':32400') || 
-      tabs[0].url.includes('fandango.com') || 
-      tabs[0].url.includes('vudu.com') || 
-      tabs[0].url.includes('netflix.com') ||
-      tabs[0].url.includes('primevideo.com') ||
-      tabs[0].url.includes('amazon.com/gp/video') ||
-      tabs[0].url.includes('amazon.com/v/') ||
-      tabs[0].url.includes('amazon.co.uk/gp/video') ||
-      tabs[0].url.includes('amazon.ca/gp/video')
-    )) {
-      const row = document.getElementById('respectfulRow');
-      if (row) row.style.display = 'none';
-      const sliderRow = document.querySelector('.slider-row');
-      if (sliderRow) sliderRow.style.display = 'none';
+  const updateBrandVisibility = (urlStr) => {
+    const url = (urlStr || '').toLowerCase();
+    const isNonYoutube = (
+      url.includes('paramountplus.com') || 
+      url.includes('max.com') || 
+      url.includes('hbomax.com') || 
+      url.includes('disneyplus.com') || 
+      url.includes('hulu.com') || 
+      url.includes('plex.tv') || 
+      url.includes('plex.direct') || 
+      url.includes(':32400') || 
+      url.includes('fandango.com') || 
+      url.includes('vudu.com') || 
+      url.includes('netflix.com') ||
+      url.includes('primevideo.com') ||
+      url.includes('amazon.com') ||
+      url.includes('peacocktv.com') ||
+      url.includes('peacock.com') ||
+      url.includes('spotify.com') ||
+      url.includes('facebook.com') ||
+      url.includes('twitter.com') ||
+      url.includes('x.com')
+    );
+
+    const row = document.getElementById('respectfulRow');
+    const sliderRow = document.querySelector('.slider-row');
+    if (isNonYoutube) {
+      if (row) row.style.setProperty('display', 'none', 'important');
+      if (sliderRow) sliderRow.style.setProperty('display', 'none', 'important');
+    } else {
+      if (row) row.style.setProperty('display', 'flex', 'important');
+      if (sliderRow) sliderRow.style.setProperty('display', 'flex', 'important');
+    }
+  };
+
+  getActiveTab((tab) => {
+    if (tab && tab.url) {
+      updateBrandVisibility(tab.url);
+    } else {
+      updateBrandVisibility('youtube.com');
     }
   });
 
@@ -1626,42 +1673,84 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
     // Ensure enabledCategories is initialized if missing
-    if (!state.enabledCategories) {
-      state.enabledCategories = ["Profanity", "Blasphemy", "Custom"];
+    if (!state.enabledCategories || state.enabledCategories.length === 0) {
+      state.enabledCategories = ["Profanity", "Blasphemy", "Sexual", "Scatological", "Anatomical", "Derogatory", "Bleeps & Symbols", "Custom"];
+    } else {
+      if (!state.enabledCategories.includes("Bleeps & Symbols")) {
+        state.enabledCategories.push("Bleeps & Symbols");
+      }
     }
 
     if (!state.collapsedCategories) {
       state.collapsedCategories = [];
     }
     
-    // Auto-migration to ensure new default words are in active blocklist
+    // Auto-migration to ensure clean de-duplicated blocklist with Bleeps & Symbols
     if (state.blocklist && state.blocklist.length > 0) {
-      const hasChrist = state.blocklist.some(item => {
-        let word = typeof item === 'string' ? item : item.word;
-        return word.toLowerCase() === 'christ';
+      let blocklistNeedsSave = false;
+
+      // 1. Move mask and bracket bleep symbols to "Bleeps & Symbols"
+      state.blocklist.forEach(item => {
+        if (typeof item === 'object' && item.word) {
+          const w = item.word.trim();
+          if (w === '****' || w === '***' || w === '[ __ ]' || w === '[__]') {
+            if (item.category !== 'Bleeps & Symbols') {
+              item.category = 'Bleeps & Symbols';
+              blocklistNeedsSave = true;
+            }
+          }
+        }
       });
-      if (!hasChrist) {
-        state.blocklist.push({ word: "christ", category: "Blasphemy" });
-        state.blocklist.push({ word: "christ's", category: "Blasphemy" });
-      }
-      
-      const hasAss = state.blocklist.some(item => {
-        let word = typeof item === 'string' ? item : item.word;
-        return word.toLowerCase() === 'ass';
+
+      // 2. Remove duplicate words from Profanity
+      const duplicateProfanities = ['shit', 'fuck', 'asshole', 'motherfucker'];
+      const initialLen = state.blocklist.length;
+      state.blocklist = state.blocklist.filter(item => {
+        if (typeof item === 'object' && item.word && item.category === 'Profanity') {
+          const w = item.word.toLowerCase().trim();
+          if (duplicateProfanities.includes(w)) {
+            return false;
+          }
+        }
+        return true;
       });
-      if (!hasAss) {
-        state.blocklist.push({ word: "ass", category: "Anatomical" });
+      if (state.blocklist.length !== initialLen) {
+        blocklistNeedsSave = true;
       }
+
+      // 3. Ensure target categories have their words
+      const ensureWord = (word, cat) => {
+        const lower = word.toLowerCase().trim();
+        const exists = state.blocklist.some(item => {
+          const w = (typeof item === 'string' ? item : item.word).toLowerCase().trim();
+          const c = typeof item === 'string' ? 'Custom' : item.category;
+          return w === lower && c === cat;
+        });
+        if (!exists) {
+          state.blocklist.push({ word: word, category: cat });
+          blocklistNeedsSave = true;
+        }
+      };
+
+      ensureWord("christ", "Blasphemy");
+      ensureWord("christ's", "Blasphemy");
+      ensureWord("goddamn", "Blasphemy");
+      ensureWord("ass", "Anatomical");
+      ensureWord("asshole", "Anatomical");
+      ensureWord("shitty", "Scatological");
+      ensureWord("bullshit", "Scatological");
+      ensureWord("shithole", "Scatological");
+      ensureWord("shitstorm", "Scatological");
+      ensureWord("badass", "Profanity");
+      ensureWord("fucking", "Sexual");
+      ensureWord("fucked", "Sexual");
+      ensureWord("motherfucker", "Sexual");
+      ensureWord("****", "Bleeps & Symbols");
+      ensureWord("***", "Bleeps & Symbols");
+      ensureWord("[ __ ]", "Bleeps & Symbols");
+      ensureWord("[__]", "Bleeps & Symbols");
       
-      const hasShitty = state.blocklist.some(item => {
-        let word = typeof item === 'string' ? item : item.word;
-        return word.toLowerCase() === 'shitty';
-      });
-      if (!hasShitty) {
-        state.blocklist.push({ word: "shitty", category: "Scatological" });
-      }
-      
-      if (!hasChrist || !hasAss || !hasShitty) {
+      if (blocklistNeedsSave) {
         saveState();
       }
     }
@@ -1679,14 +1768,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   function refreshActiveTabDetails() {
-    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-    if (tabs && tabs[0]) {
+    getActiveTab((tab) => {
+    if (tab) {
       currentScriptData = [];
       calculateCategoryCounts("");
       updateImpactHud();
       loadScript();
       
-      const url = tabs[0].url || "";
+      const url = tab.url || "";
       updateSelectedPlatformPill(url);
       
       // Update body background to emulate the brand theme!
@@ -1699,7 +1788,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.style.setProperty('--bg-edge', '#0a1114');
       }
 
-      const pageTitle = tabs[0].title || "";
+      const pageTitle = tab.title || "";
       const domainTitle = document.querySelector('.domain-info h2');
       const domainIconContainer = document.getElementById('domainIconContainer');
       
@@ -1745,7 +1834,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // Nuke from orbit: Just take a literal screenshot of the tab!
         // This bypasses ALL of Disney's DOM obfuscation, canvas hiding, and CSS tricks.
-        captureTabAndRender(tabs[0], url);
+        captureTabAndRender(tab, url);
         return; // Skip the default fallback
       } else if (url.includes("hulu.com")) {
         domainIconContainer.style.display = "flex";
@@ -1755,7 +1844,7 @@ document.addEventListener("DOMContentLoaded", () => {
         domainSubtitle.innerHTML = cleanTitle || "Hulu";
         document.querySelector('.domain-info').title = pageTitle || "Hulu";
         
-        captureTabAndRender(tabs[0], url);
+        captureTabAndRender(tab, url);
         return;
       } else if (url.includes("plex.tv") || url.includes("plex.direct") || url.includes(":32400")) {
         domainIconContainer.style.display = "flex";
@@ -1765,7 +1854,7 @@ document.addEventListener("DOMContentLoaded", () => {
         domainSubtitle.innerHTML = cleanTitle || "Plex";
         document.querySelector('.domain-info').title = pageTitle || "Plex";
         
-        captureTabAndRender(tabs[0], url);
+        captureTabAndRender(tab, url);
         return;
       } else if (url.includes("fandango.com") || url.includes("vudu.com")) {
         domainIconContainer.style.display = "flex";
@@ -1775,7 +1864,7 @@ document.addEventListener("DOMContentLoaded", () => {
         domainSubtitle.innerHTML = cleanTitle || "Fandango at Home";
         document.querySelector('.domain-info').title = pageTitle || "Fandango at Home";
         
-        captureTabAndRender(tabs[0], url);
+        captureTabAndRender(tab, url);
         return;
       } else if (url.includes("netflix.com")) {
         domainIconContainer.style.display = "flex";
@@ -1785,7 +1874,7 @@ document.addEventListener("DOMContentLoaded", () => {
         domainSubtitle.innerHTML = cleanTitle || "Netflix";
         document.querySelector('.domain-info').title = pageTitle || "Netflix";
         
-        captureTabAndRender(tabs[0], url);
+        captureTabAndRender(tab, url);
         return;
       } else if (url.includes("primevideo.com") || (url.includes("amazon.") && (url.includes("/gp/video") || url.includes("/v/") || url.includes("/dp/")))) {
         domainIconContainer.style.display = "flex";
@@ -1795,7 +1884,7 @@ document.addEventListener("DOMContentLoaded", () => {
         domainSubtitle.innerHTML = cleanTitle || "Prime Video";
         document.querySelector('.domain-info').title = pageTitle || "Prime Video";
         
-        captureTabAndRender(tabs[0], url);
+        captureTabAndRender(tab, url);
         return;
       } else if (url.includes("spotify.com")) {
         domainIconContainer.style.display = "flex";
@@ -1805,7 +1894,7 @@ document.addEventListener("DOMContentLoaded", () => {
         domainSubtitle.innerHTML = cleanTitle || "Spotify";
         document.querySelector('.domain-info').title = pageTitle || "Spotify";
         
-        captureTabAndRender(tabs[0], url);
+        captureTabAndRender(tab, url);
         return;
       } else if (isXDomain(url)) {
         domainIconContainer.style.display = "flex";
@@ -1815,7 +1904,7 @@ document.addEventListener("DOMContentLoaded", () => {
         domainSubtitle.innerHTML = cleanTitle || "X (Twitter)";
         document.querySelector('.domain-info').title = pageTitle || "X (Twitter)";
         
-        captureTabAndRender(tabs[0], url);
+        captureTabAndRender(tab, url);
         return;
       } else if (url.includes("facebook.com") || url.includes("fb.watch")) {
         domainIconContainer.style.display = "flex";
@@ -1825,7 +1914,7 @@ document.addEventListener("DOMContentLoaded", () => {
         domainSubtitle.innerHTML = cleanTitle || "Facebook";
         document.querySelector('.domain-info').title = pageTitle || "Facebook";
         
-        captureTabAndRender(tabs[0], url);
+        captureTabAndRender(tab, url);
         return;
       } else if (url.includes("paramountplus.com")) {
         domainIconContainer.style.display = "flex";
@@ -1835,7 +1924,17 @@ document.addEventListener("DOMContentLoaded", () => {
         domainSubtitle.innerHTML = cleanTitle || "Paramount+";
         document.querySelector('.domain-info').title = pageTitle || "Paramount+";
         
-        captureTabAndRender(tabs[0], url);
+        captureTabAndRender(tab, url);
+        return;
+      } else if (url.includes("peacocktv.com") || url.includes("peacock.com")) {
+        domainIconContainer.style.display = "flex";
+        domainIconContainer.className = "domain-icon peacock";
+        domainTitle.innerHTML = "Censoring";
+        domainIcon.src = "images/ic_peacock.svg";
+        domainSubtitle.innerHTML = cleanTitle || "Peacock";
+        document.querySelector('.domain-info').title = pageTitle || "Peacock";
+        
+        captureTabAndRender(tab, url);
         return;
       } else if (url.includes("max.com") || url.includes("hbomax.com")) {
         domainIconContainer.style.display = "flex";
@@ -1845,7 +1944,7 @@ document.addEventListener("DOMContentLoaded", () => {
         domainSubtitle.innerHTML = cleanTitle || "Max";
         document.querySelector('.domain-info').title = pageTitle || "Max";
         
-        captureTabAndRender(tabs[0], url);
+        captureTabAndRender(tab, url);
         return;
       } else {
         // Zero state
@@ -1863,7 +1962,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       
       // Fallback for any other scenario on supported domains
-      fallbackContentScriptThumbnail(tabs[0].id, url);
+      fallbackContentScriptThumbnail(tab.id, url);
     } else {
       // Not in a valid tab context (zero state)
       const domainTitle = document.querySelector('.domain-info h2');
@@ -1972,6 +2071,12 @@ function getPlatformFallbackBanner(url) {
       logo: "images/ic_paramount.svg",
       centerBg: "rgb(0, 30, 80)", edgeBg: "rgb(0, 10, 30)"
     };
+  } else if (url.includes("peacocktv.com") || url.includes("peacock.com")) {
+    return {
+      gradient: "linear-gradient(135deg, #16003B 0%, #00A8E1 100%)",
+      logo: "images/ic_peacock.svg",
+      centerBg: "rgb(15, 5, 45)", edgeBg: "rgb(5, 0, 20)"
+    };
   } else if (url.includes("spotify.com")) {
     return {
       gradient: "linear-gradient(135deg, #121212 0%, #1db954 100%)",
@@ -2026,8 +2131,8 @@ function showActivePlatformBanner() {
     videoBanner.style.backgroundImage = `url('${currentPlatformThumbnail}')`;
   } else {
     videoBanner.classList.remove("has-thumbnail");
-    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-      const url = (tabs && tabs[0]) ? (tabs[0].url || "") : "";
+    getActiveTab((tab) => {
+      const url = tab ? (tab.url || "") : "";
       const fallback = getPlatformFallbackBanner(url);
       if (fallback) {
         videoBanner.classList.remove("banner-collapsed");
@@ -2112,74 +2217,103 @@ function loadScript() {
   const scriptContent = document.getElementById("scriptContent");
   scriptContent.innerHTML = "<div style='padding: 20px; color: #888;'>Loading script...</div>";
   
-  chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-    if (!tabs || !tabs[0]) return;
+  getActiveTab((tab) => {
+    if (!tab) return;
     
     // Check if on Disney+ or Hulu (DRM chunked streaming prevents ahead-of-time extraction)
-    if (tabs[0].url && (
-      tabs[0].url.includes("paramountplus.com") || 
-      tabs[0].url.includes("max.com") || 
-      tabs[0].url.includes("hbomax.com") || 
-      tabs[0].url.includes("disneyplus.com") || 
-      tabs[0].url.includes("hulu.com") || 
-      tabs[0].url.includes("plex.tv") || 
-      tabs[0].url.includes("plex.direct") || 
-      tabs[0].url.includes(":32400") || 
-      tabs[0].url.includes("fandango.com") || 
-      tabs[0].url.includes("vudu.com") || 
-      tabs[0].url.includes("netflix.com") ||
-      tabs[0].url.includes("primevideo.com") ||
-      (tabs[0].url.includes("amazon.") && (tabs[0].url.includes("/gp/video") || tabs[0].url.includes("/v/") || tabs[0].url.includes("/dp/")))
+    if (tab.url && (
+      tab.url.includes("peacocktv.com") ||
+      tab.url.includes("peacock.com") ||
+      tab.url.includes("paramountplus.com") || 
+      tab.url.includes("max.com") || 
+      tab.url.includes("hbomax.com") || 
+      tab.url.includes("disneyplus.com") || 
+      tab.url.includes("hulu.com") || 
+      tab.url.includes("plex.tv") || 
+      tab.url.includes("plex.direct") || 
+      tab.url.includes(":32400") || 
+      tab.url.includes("fandango.com") || 
+      tab.url.includes("vudu.com") || 
+      tab.url.includes("netflix.com") ||
+      tab.url.includes("primevideo.com") ||
+      (tab.url.includes("amazon.") && (tab.url.includes("/gp/video") || tab.url.includes("/v/") || tab.url.includes("/dp/")))
     )) {
        let platformName = "Disney+";
-       if (tabs[0].url.includes("paramountplus.com")) platformName = "Paramount+";
-       else if (tabs[0].url.includes("max.com") || tabs[0].url.includes("hbomax.com")) platformName = "Max";
-       else if (tabs[0].url.includes("hulu.com")) platformName = "Hulu";
-       else if (tabs[0].url.includes("plex.tv") || tabs[0].url.includes("plex.direct") || tabs[0].url.includes(":32400")) platformName = "Plex";
-       else if (tabs[0].url.includes("fandango.com") || tabs[0].url.includes("vudu.com")) platformName = "Fandango at Home";
-       else if (tabs[0].url.includes("netflix.com")) platformName = "Netflix";
-       else if (tabs[0].url.includes("primevideo.com") || tabs[0].url.includes("amazon.")) platformName = "Prime Video";
+       if (tab.url.includes("peacocktv.com") || tab.url.includes("peacock.com")) platformName = "Peacock";
+       else if (tab.url.includes("paramountplus.com")) platformName = "Paramount+";
+       else if (tab.url.includes("max.com") || tab.url.includes("hbomax.com")) platformName = "Max";
+       else if (tab.url.includes("hulu.com")) platformName = "Hulu";
+       else if (tab.url.includes("plex.tv") || tab.url.includes("plex.direct") || tab.url.includes(":32400")) platformName = "Plex";
+       else if (tab.url.includes("fandango.com") || tab.url.includes("vudu.com")) platformName = "Fandango at Home";
+       else if (tab.url.includes("netflix.com")) platformName = "Netflix";
+       else if (tab.url.includes("primevideo.com") || tab.url.includes("amazon.")) platformName = "Prime Video";
        scriptContent.innerHTML = `<div style='padding: 20px; color: #888;'>Dynamic script extraction is unavailable for ${platformName} due to DRM encryption and chunked streaming.</div>`;
        return;
     }
     
     // Only proceed if we are actually on YouTube
-    if (!tabs[0].url || !tabs[0].url.includes("youtube.com")) {
+    if (!tab.url || !tab.url.includes("youtube.com")) {
        scriptContent.innerHTML = "<div style='padding: 20px; color: #888;'>Script unavailable for this platform.</div>";
        return;
     }
     
 
     
-    chrome.tabs.sendMessage(tabs[0].id, { action: "REQUEST_CAPTIONS" }, (response) => {
-      if (chrome.runtime.lastError || !response || !response.payloads || response.payloads.length === 0) {
-        console.log("🤬 [Censor] Content script unavailable or missing captions. Showing reload prompt.");
-        scriptContent.innerHTML = `
-          <div style='padding: 30px 20px; text-align: center; color: #888;'>
-            <div style='margin-bottom: 16px; font-size: 14px;'>We need a quick page refresh to load the video's script!</div>
-            <button id="reloadTabBtn" class="primary-btn">
-              Reload video tab
-            </button>
-          </div>
-        `;
-        
-        document.getElementById("reloadTabBtn").addEventListener("click", () => {
-           chrome.tabs.reload(tabs[0].id);
-        });
-        
-        // Auto-scroll to the bottom so the reload message isn't hidden below the fold
-        if (currentView === 'script') {
-          setTimeout(() => {
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-          }, 10);
-        }
-        
+    chrome.tabs.sendMessage(tab.id, { action: "REQUEST_CAPTIONS" }, (response) => {
+      const err = chrome.runtime.lastError;
+      let payloads = (!err && response && response.payloads) ? response.payloads : [];
+      if (payloads.length > 0) {
+        renderScript(payloads);
         return;
       }
-      
-      renderScript(response.payloads);
+
+      // Check chrome.storage.local as secondary fallback
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.get(['activeVideoCaptions', 'lastFetchedCaptions'], (res) => {
+          let fallback = [];
+          if (res.activeVideoCaptions && res.activeVideoCaptions.length > 0) {
+            fallback = res.activeVideoCaptions;
+          } else if (res.lastFetchedCaptions) {
+            fallback = [res.lastFetchedCaptions];
+          }
+
+          if (fallback.length > 0) {
+            renderScript(fallback);
+            return;
+          }
+
+          showReloadScriptPrompt();
+        });
+        return;
+      }
+
+      showReloadScriptPrompt();
     });
   });
+}
+
+function showReloadScriptPrompt() {
+  const scriptContent = document.getElementById("scriptContent");
+  if (!scriptContent) return;
+  scriptContent.innerHTML = `
+    <div style='padding: 30px 20px; text-align: center; color: #888;'>
+      <div style='margin-bottom: 16px; font-size: 14px;'>We need a quick page refresh to load the video's script!</div>
+      <button id="reloadTabBtn" class="primary-btn">
+        Reload video tab
+      </button>
+    </div>
+  `;
+  
+  const btn = document.getElementById("reloadTabBtn");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      getActiveTab((tab) => {
+        if (tab && tab.id) {
+          chrome.tabs.reload(tab.id);
+        }
+      });
+    });
+  }
 }
 
 function renderScript(payloads) {
@@ -2469,32 +2603,34 @@ function showAuthModal() {
     <div class="auth-modal-card">
       <div class="auth-modal-content">
         <span class="auth-modal-close" id="authModalClose">&times;</span>
-        <img src="images/ic_boo_halo.png" class="auth-modal-image" alt="BooTube Auth">
-        <div class="auth-modal-title" id="authModalTitle">Sign In</div>
+        <img src="images/ic_boo_basic.png" class="auth-modal-image" alt="BooTube Auth" style="width: 48px; height: 48px; object-fit: contain;">
+        <div class="auth-modal-title" id="authModalTitle">Sign in</div>
         <div class="auth-modal-subtitle" id="authModalSubtitle">Sign in to your BooTube account to synchronize settings and filters.</div>
         
         <div class="auth-modal-form" id="authLoginForm">
-          <input type="email" id="authEmail" class="auth-modal-input" placeholder="Email Address" required>
+          <input type="email" id="authEmail" class="auth-modal-input" placeholder="Email address" required>
           <div class="password-container" style="position:relative; width:100%;">
-            <input type="password" id="authPassword" class="auth-modal-input" placeholder="Password" style="padding-right: 36px;" required>
-            <span id="togglePasswordBtn" class="material-icons" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer; color:#a0aec0; font-size:16px; user-select:none;">visibility</span>
+            <input type="password" id="authPassword" class="auth-modal-input" placeholder="Password" style="padding-right: 40px;" required>
+            <span id="togglePasswordBtn" style="position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer; display:flex; align-items:center; justify-content:center; user-select:none; opacity:0.75;" title="Toggle password visibility">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="#a0aec0"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27 -3.11 11 -7.5c-1.73 -4.39 -6 -7.5 -11 -7.5zM12 17c-2.76 0 -5 -2.24 -5 -5s2.24 -5 5 -5 5 2.24 5 5 -2.24 5 -5 5zM12 9c-1.66 0 -3 1.34 -3 3s1.34 3 3 3 3 -1.34 3 -3 -1.34 -3 -3 -3z"/></svg>
+            </span>
           </div>
           <div id="authErrorMsg" class="auth-modal-error" style="display:none;"></div>
-          <button class="auth-modal-btn" id="authLoginBtn">Log In to App</button>
+          <button class="auth-modal-btn" id="authLoginBtn">Sign in</button>
         </div>
         
         <div class="auth-modal-form" id="authResetForm" style="display:none;">
-          <input type="email" id="authResetEmail" class="auth-modal-input" placeholder="Email Address" required>
+          <input type="email" id="authResetEmail" class="auth-modal-input" placeholder="Email address" required>
           <div id="authResetErrorMsg" class="auth-modal-error" style="display:none;"></div>
           <div id="authResetSuccessMsg" class="auth-modal-success" style="display:none;"></div>
-          <button class="auth-modal-btn" id="authSendResetBtn">Send Reset Link</button>
+          <button class="auth-modal-btn" id="authSendResetBtn">Send reset link</button>
         </div>
         
         <div class="auth-modal-footer">
-          <a href="#" class="auth-modal-link" id="authResetLink">Forgot Password?</a>
-          <a href="#" class="auth-modal-link" id="authBackToLoginLink" style="display:none;">Back to Login</a>
+          <a href="#" class="auth-modal-link" id="authResetLink">Forgot password?</a>
+          <a href="#" class="auth-modal-link" id="authBackToLoginLink" style="display:none;">Back to login</a>
           <span class="auth-modal-divider">|</span>
-          <a href="#" class="auth-modal-link" id="authWebLoginBtn">Sign in via Website</a>
+          <a href="#" class="auth-modal-link" id="authWebLoginBtn">Sign in via website</a>
         </div>
       </div>
     </div>
@@ -2551,7 +2687,7 @@ function showAuthModal() {
       resetForm.style.display = "none";
       resetLink.style.display = "inline";
       backToLoginLink.style.display = "none";
-      modalTitle.textContent = "Sign In";
+      modalTitle.textContent = "Sign in";
       modalSubtitle.textContent = "Sign in to your BooTube account to synchronize settings and filters.";
     };
   }
@@ -2560,9 +2696,7 @@ function showAuthModal() {
     webLoginBtn.onclick = (e) => {
       e.preventDefault();
       toast.className = "toast";
-      chrome.storage.local.set({ userExplicitlySignedOut: false }, () => {
-        chrome.tabs.create({ url: "https://bootube.app/login?clean=true" });
-      });
+      chrome.tabs.create({ url: "https://bootube.app/login?clean=true" });
     };
   }
   
@@ -2591,7 +2725,7 @@ function showAuthModal() {
       if (email && !validateEmail(email)) {
         resetErrorMsg.textContent = "Please enter a valid email address.";
         resetErrorMsg.style.display = "block";
-      } else if (resetErrorMsg.textContent === "Please enter a valid email address.") {
+      } else if (errorMsg.textContent === "Please enter a valid email address.") {
         resetErrorMsg.style.display = "none";
       }
     });
@@ -2599,14 +2733,17 @@ function showAuthModal() {
 
   const togglePasswordBtn = document.getElementById("togglePasswordBtn");
   const authPasswordInput = document.getElementById("authPassword");
+  const EYE_OPEN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="#a0aec0"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27 -3.11 11 -7.5c-1.73 -4.39 -6 -7.5 -11 -7.5zM12 17c-2.76 0 -5 -2.24 -5 -5s2.24 -5 5 -5 5 2.24 5 5 -2.24 5 -5 5zM12 9c-1.66 0 -3 1.34 -3 3s1.34 3 3 3 3 -1.34 3 -3 -1.34 -3 -3 -3z"/></svg>`;
+  const EYE_OFF_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="#a0aec0"><path d="M12 7c2.76 0 5 2.24 5 5 0 0.65 -0.13 1.26 -0.36 1.83l2.92 2.92c1.51 -1.26 2.7 -2.89 3.44 -4.75 -1.73 -4.39 -6 -7.5 -11 -7.5 -1.4 0 -2.74 0.25 -3.98 0.7l2.16 2.16c0.76 -0.23 1.37 -0.36 2.02 -0.36zM2 4.27l2.28 2.28 0.46 0.46c-1.66 1.29 -2.96 3.01 -3.74 4.99 1.73 4.39 6 7.5 11 7.5 1.55 0 3.03 -0.3 4.38 -0.84l0.42 0.42 1.93 1.93 1.27 -1.27L3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-0.05 0.21 -0.08 0.43 -0.08 0.65 0 1.66 1.34 3 3 3 0.22 0 0.44 -0.03 0.65 -0.08l1.55 1.55c-0.67 0.33 -1.41 0.53 -2.2 0.53 -2.76 0 -5 -2.24 -5 -5 0 -0.79 0.2 -1.53 0.53 -2.2zm4.31 -0.78l3.15 3.15 0.02 -0.17c0 -1.66 -1.34 -3 -3 -3l-0.17 0.02z"/></svg>`;
+
   if (togglePasswordBtn && authPasswordInput) {
     togglePasswordBtn.addEventListener("click", () => {
       if (authPasswordInput.type === "password") {
         authPasswordInput.type = "text";
-        togglePasswordBtn.textContent = "visibility_off";
+        togglePasswordBtn.innerHTML = EYE_OFF_SVG;
       } else {
         authPasswordInput.type = "password";
-        togglePasswordBtn.textContent = "visibility";
+        togglePasswordBtn.innerHTML = EYE_OPEN_SVG;
       }
     });
   }
@@ -2638,39 +2775,48 @@ function showAuthModal() {
             if (tab.url) {
               try {
                 const urlObj = new URL(tab.url);
-                if (urlObj.hostname === "localhost" || urlObj.hostname === "127.0.0.1") {
+                if (urlObj.hostname.includes("bootube.app")) {
                   detectedOrigin = `${urlObj.protocol}//${urlObj.host}`;
                   break;
-                } else if (urlObj.hostname.includes("bootube.app")) {
+                } else if ((urlObj.hostname === "localhost" || urlObj.hostname === "127.0.0.1") && 
+                           (tab.title && tab.title.toLowerCase().includes("bootube"))) {
                   detectedOrigin = `${urlObj.protocol}//${urlObj.host}`;
+                  break;
                 }
               } catch (e) {}
             }
           }
         }
         
-        let origin = detectedOrigin || state.lastSyncOrigin;
-        if (!origin) {
-          try {
-            const pingRes = await fetch("http://localhost:3000/api/auth/login", { method: 'OPTIONS' }).catch(() => null);
-            if (pingRes) {
-              origin = "http://localhost:3000";
-            }
-          } catch (e) {}
-        }
-        if (!origin) {
-          origin = 'https://bootube.app';
-        }
-        const baseOrigin = origin.replace(/\/$/, '');
+        // Authoritative production backend is always https://bootube.app
+        const validLastSync = (state.lastSyncOrigin && !state.lastSyncOrigin.includes("localhost")) ? state.lastSyncOrigin : null;
+        let origin = detectedOrigin || validLastSync || 'https://bootube.app';
+        let baseOrigin = origin.replace(/\/$/, '');
 
         try {
-          const response = await fetch(`${baseOrigin}/api/auth/login`, {
+          let response = await fetch(`${baseOrigin}/api/auth/login`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({ email, password })
-          });
+          }).catch(() => null);
+
+          // If origin was localhost or custom and failed or returned 404, immediately fall back to production https://bootube.app
+          if ((!response || response.status === 404) && baseOrigin !== 'https://bootube.app') {
+            baseOrigin = 'https://bootube.app';
+            response = await fetch(`${baseOrigin}/api/auth/login`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ email, password })
+            }).catch(() => null);
+          }
+
+          if (!response) {
+            throw new Error("Unable to connect to BooTube server. Please check your internet connection.");
+          }
           
           let errorText = "Invalid email or password.";
           if (response.ok) {
@@ -2678,14 +2824,20 @@ function showAuthModal() {
               const data = await response.json();
               if (data && data.session) {
                 const newSession = data.session;
-                chrome.storage.local.set({
-                  supabaseSession: newSession,
-                  subscriptionStatus: newSession.user?.user_metadata?.subscription_status || 'free',
-                  lastSyncOrigin: baseOrigin,
-                  userExplicitlySignedOut: false
-                }, () => {
-                  toast.className = "toast";
-                  chrome.runtime.sendMessage({ action: "FORCE_SYNC" });
+                chrome.storage.local.get(['subscriptionStatus'], (subRes) => {
+                  const preservedStatus = subRes.subscriptionStatus || 'active';
+                  chrome.storage.local.set({
+                    supabaseSession: newSession,
+                    subscriptionStatus: preservedStatus,
+                    lastSyncOrigin: baseOrigin,
+                    userExplicitlySignedOut: false,
+                    signedOutAccessToken: null
+                  }, () => {
+                    toast.className = "toast";
+                    chrome.runtime.sendMessage({ action: "FORCE_SYNC" }, () => {
+                      if (chrome.runtime.lastError) {}
+                    });
+                  });
                 });
                 return;
               } else {
@@ -2696,7 +2848,7 @@ function showAuthModal() {
             }
           } else {
             if (response.status === 404) {
-              errorText = "Login endpoint not found (404). Ensure your local server is running or the backend is deployed.";
+              errorText = "Login endpoint not found (404). Please verify your connection to https://bootube.app.";
             } else if (response.status === 500) {
               errorText = "Internal Server Error (500). Please check your Next.js server console logs.";
             } else {
@@ -2717,7 +2869,7 @@ function showAuthModal() {
           errorMsg.textContent = err.message || "Invalid email or password.";
           errorMsg.style.display = "block";
           loginBtn.disabled = false;
-          loginBtn.textContent = "Log In to App";
+          loginBtn.textContent = "Sign in";
         }
       });
     };
@@ -2725,16 +2877,22 @@ function showAuthModal() {
   
   if (sendResetBtn) {
     sendResetBtn.onclick = async () => {
-      const email = document.getElementById("authResetEmail").value.trim();
+      const emailInput = document.getElementById("authResetEmail");
+      const email = emailInput ? emailInput.value.trim() : "";
+      const resetErrorMsg = document.getElementById("authResetErrorMsg");
+      const resetSuccessMsg = document.getElementById("authResetSuccessMsg");
+
       if (!email) {
         resetErrorMsg.textContent = "Please enter your email.";
         resetErrorMsg.style.display = "block";
+        resetSuccessMsg.style.display = "none";
         return;
       }
 
       if (!validateEmail(email)) {
         resetErrorMsg.textContent = "Please enter a valid email address.";
         resetErrorMsg.style.display = "block";
+        resetSuccessMsg.style.display = "none";
         return;
       }
       
@@ -2750,39 +2908,48 @@ function showAuthModal() {
             if (tab.url) {
               try {
                 const urlObj = new URL(tab.url);
-                if (urlObj.hostname === "localhost" || urlObj.hostname === "127.0.0.1") {
+                if (urlObj.hostname.includes("bootube.app")) {
                   detectedOrigin = `${urlObj.protocol}//${urlObj.host}`;
                   break;
-                } else if (urlObj.hostname.includes("bootube.app")) {
+                } else if ((urlObj.hostname === "localhost" || urlObj.hostname === "127.0.0.1") && 
+                           (tab.title && tab.title.toLowerCase().includes("bootube"))) {
                   detectedOrigin = `${urlObj.protocol}//${urlObj.host}`;
+                  break;
                 }
               } catch (e) {}
             }
           }
         }
         
-        let origin = detectedOrigin || state.lastSyncOrigin;
-        if (!origin) {
-          try {
-            const pingRes = await fetch("http://localhost:3000/api/auth/login", { method: 'OPTIONS' }).catch(() => null);
-            if (pingRes) {
-              origin = "http://localhost:3000";
-            }
-          } catch (e) {}
-        }
-        if (!origin) {
-          origin = 'https://bootube.app';
-        }
-        const baseOrigin = origin.replace(/\/$/, '');
+        // Authoritative production backend is always https://bootube.app
+        const validLastSync = (state.lastSyncOrigin && !state.lastSyncOrigin.includes("localhost")) ? state.lastSyncOrigin : null;
+        let origin = detectedOrigin || validLastSync || 'https://bootube.app';
+        let baseOrigin = origin.replace(/\/$/, '');
 
         try {
-          const response = await fetch(`${baseOrigin}/api/auth/reset-password`, {
+          let response = await fetch(`${baseOrigin}/api/auth/reset-password`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({ email })
-          });
+          }).catch(() => null);
+
+          // If origin was localhost or custom and failed or returned 404, immediately fall back to production https://bootube.app
+          if ((!response || response.status === 404) && baseOrigin !== 'https://bootube.app') {
+            baseOrigin = 'https://bootube.app';
+            response = await fetch(`${baseOrigin}/api/auth/reset-password`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ email })
+            }).catch(() => null);
+          }
+
+          if (!response) {
+            throw new Error("Unable to connect to BooTube server. Please check your internet connection.");
+          }
           
           let errorText = "Failed to send reset link.";
           if (response.ok) {
@@ -2792,7 +2959,7 @@ function showAuthModal() {
             return;
           } else {
             if (response.status === 404) {
-              errorText = "Reset password endpoint not found (404). Ensure your local server is running or the backend is deployed.";
+              errorText = "Reset password endpoint not found (404). Please verify your connection to https://bootube.app.";
             } else if (response.status === 500) {
               errorText = "Internal Server Error (500). Please check your Next.js server console logs.";
             } else {
@@ -2814,7 +2981,7 @@ function showAuthModal() {
           resetErrorMsg.style.display = "block";
         } finally {
           sendResetBtn.disabled = false;
-          sendResetBtn.textContent = "Send Reset Link";
+          sendResetBtn.textContent = "Send reset link";
         }
       });
     };

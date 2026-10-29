@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+  <defs>
+    <clipPath id="ticket-clip">
+      <path d="M 4,4 H 20 V 10 A 2,2 0 0,0 20,14 V 20 H 4 V 14 A 2,2 0 0,0 4,10 Z"/>
+    </clipPath>
+  </defs>
+  <g transform="rotate(-11 12 12)">
+    <!-- Orange Ticket Background -->
+    <path d="M 4,4 H 20 V 10 A 2,2 0 0,0 20,14 V 20 H 4 V 14 A 2,2 0 0,0 4,10 Z" fill="#F15A24"/>
+    <!-- White 'F' clipped to the ticket shape -->
+    <path d="M 4,6 H 15 V 9 H 9.5 V 11.5 H 13 V 14 H 9.5 V 18 H 4 Z" fill="#FFFFFF" clip-path="url(#ticket-clip)"/>
+    <!-- Ticket Outline -->
+    <path d="M 4,4 H 20 V 10 A 2,2 0 0,0 20,14 V 20 H 4 V 14 A 2,2 0 0,0 4,10 Z" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-linejoin="round"/>
+  </g>
+</svg>

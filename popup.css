@@ -2,7 +2,7 @@ body {
   margin: 0;
   padding: 0;
   position: relative;
-  font-family: 'Inter', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   background: radial-gradient(circle at center, var(--bg-center, #133a46) 0%, var(--bg-edge, #0a1114) 100%);
   background-attachment: fixed;
   transition: background 0.5s ease;
@@ -97,7 +97,8 @@ body {
 }
 
 .icon-btn {
-  background: none;
+  position: relative;
+  background: transparent;
   border: none;
   width: 36px;
   height: 36px;
@@ -108,26 +109,46 @@ body {
   justify-content: center;
   color: #FFFFFF;
   opacity: 0.55;
-  transition: opacity 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+  transition: opacity 0.2s ease, background-color 0.2s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .icon-btn:hover {
-  opacity: 0.9;
-  background-color: rgba(255, 255, 255, 0.05);
-  transform: translateY(-0.5px);
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Tactile Spring Press State */
+.icon-btn:active {
+  transform: scale(0.88);
+  transition: transform 0.08s ease-out;
 }
 
 .icon-btn.active-btn {
   opacity: 1;
-  background-color: rgba(71, 137, 240, 0.15);
-  box-shadow: 0 0 10px rgba(71, 137, 240, 0.1);
-  transform: translateY(-1px);
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.icon-btn.active-btn:hover {
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
 .icon-btn img {
   width: 20px;
   height: 20px;
-  transition: transform 0.2s ease;
+  pointer-events: none;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+}
+
+.icon-btn:active img {
+  transform: scale(0.88);
+  transition: transform 0.08s ease-out;
+}
+
+.icon-btn.active-btn img {
+  filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(202deg) brightness(98%) contrast(92%);
+  transform: scale(1.08);
 }
 
 .close-btn img {
@@ -344,6 +365,12 @@ body {
   background: rgba(0, 100, 255, 0.12);
   border: 1px solid rgba(0, 100, 255, 0.25);
   box-shadow: 0 4px 12px rgba(0, 100, 255, 0.12);
+}
+
+.domain-icon.peacock {
+  background: rgba(0, 168, 225, 0.12);
+  border: 1px solid rgba(0, 168, 225, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 168, 225, 0.12);
 }
 
 .domain-info {
@@ -1128,6 +1155,15 @@ input:checked + .slider:before {
 
 .disclaimer-content strong {
   color: #A0A5AA;
+}
+
+.disclaimer-content code {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 11px;
+  color: #c9d1d9;
 }
 .ctx-content {
   flex-grow: 1;
