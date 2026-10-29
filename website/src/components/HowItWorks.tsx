@@ -1441,28 +1441,28 @@ export default function HowItWorks() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
               
               {/* Free Plan */}
-              <div className="flex flex-col p-8 rounded-2xl border border-white/5 bg-black/40 relative">
+              <div className="flex flex-col p-8 rounded-2xl border border-white/35 bg-gradient-to-b from-zinc-800/85 to-zinc-900/95 backdrop-blur-md relative shadow-[0_0_30px_rgba(255,255,255,0.06),inset_0_1px_0_0_rgba(255,255,255,0.2)] hover:border-white/55 hover:from-zinc-800/95 hover:to-zinc-900 transition-all">
                 <h3 className="text-xl font-bold text-white mb-2">Free plan</h3>
-                <p className="text-sm text-gray-400 mb-6">Essential blasphemy censoring for everyone.</p>
+                <p className="text-sm text-gray-300 mb-6">Essential blasphemy censoring for everyone.</p>
                 
                 <div className="flex items-baseline gap-1 mb-8">
                   <span className="text-4xl font-black text-white">$0</span>
-                  <span className="text-xs text-gray-500 font-medium">/ forever</span>
+                  <span className="text-xs text-gray-300 font-medium">/ forever</span>
                 </div>
 
-                <hr className="border-white/5 mb-8" />
+                <hr className="border-white/20 mb-8" />
 
                 <ul className="space-y-4 mb-8 flex-grow">
-                  <li className="flex items-center gap-3 text-sm text-gray-300">
+                  <li className="flex items-center gap-3 text-sm text-gray-200">
                     <span className="text-cyan-400">✓</span> 100% free blasphemy filtering
                   </li>
-                  <li className="flex items-center gap-3 text-sm text-gray-300">
+                  <li className="flex items-center gap-3 text-sm text-gray-200">
                     <span className="text-cyan-400">✓</span> Mutes YouTube & Podcasts
                   </li>
-                  <li className="flex items-center gap-3 text-sm text-gray-300">
+                  <li className="flex items-center gap-3 text-sm text-gray-200">
                     <span className="text-cyan-400">✓</span> Mutes Disney+, Hulu, Plex & Vudu
                   </li>
-                  <li className="flex items-center gap-3 text-sm text-gray-300">
+                  <li className="flex items-center gap-3 text-sm text-gray-200">
                     <span className="text-cyan-400">✓</span> Offline real-time processing
                   </li>
                 </ul>
@@ -1471,14 +1471,14 @@ export default function HowItWorks() {
                   href="https://chromewebstore.google.com/detail/BooTube/bfocenkbkchffgnogonjhmlfpgnhbloa"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full text-center py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold rounded-xl transition-all pointer-events-auto"
+                  className="w-full text-center py-3 bg-white/15 hover:bg-white/25 border border-white/35 hover:border-white/55 text-white font-bold rounded-xl shadow-md transition-all pointer-events-auto"
                 >
                   Add to browser
                 </a>
               </div>
 
               {/* Premium Plan */}
-              <div className="flex flex-col p-8 rounded-2xl border border-cyan-500/20 bg-cyan-950/10 relative overflow-hidden">
+              <div className="flex flex-col p-8 rounded-2xl border border-cyan-500/30 bg-cyan-950/20 backdrop-blur-md relative overflow-hidden shadow-[0_0_30px_rgba(6,182,212,0.1)] hover:border-cyan-400/50 transition-all">
                 <div className="absolute top-0 right-0 px-4 py-1.5 bg-cyan-500 text-black text-[10px] font-black uppercase tracking-widest rounded-bl-xl">
                   Most popular
                 </div>
@@ -1491,7 +1491,7 @@ export default function HowItWorks() {
                   <span className="text-xs text-cyan-400 font-medium">/ month</span>
                 </div>
 
-                <hr className="border-cyan-500/10 mb-8" />
+                <hr className="border-cyan-500/20 mb-8" />
 
                 <ul className="space-y-4 mb-8 flex-grow">
                   <li className="flex items-center gap-3 text-sm text-gray-300">

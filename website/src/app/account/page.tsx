@@ -622,7 +622,7 @@ export default function DashboardPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Free Tier Details */}
-              <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col justify-between">
+              <div className="p-6 rounded-2xl bg-gradient-to-b from-zinc-800/80 to-zinc-900/90 border border-white/30 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.15)] flex flex-col justify-between">
                 <div>
                   <h3 className="text-md font-extrabold text-gray-300 uppercase tracking-wide">Free Plan</h3>
                   <div className="text-2xl font-black text-white mt-2 mb-4">$0.00 <span className="text-xs text-gray-500 font-medium">/ forever</span></div>
